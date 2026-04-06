@@ -12,43 +12,22 @@
 │  ┌──────────────────────┐      ┌──────────────────────┐         │
 │  │   React Web App      │      │  React Native Mobile │         │
 │  │  (Browser)           │      │  (iOS/Android)       │         │
-│  │  - Inventory         │      │  - Delivery Form     │         │
-│  │  - Dashboard         │      │  - Offline Support   │         │
-│  │  - Settings (Admin)  │      │  - Local Cache       │         │
-│  │  - Payments          │      │  - Photo Proof       │         │
+│  │  Tabs: Home, Inventory,      │  Same tab bar: Home, │         │
+│  │  Parties, Receipts, Payments │  Inventory, Parties, │         │
+│  │  Avatar menu: Settings,       │  Receipts, Payments  │         │
+│  │  warehouse switch, profile   │  + same avatar menu  │         │
 │  └──────────────────────┘      └──────────────────────┘         │
 │                 ↓                         ↓                       │
 └─────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────┐
-│                      API LAYER (REST)                            │
+│              SUPABASE API (MVP — no separate Node server)        │
 ├─────────────────────────────────────────────────────────────────┤
-│                                                                   │
-│  Node.js / Express / Hono                                       │
-│  ┌────────────────────────────────────────────────────┐         │
-│  │ Routes:                                            │         │
-│  │ • POST   /api/lots                                 │         │
-│  │ • GET    /api/lots                                 │         │
-│  │ • GET    /api/lots/:id                             │         │
-│  │ • POST   /api/lots/:id/delivery                    │         │
-│  │ • POST   /api/lots/:id/delivery/override           │         │
-│  │ • POST   /api/lots/:id/written-off                 │         │
-│  │ • POST   /api/lots/:id/disputed                    │         │
-│  │ • GET    /api/customers/:id/outstanding           │         │
-│  │ • POST   /api/customers/:id/receipts               │         │
-│  │ • GET    /api/warehouse-settings/:id               │         │
-│  │ • POST   /api/warehouse-settings/:id               │         │
-│  │ • GET    /api/dashboard/home                       │         │
-│  │ • GET    /api/dashboard/inventory                  │         │
-│  │ • POST   /api/jobs/daily-stale-check (internal)    │         │
-│  └────────────────────────────────────────────────────┘         │
-│                                                                   │
-│  Middleware:                                                      │
-│  • Auth (JWT from Supabase)                                      │
-│  • RLS enforcement (row-level security)                          │
-│  • Error handling                                                │
-│  • Request logging                                               │
-│                                                                   │
+│  • PostgREST (auto REST from Postgres) + RLS per request         │
+│  • Supabase Auth (JWT; phone identity)                           │
+│  • Optional: RPC / Edge Functions for jobs & complex mutations   │
+│  • Logical “/api/…” contracts in API spec map to tables + RLS   │
+│    + Edge Functions (e.g. daily stale check), not Express routes │
 └─────────────────────────────────────────────────────────────────┘
                            ↓
 ┌─────────────────────────────────────────────────────────────────┐
@@ -62,7 +41,7 @@
 │  PostgreSQL Database:                                            │
 │  ┌─────────────────────────────────────────────────┐             │
 │  │ Tables:                                         │             │
-│  │ • warehouses                                    │             │
+│  │ • tenants, warehouses                           │             │
 │  │ • customers                                     │             │
 │  │ • products                                      │             │
 │  │ • lots (status, balanceBags, lodgementDate)     │             │
@@ -71,16 +50,16 @@
 │  │ • deliveries (with blocking info)               │             │
 │  │ • customer_receipts                             │             │
 │  │ • receipt_allocations (FIFO)                     │             │
-│  │ • users (role-based)                            │             │
+│  │ • auth.users + user_profiles + user_roles       │             │
 │  │ • warehouse_settings (config)                    │             │
 │  │ • audit_log (compliance)                         │             │
 │  │ • lot_status_history (traceability)              │             │
 │  └─────────────────────────────────────────────────┘             │
 │                                                                   │
 │  Row-Level Security (RLS):                                       │
-│  • Users see only their warehouse data                           │
-│  • OPS_MANAGER sees only ACTIVE/STALE lots                       │
-│  • ADMIN/OWNER see all lots                                      │
+│  • Tenant + assigned-warehouse access (see multitenancy rules)   │
+│  • Role: OWNER / MANAGER / STAFF (legacy ADMIN→OWNER, etc.)      │
+│  • Fine-grained row policies (e.g. STAFF lot visibility) in SQL  │
 │                                                                   │
 │  Realtime (Supabase):                                            │
 │  • Subscribe to lot status changes                               │
@@ -100,7 +79,7 @@
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                   │
 │  • Sentry (Error tracking)                                       │
-│  • Datadog/CloudWatch (Monitoring & metrics)                     │
+│  • Posthog (Monitoring & metrics)                     │
 │  • Whatsapp Business (Whatsapp notifications)                    │
 │  • Supabase Storage (Invoice/document storage)                   │
 │                                                                  │
@@ -152,7 +131,7 @@ If blocked (409), Owner overrides:
      • oldValues = null
      • newValues = { deliveryID, overrideReason }
      • reason = overrideReason
-  6. Notify all ADMIN users (in-app notification or email)
+  6. Notify all OWNER users (in-app notification or email)
   7. Return 200 { success, deliveryID }
 ```
 
@@ -222,18 +201,19 @@ Customer sends payment:
 
 ### Decision 1: Supabase vs Custom Backend + Database
 
-**Decision**: Use Supabase (PostgreSQL + Auth + Realtime)
+**Decision**: Use **Supabase as the only application backend for MVP** (PostgreSQL + Auth + PostgREST + RLS + Realtime + Edge Functions). **No dedicated Node/Express/Hono API** until a future version explicitly needs it.
 
 **Rationale**:
-- ✅ Authentication (Phone OTP) built-in
+- ✅ Authentication (Phone OTP) built-in; **`auth.users`** is identity source of truth
 - ✅ Row-Level Security (RLS) enforces access control at DB level
+- ✅ PostgREST exposes CRUD; complex flows use **RPC or Edge Functions**
 - ✅ Realtime subscriptions for live updates
-- ✅ Edge Functions for scheduled jobs
+- ✅ Edge Functions for scheduled jobs (e.g. stale check)
 - ✅ Managed PostgreSQL (no ops overhead)
 - ⚠️ Vendor lock-in (Supabase is open-source, but still proprietary)
 
 **Alternative Considered**:
-- Custom Node + PostgreSQL: More control, higher ops burden
+- Custom Node + PostgreSQL: deferred; add only if Supabase limits are hit
 - Firebase: Better for real-time, but weaker SQL
 
 **Mitigation**:
@@ -312,27 +292,27 @@ Customer sends payment:
 - ⚠️ Customer might want specific allocation (e.g., pay one lot only)
 
 **Mitigation**:
-- Manual reallocation available to ADMIN/OWNER
+- Manual reallocation available to OWNER
 - UI shows proposed allocations before confirm
 
 ---
 
-### Decision 6: Role-Based Views (OPS_MANAGER sees only ACTIVE/STALE)
+### Decision 6: Role-Based Views (STAFF sees only ACTIVE/STALE)
 
-**Decision**: OPS_MANAGER cannot see DELIVERED/CLEARED/WRITTEN_OFF lots
+**Decision**: STAFF cannot see DELIVERED/CLEARED/WRITTEN_OFF lots
 
 **Rationale**:
 - ✅ Reduces cognitive load (focus on actionable lots)
 - ✅ Prevents accidental actions on closed lots
-- ⚠️ OPS_MANAGER loses visibility into closed history
+- ⚠️ STAFF loses visibility into closed history
 
 **Mitigation**:
-- ADMIN/OWNER can see full lot history
+- OWNER/MANAGER can see full lot history
 - Audit log available to authorized users
-- OPS_MANAGER can request ADMIN to show history if needed
+- OWNER can request MANAGER to show history if needed
 
 **Enforcement**:
-- RLS policy: `WHERE status IN ('ACTIVE', 'STALE')` for OPS_MANAGER
+- RLS policy: `WHERE status IN ('ACTIVE', 'STALE')` for STAFF
 - Frontend also hides (defense in depth)
 
 ---
@@ -366,7 +346,7 @@ Customer sends payment:
 
 **Mitigation**:
 - Sensible defaults (180 days blanket, 30 days follow-up)
-- ADMIN only access
+- OWNER only access
 - Documented in settings UI
 
 ---
@@ -376,14 +356,14 @@ Customer sends payment:
 **Decision**: Only OWNER can override final delivery block
 
 **Rationale**:
-- ✅ Prevents OPS_MANAGER from circumventing collections
+- ✅ Prevents MANAGER from circumventing collections
 - ✅ Escalates to decision-maker
 - ✅ Audit trail (OWNER's decision, not ops)
-- ⚠️ OPS_Manager friction if OWNER unavailable
+- ⚠️ MANAGER friction if OWNER unavailable
 
 **Mitigation**:
 - OWNER can delegate (v1.1 feature)
-- Clear notification to admins when override happens
+- Clear notification to managers when override happens
 - 7-day audit flag catches abuse
 
 ---
@@ -465,12 +445,12 @@ Customer sends payment:
 
 ## PART 5: SCALABILITY & PERFORMANCE
 
-### Expected Load (Year 1)
+### Expected Load (Month 1)
 
 - **Warehouses**: 5-10
-- **Customers per warehouse**: 50-100
-- **Lots per warehouse**: 200-500
-- **Deliveries per day**: 50-100
+- **Customers per warehouse**: 500-800
+- **Lots per warehouse**: 2000-5000
+- **Deliveries per day**: 20-50
 - **Concurrent users**: 10-20 per warehouse
 
 ### Performance Targets
@@ -495,7 +475,7 @@ CREATE INDEX idx_audit_log_warehouseID_createdAt ON audit_log(warehouseID, creat
 
 ### Caching Considerations (v1.1)
 
-- Warehouse settings: Cache for 1 hour (invalidate on update)
+- Warehouse settings: Cache for 1 day (invalidate on update)
 - Customer outstanding: Cache for 5 min (hit frequently)
 - Lot list: No caching (changes frequently with deliveries)
 
@@ -506,7 +486,7 @@ CREATE INDEX idx_audit_log_warehouseID_createdAt ON audit_log(warehouseID, creat
 | Threat | Mitigation |
 |--------|-----------|
 | Unauthorized lot access | RLS: WHERE warehouseID = user.warehouseID |
-| OPS_MANAGER views WRITTEN_OFF | RLS: WHERE status IN ('ACTIVE', 'STALE') |
+| MANAGER views WRITTEN_OFF | RLS: WHERE status IN ('ACTIVE', 'STALE') |
 | Circumvent delivery block | Backend validates role before override |
 | Manipulate outstanding amount | Audit log + immutable history |
 | Fake receipts | Audit log captures who recorded payment |
@@ -520,25 +500,23 @@ CREATE INDEX idx_audit_log_warehouseID_createdAt ON audit_log(warehouseID, creat
 
 ```
 ┌─────────────────────────────────────────────────┐
-│           Production Deployment                  │
+│           Production Deployment                 │
 ├─────────────────────────────────────────────────┤
-│                                                   │
+│                                                 │
 │  Clients (Web, Mobile)                          │
-│    ↓ HTTPS                                       │
-│  CDN (Vercel / Cloudflare)                      │
-│    ↓                                             │
-│  API Server (Node.js, 2 instances)              │
-│    • Load balancer (AWS ALB / Nginx)            │
-│    • Auto-scale based on CPU/Memory             │
-│    ↓                                             │
+│    ↓ HTTPS                                      │
+│  CDN (Vercel) — static web assets               │
+│    ↓                                            │
+│  Supabase (Auth + PostgREST + RLS + Edge Fn)    │
+│    • No separate Node API tier for MVP          │
+│    ↓                                            │
 │  Supabase (Managed PostgreSQL)                  │
 │    • Connection pooling (via Supabase Postgres) │
 │    • Read replicas (if >100 concurrent)         │
 │    • Automated backups (daily)                  │
-│    ↓                                             │
-│  Monitoring (Sentry, Datadog)                   │
-│  Backups (S3)                                   │
-│                                                   │
+│    ↓                                            │
+│  Monitoring (Sentry, Posthog)                   │
+│                                                 │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -556,7 +534,7 @@ CREATE INDEX idx_audit_log_warehouseID_createdAt ON audit_log(warehouseID, creat
 **Real-Time Notifications**:
 - Supabase Realtime subscriptions (already infra ready)
 - Delivery events → Realtime broadcast
-- Collections follow-up alerts (Twilio SMS)
+- Collections follow-up alerts (Whatsapp Alerts)
 
 **Bulk Lot Import**:
 - CSV upload → S3 bucket
@@ -580,7 +558,7 @@ CREATE INDEX idx_audit_log_warehouseID_createdAt ON audit_log(warehouseID, creat
 
 | Version | Architecture | Key Changes |
 |---------|--------------|------------|
-| 1.0 MVP | Supabase + REST API | Lot mgmt, delivery blocking, payments, stale detection |
+| 1.0 MVP | Supabase-only (PostgREST + RLS + Edge) | Lot mgmt, delivery blocking, payments, stale detection |
 | 1.1 | + Storage, Realtime | Photo proof, SMS alerts, bulk import |
 | 1.2 | + Redis caching | Performance optimization, real-time sync |
 | 2.0 | + GraphQL API | Advanced queries, subscription support |
@@ -589,33 +567,12 @@ CREATE INDEX idx_audit_log_warehouseID_createdAt ON audit_log(warehouseID, creat
 
 ## APPENDIX: Tech Stack Summary
 
-**Backend**:
-- Runtime: Node.js (18+)
-- Framework: Express or Hono
-- ORM: Drizzle or Supabase client
-- Testing: Jest, Supertest
-- Deployment: Docker + AWS ECS or Vercel Functions
-
-**Frontend (Web)**:
-- Framework: React 18+
-- State: Zustand + React Query
-- UI: Shadcn/ui + Tailwind CSS
-- Forms: React Hook Form + Zod
-- Deployment: Vercel or Netlify
-
-**Frontend (Mobile)**:
-- Framework: React Native 0.71+
-- Navigation: React Navigation
-- State: Zustand + React Query
-- Deployment: EAS Build (Expo) or Xcode/Android Studio
-
-**Database**:
-- Supabase (Managed PostgreSQL 14+)
-- Auth: Supabase Auth (Phone OTP)
-- Realtime: Supabase Realtime
-
-**Monitoring**:
-- Error tracking: Sentry
-- Metrics: Datadog or CloudWatch
-- Logs: Supabase logs + CloudWatch
-
+- **Mobile:** React Native + Expo
+- **UI:** GlueStack UI, Shadcn/ui + Tailwind CSS (for web)
+- **Web:** React + TypeScript
+- **Backend/DB/Auth/Storage:** Supabase (PostgreSQL + RLS + Realtime)
+- **Auth:** Supabase Auth — phone number + WhatsApp OTP (no email)
+- **Validation:** Zod + TanStack Query
+- **i18n:** react-i18next + expo-localization
+- **Deployment:** App Store / Play Store (mobile), Vercel (web)
+- **Monitoring:** Sentry, Postohg, Supabase logs

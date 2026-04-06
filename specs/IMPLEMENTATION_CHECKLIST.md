@@ -1,7 +1,7 @@
 # Cold Storage MVP: Implementation Checklist & Deployment Guide
 
 **Timeline**: 12 weeks
-**Team**: 1 Backend (Node/SQL), 1 Frontend (React), 1 Mobile (React Native)
+**Team**: 1 Backend (Supabase/SQL/Edge), 1 Frontend (React), 1 Mobile (React Native)
 
 ---
 
@@ -14,62 +14,55 @@
   - Configure PostgreSQL
   - Enable Realtime (for live updates)
   - Enable Storage (for invoices/documents later)
-  - [ ] Test connection from backend
+  - [ ] Test connection from app + Supabase CLI / dashboard
 
 - [ ] **Implement Auth System**
-  - Configure Supabase Phone OTP
-  - Create auth middleware (Express/Node)
-  - Test OTP flow: Send → Verify → JWT token
+  - Configure Supabase Phone OTP (no email in domain)
+  - On first login: create **`user_profiles`** row (`id` = `auth.users.id`) and **`user_roles`** + **`user_warehouse_assignments`** (seed or admin flow)
+  - Test OTP flow: Send → Verify → JWT; **`getUser()`** on clients/Edge
   - [ ] Test login/logout flow locally
 
-- [ ] **Database Schema Migration**
-  - Run `01_create_enums.sql` (ENUM types)
-  - Run `02_create_tables.sql` (all tables from spec)
-  - Run `03_create_indexes.sql` (performance indexes)
-  - Run `04_create_rls_policies.sql` (row-level security)
+- [ ] **Database Schema Migration** (Supabase CLI / `packages/supabase`)
+  - Single or staged migrations: enums, **`tenants`**, **`warehouses` (+ tenant_id)**, **`user_profiles`**, **`user_roles`**, **`user_warehouse_assignments`**, then domain tables from [`API_AND_SCHEMA_SPEC.md`](API_AND_SCHEMA_SPEC.md) (snake_case)
+  - **`user_role`**: `OWNER`, `MANAGER`, `STAFF` only
+  - RLS: `public.current_tenant_id()`, `public.accessible_warehouse_ids()`; **minimal triggers** (prefer joins + column DEFAULTs — see multitenancy rule)
   - [ ] Verify schema in Supabase console
   - [ ] Test constraints (e.g., balanceBags validation)
 
 - [ ] **Seed Test Data**
-  - Create 1 warehouse
+  - Create 1 tenant, 1 warehouse, profile + role + assignments for test user
   - Create 5 sample customers
   - Create 10 sample products (with staleDaysLimit)
   - Create 20 sample lots (various statuses)
   - [ ] Verify data loads correctly
 
-### Week 2: API Foundation
+### Week 2: Supabase client & RLS verification (no Node API)
 
-- [ ] **Setup Backend Framework**
-  - Initialize Node/Express or Hono
-  - Configure Supabase client (service role key)
-  - Setup environment variables (.env)
-  - [ ] Test basic API response
+- [ ] **App ↔ Supabase wiring**
+  - Expo + Vite apps: Supabase JS client (anon key + user JWT); env via `expo-constants` / Vite `import.meta.env`
+  - [ ] Test authenticated `select` against one RLS-protected table
 
-- [ ] **Implement Authentication Middleware**
-  - Validate JWT from Supabase
-  - Extract user role & warehouseID
-  - Attach to request context
-  - [ ] Test auth on a simple endpoint
+- [ ] **Auth session usage**
+  - Use `getUser()` (or equivalent) after OTP; load **`user_profiles`** + **`user_roles`** for UI (role, tenant)
+  - Persist **active `warehouse_id`** in client state (warehouse switcher in avatar menu)
+  - [ ] Test: user without assignment sees no warehouse data
 
-- [ ] **Error Handling & Response Format**
-  - Standardize response: `{ success, data, error, code }`
-  - Create error handler for 400/403/409/500
-  - Setup request logging
-  - [ ] Test error responses
+- [ ] **Error handling (client)**
+  - Map PostgREST / Auth errors to user-visible messages (i18n)
+  - [ ] Test forbidden / validation errors from RLS or checks
 
-- [ ] **Database Client & Query Helpers**
-  - Create Supabase client instance
-  - Write helper functions: `getLotsForWarehouse()`, `getCustomerOutstanding()`
-  - [ ] Test queries with seed data
+- [ ] **Query helpers (TS in app or `packages/shared`)**
+  - Typed helpers: e.g. `getLotsForWarehouse(warehouseId)` using `.from('lots').select(...)` — RLS enforces access
+  - [ ] Test with seed data
 
 ---
 
 ## PHASE 2: CORE ACCRUAL & STATUS (Weeks 3-4)
 
-### Week 3: Lot Management Endpoints
+### Week 3: Lot management (Supabase / PostgREST — not a separate `/api` server)
 
-- [ ] **GET /api/lots**
-  - Fetch lots with filters (status, customer, warehouse)
+- [ ] **List lots** (equivalent to legacy `GET /api/lots`)
+  - Fetch lots with filters (status, customer, warehouse) via `.from('lots')` or a view; RLS enforced
   - Calculate: daysOld, daysUntilStale, outstanding, spoilageRiskLevel
   - Pagination support
   - [ ] Test with filters: GET /api/lots?status=ACTIVE&status=STALE
@@ -349,11 +342,9 @@
 
 #### 1. Staging Deployment (Day 1)
 
-- [ ] Deploy backend to staging environment
-  - Build Docker image (if using)
-  - Deploy to staging server (or serverless)
-  - Verify API endpoints respond
-  - Run smoke tests against staging
+- [ ] Deploy / verify **Supabase** staging project
+  - Apply migrations; confirm RLS; deploy Edge Functions if any
+  - Smoke-test PostgREST + Auth from staging app build (no separate API server)
 
 - [ ] Deploy frontend to staging
   - Build React app

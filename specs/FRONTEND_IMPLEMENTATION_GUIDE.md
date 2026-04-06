@@ -1,8 +1,12 @@
 # Cold Storage MVP: Frontend Implementation Guide
 
-**Tech Stack**: React (web) + React Native (mobile)
-**State Management**: Zustand + React Query
-**UI Framework**: Shadcn/ui (web), custom components (mobile)
+**Tech Stack**: React (web) + React Native (mobile)  
+**State Management**: Zustand + TanStack Query  
+**UI Framework**: Shadcn/ui (web), GlueStack UI (mobile)
+
+**Navigation (web + mobile — keep consistent)**  
+- **Bottom tabs (5):** Home (dashboard / summary), Inventory, Parties, Receipts, Payments  
+- **Not** root tabs: Settings, warehouse switcher, profile → **user avatar menu** (items shown by **OWNER / MANAGER / STAFF**)
 
 ---
 
@@ -12,11 +16,17 @@
 ```
 src/
 ├── pages/
-│   ├── Dashboard/
-│   │   ├── Home.tsx           (Summary + collections follow-up)
-│   │   ├── Inventory.tsx      (Lot list with spoilage risk)
-│   │   ├── Collections.tsx    (Payment tracking)
-│   │   └── Settings.tsx       (Admin only)
+│   ├── Home/
+│   │   └── Home.tsx           (Dashboard summary + collections follow-up)
+│   ├── Inventory/
+│   │   └── Inventory.tsx      (Lot list with spoilage risk)
+│   ├── Parties/
+│   │   └── Parties.tsx
+│   ├── Receipts/
+│   │   └── Receipts.tsx       (Receipt recording / list)
+│   ├── Payments/
+│   │   └── Payments.tsx       (Payments / allocations UX)
+│   └── ...                    (Settings / profile via header avatar, not a tab)
 │
 ├── components/
 │   ├── LotCard.tsx            (Reusable lot display)
@@ -50,6 +60,10 @@ src/
 │
 └── App.tsx
 ```
+
+### Mobile (React Native / Expo)
+
+Mirror the **same five tabs**: `Home`, `Inventory`, `Parties`, `Receipts`, `Payments` under `src/screens/`. Use a **header avatar** (or profile slot) for Settings, warehouse switch, and profile — **role-aware** (OWNER / MANAGER / STAFF).
 
 ---
 

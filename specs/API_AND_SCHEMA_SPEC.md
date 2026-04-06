@@ -1,8 +1,16 @@
 # Cold Storage MVP: Detailed API & Database Schema
 
-**Status**: Ready for backend development
-**Database**: Supabase PostgreSQL
-**API Framework**: Supabase REST (GraphQL later)
+**Status**: Ready for backend development  
+**Database**: Supabase PostgreSQL  
+**API surface**: **Supabase only for MVP** — PostgREST, RLS, Auth, Storage, Edge Functions (cron/jobs). No separate Node/Express/Hono server unless product later requires it. REST paths in Part 2 describe **logical operations** (implement as RPC, Edge Functions, or direct table access under RLS).
+
+**Identity**: **`auth.users`** is the golden source for sign-in (phone). App tables use **`public.user_profiles`** (`id` = `auth.users.id`) and **`public.user_roles`** (`user_id`, `tenant_id`, `role`) for tenant membership. **No email** in domain tables.
+
+**Roles (canonical)**: `OWNER`, `MANAGER`, `STAFF`. Legacy mapping: `ADMIN` → `OWNER`, `SUPERVISOR` → `MANAGER`, `OPS_MANAGER` → `STAFF`.
+
+**RLS / triggers**: Resolve tenant from the **logged-in user** via `public.current_tenant_id()` (backed by `user_roles`). Prefer **joins** `warehouse_id` → `warehouses.tenant_id` and **`DEFAULT current_tenant_id()`** on `tenant_id` columns where needed; **avoid** a large set of `BEFORE INSERT` stamp triggers.
+
+**DB naming**: Implement schema in **snake_case**; this document still shows some historical camelCase in fragments — migrate names when writing SQL (e.g. `warehouse_id`, `created_at`).
 
 ---
 
@@ -21,11 +29,11 @@ CREATE TYPE lot_status AS ENUM (
   'DISPUTED'
 );
 
--- User Roles
+-- User Roles (canonical)
 CREATE TYPE user_role AS ENUM (
-  'ADMIN',
   'OWNER',
-  'OPS_MANAGER'
+  'MANAGER',
+  'STAFF'
 );
 
 -- Rental Modes
@@ -61,6 +69,8 @@ CREATE TYPE payment_method AS ENUM (
 ```sql
 CREATE TABLE warehouses (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenantID UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    -- Multi-tenant: every warehouse belongs to one business (tenant)
   warehouseName TEXT NOT NULL,
   warehouseCode TEXT UNIQUE NOT NULL,
   city TEXT NOT NULL,
@@ -86,7 +96,6 @@ CREATE TABLE customers (
   warehouseID UUID NOT NULL REFERENCES warehouses(id) ON DELETE CASCADE,
   customerName TEXT NOT NULL,
   phone TEXT NOT NULL,
-  email TEXT,
   address TEXT,
   gstin TEXT,
   creditLimit DECIMAL(12,2) DEFAULT 0,
@@ -272,7 +281,7 @@ CREATE TABLE deliveries (
     -- If status = BLOCKED, reason why
 
   -- Override Info
-  overriddenBy UUID REFERENCES users(id),
+  overriddenBy UUID REFERENCES user_profiles(id),
   overrideReason TEXT,
   overrideAt TIMESTAMPTZ,
 
@@ -312,7 +321,7 @@ CREATE TABLE customer_receipts (
   notes TEXT,
 
   -- Recording
-  recordedBy UUID REFERENCES users(id),
+  recordedBy UUID REFERENCES user_profiles(id),
 
   createdAt TIMESTAMPTZ DEFAULT NOW(),
   updatedAt TIMESTAMPTZ DEFAULT NOW()
@@ -340,7 +349,7 @@ CREATE TABLE receipt_allocations (
   amount DECIMAL(12,2) NOT NULL,
 
   -- Metadata
-  allocatedBy UUID REFERENCES users(id),
+  allocatedBy UUID REFERENCES user_profiles(id),
   allocatedManually BOOLEAN DEFAULT false,
     -- false = auto-allocated FIFO, true = manual allocation
 
@@ -365,34 +374,64 @@ ALTER TABLE receipt_allocations
   );
 ```
 
-#### 10. Users
+#### 10. Tenants, User profiles & roles (replaces single `users` table)
+
+**`tenants`** — root business entity (add before `warehouses` in migrations):
+
 ```sql
-CREATE TABLE users (
-  id UUID PRIMARY KEY,
-    -- From Supabase auth.users(id)
-
-  warehouseID UUID NOT NULL REFERENCES warehouses(id) ON DELETE CASCADE,
-
-  -- Profile
-  email TEXT UNIQUE NOT NULL,
-  phone TEXT NOT NULL,
-  displayName TEXT,
-
-  -- Role
-  role user_role NOT NULL,
-
-  -- Status
-  isActive BOOLEAN DEFAULT true,
-  lastSignIn TIMESTAMPTZ,
-
-  createdAt TIMESTAMPTZ DEFAULT NOW(),
-  updatedAt TIMESTAMPTZ DEFAULT NOW()
+CREATE TABLE tenants (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+```
 
--- Indexes
-CREATE INDEX idx_users_warehouseID ON users(warehouseID);
-CREATE INDEX idx_users_role ON users(role);
-CREATE INDEX idx_users_email ON users(email);
+**`warehouses`** — add `tenantID` (or `tenant_id` in snake_case SQL) FK → `tenants`.
+
+**`user_profiles`** — one row per `auth.users` id (phone identity; no email):
+
+```sql
+CREATE TABLE user_profiles (
+  id UUID PRIMARY KEY
+    REFERENCES auth.users(id) ON DELETE CASCADE,
+  phone TEXT NOT NULL,
+  display_name TEXT,
+  avatar_url TEXT,
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+```
+
+**`user_roles`** — tenant membership + single role per tenant row:
+
+```sql
+CREATE TABLE user_roles (
+  user_id UUID NOT NULL REFERENCES user_profiles(id) ON DELETE CASCADE,
+  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  role user_role NOT NULL,
+  PRIMARY KEY (user_id, tenant_id)
+);
+```
+
+**`user_warehouse_assignments`** — which warehouses a user may access:
+
+```sql
+CREATE TABLE user_warehouse_assignments (
+  user_id UUID NOT NULL REFERENCES user_profiles(id) ON DELETE CASCADE,
+  warehouse_id UUID NOT NULL REFERENCES warehouses(id) ON DELETE CASCADE,
+  assigned_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (user_id, warehouse_id)
+);
+```
+
+**MVP**: typically one `user_roles` row per user. Multi-tenant users need a defined `active_tenant_id` (or equivalent) before `current_tenant_id()` can stay unambiguous.
+
+```sql
+-- Indexes (snake_case in real migrations)
+CREATE INDEX idx_user_profiles_phone ON user_profiles(phone);
+CREATE INDEX idx_user_roles_tenant ON user_roles(tenant_id);
+CREATE INDEX idx_user_roles_user ON user_roles(user_id);
 ```
 
 #### 11. AuditLog
@@ -402,7 +441,7 @@ CREATE TABLE audit_log (
   warehouseID UUID NOT NULL REFERENCES warehouses(id) ON DELETE CASCADE,
 
   -- Actor
-  userID UUID REFERENCES users(id) ON DELETE SET NULL,
+  userID UUID REFERENCES user_profiles(id) ON DELETE SET NULL,
 
   -- Action Details
   entityType TEXT NOT NULL,
@@ -450,7 +489,7 @@ CREATE TABLE lot_status_history (
     -- e.g., "Owner marked as loss"
     -- e.g., "Final delivery completed"
 
-  changedBy UUID REFERENCES users(id) ON DELETE SET NULL,
+  changedBy UUID REFERENCES user_profiles(id) ON DELETE SET NULL,
 
   createdAt TIMESTAMPTZ DEFAULT NOW()
 );
@@ -506,69 +545,85 @@ ALTER TABLE warehouse_settings
 
 ### 1.3 Row-Level Security (RLS) Policies
 
+Implement helpers in **`public`** (example names):
+
+- `public.current_tenant_id()` — from `user_roles` for `auth.uid()` (MVP: single row per user).
+- `public.accessible_warehouse_ids()` — from `user_warehouse_assignments`.
+
+Prefer **joining `warehouses.tenant_id`** on `warehouse_id` instead of many `BEFORE INSERT` triggers. See `.cursor/rules/supabase_multitenancy.mdc` for full patterns.
+
 #### Warehouses Table
 ```sql
--- Users can view warehouses they belong to
-CREATE POLICY "users_view_own_warehouse" ON warehouses
+-- User sees warehouses in their tenant and assignment list
+CREATE POLICY "warehouses_select" ON warehouses
   FOR SELECT
   USING (
-    EXISTS (
-      SELECT 1 FROM users
-      WHERE users.warehouseID = warehouses.id
-      AND users.id = auth.uid()
-    )
+    tenant_id = public.current_tenant_id()
+    AND id IN (SELECT public.accessible_warehouse_ids())
   );
 
--- ADMIN/OWNER can update settings
-CREATE POLICY "admin_owner_update_warehouse" ON warehouses
+-- OWNER or MANAGER can update warehouse metadata (tune per product)
+CREATE POLICY "warehouses_update" ON warehouses
   FOR UPDATE
   USING (
-    EXISTS (
-      SELECT 1 FROM users
-      WHERE users.warehouseID = warehouses.id
-      AND users.id = auth.uid()
-      AND users.role IN ('ADMIN', 'OWNER')
+    tenant_id = public.current_tenant_id()
+    AND id IN (SELECT public.accessible_warehouse_ids())
+    AND EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+        AND ur.tenant_id = public.current_tenant_id()
+        AND ur.role IN ('OWNER', 'MANAGER')
     )
   );
 ```
 
 #### Lots Table
 ```sql
--- Users see lots in their warehouse
-CREATE POLICY "users_view_warehouse_lots" ON lots
+CREATE POLICY "lots_select" ON lots
   FOR SELECT
   USING (
     EXISTS (
-      SELECT 1 FROM users
-      WHERE users.warehouseID = lots.warehouseID
-      AND users.id = auth.uid()
+      SELECT 1 FROM warehouses w
+      WHERE w.id = lots.warehouseID
+        AND w.tenant_id = public.current_tenant_id()
     )
+    AND lots.warehouseID IN (SELECT public.accessible_warehouse_ids())
   );
 
--- ADMIN/OWNER can create lots
-CREATE POLICY "admin_owner_create_lots" ON lots
+CREATE POLICY "lots_insert" ON lots
   FOR INSERT
   WITH CHECK (
     EXISTS (
-      SELECT 1 FROM users
-      WHERE users.warehouseID = lots.warehouseID
-      AND users.id = auth.uid()
-      AND users.role IN ('ADMIN', 'OWNER')
+      SELECT 1 FROM warehouses w
+      WHERE w.id = lots.warehouseID
+        AND w.tenant_id = public.current_tenant_id()
+    )
+    AND lots.warehouseID IN (SELECT public.accessible_warehouse_ids())
+    AND EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+        AND ur.tenant_id = public.current_tenant_id()
+        AND ur.role IN ('OWNER', 'MANAGER')
     )
   );
 ```
 
 #### WarehouseSettings Table
 ```sql
--- ADMIN only can view/update
-CREATE POLICY "admin_only_settings" ON warehouse_settings
+-- OWNER only (replaces legacy "ADMIN only")
+CREATE POLICY "warehouse_settings_owner" ON warehouse_settings
   FOR SELECT
   USING (
     EXISTS (
-      SELECT 1 FROM users
-      WHERE users.warehouseID = warehouse_settings.warehouseID
-      AND users.id = auth.uid()
-      AND users.role = 'ADMIN'
+      SELECT 1 FROM warehouses w
+      WHERE w.id = warehouse_settings.warehouseID
+        AND w.tenant_id = public.current_tenant_id()
+    )
+    AND EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+        AND ur.tenant_id = public.current_tenant_id()
+        AND ur.role = 'OWNER'
     )
   );
 ```

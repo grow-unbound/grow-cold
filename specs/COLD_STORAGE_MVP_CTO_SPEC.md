@@ -192,23 +192,28 @@ When payment allocated to `WRITTEN_OFF` lot:
 
 ### Core Tables (Pre-Existing)
 
-1. **Warehouses**
+1. **Tenants** (business / org)
    ```
-   id (PK), warehouseName, warehouseCode, city, state, ...
-   ```
-
-2. **Customers**
-   ```
-   id (PK), customerName, phone, email, warehouseID (FK), ...
+   id (PK), name, createdAt
    ```
 
-3. **Products**
+2. **Warehouses**
+   ```
+   id (PK), tenantID (FK → tenants), warehouseName, warehouseCode, city, state, ...
+   ```
+
+3. **Customers**
+   ```
+   id (PK), customerName, phone (no email), warehouseID (FK), ...
+   ```
+
+4. **Products**
    ```
    id (PK), productName, productGroupID (FK), staleDaysLimit (INT, nullable),
    createdAt, updatedAt
    ```
 
-4. **Lots**
+5. **Lots**
    ```
    id (PK), warehouseID (FK), customerID (FK), productID (FK),
    originalBags (INT), balanceBags (INT),
@@ -220,7 +225,7 @@ When payment allocated to `WRITTEN_OFF` lot:
    createdAt, updatedAt
    ```
 
-5. **RentAccruals**
+6. **RentAccruals**
    ```
    id (PK), lotID (FK), accrualDate (DATE),
    rentalAmount (DECIMAL), rentalMode (ENUM),
@@ -229,7 +234,7 @@ When payment allocated to `WRITTEN_OFF` lot:
    createdAt, updatedAt
    ```
 
-6. **TransactionCharges**
+7. **TransactionCharges**
    ```
    id (PK), deliveryID (FK), chargeType (ENUM: HAMALI, PLATFORM, KATA_COOLIE, MAMULLE),
    chargeAmount (DECIMAL), ratePerUnit (DECIMAL, nullable),
@@ -237,7 +242,7 @@ When payment allocated to `WRITTEN_OFF` lot:
    createdAt, updatedAt
    ```
 
-7. **Deliveries**
+8. **Deliveries**
    ```
    id (PK), lotID (FK), numBagsOut (INT), deliveryDate (DATE),
    deliveryNotes (TEXT),
@@ -247,7 +252,7 @@ When payment allocated to `WRITTEN_OFF` lot:
    createdAt, updatedAt
    ```
 
-8. **CustomerReceipts**
+9. **CustomerReceipts**
    ```
    id (PK), customerID (FK), receiptDate (DATE),
    totalAmount (DECIMAL), paymentMethod (TEXT),
@@ -255,28 +260,27 @@ When payment allocated to `WRITTEN_OFF` lot:
    createdAt, updatedAt
    ```
 
-9. **ReceiptAllocations**
+10. **ReceiptAllocations**
    ```
    id (PK), receiptID (FK), chargeID (FK), amount (DECIMAL),
    createdAt, updatedAt
    ```
 
-10. **Users**
-    ```
-    id (PK), email, phone, warehouseID (FK), role (ENUM: ADMIN, OWNER, OPS_MANAGER),
-    createdAt, updatedAt
-    ```
+11. **Identity & membership** (Supabase: **`auth.users`** is golden source for phone auth)
+    - **`user_profiles`**: `id` (PK) = `auth.users.id`, `phone`, `display_name`, optional `avatar_url`, `is_active`, timestamps
+    - **`user_roles`**: `user_id`, `tenant_id`, `role` (ENUM: **OWNER, MANAGER, STAFF**). Legacy doc names: ADMIN→OWNER, SUPERVISOR→MANAGER, OPS_MANAGER→STAFF
+    - **`user_warehouse_assignments`**: `user_id`, `warehouse_id` — which godowns this user may access
 
-11. **AuditLog**
+12. **AuditLog**
     ```
-    id (PK), userID (FK), entityType (TEXT), entityID (TEXT), action (TEXT),
+    id (PK), userID (FK → user_profiles), entityType (TEXT), entityID (TEXT), action (TEXT),
     oldValues (JSONB), newValues (JSONB), reason (TEXT),
     createdAt
     ```
 
 ### NEW/UPDATED Tables
 
-12. **WarehouseSettings**
+13. **WarehouseSettings**
     ```
     id (PK), warehouseID (FK, unique),
     BLANKET_STALE_DAYS (INT, default: 180),
@@ -286,7 +290,7 @@ When payment allocated to `WRITTEN_OFF` lot:
     createdAt, updatedAt
     ```
 
-13. **LotStatusHistory** (for audit trail)
+14. **LotStatusHistory** (for audit trail)
     ```
     id (PK), lotID (FK), oldStatus (ENUM), newStatus (ENUM),
     reason (TEXT), changedBy (USER_ID, FK),
@@ -298,9 +302,9 @@ When payment allocated to `WRITTEN_OFF` lot:
 ## PART 3: API SPECIFICATION
 
 ### Authentication
-- **Method**: Supabase Phone OTP
-- **Endpoints**: All routes require `Authorization: Bearer {token}`
-- **Role Check**: User role verified via `user.role` in JWT
+- **Method**: Supabase Phone OTP (**no email** in product domain)
+- **Identity**: **`auth.users`**; app reads **`user_profiles`** + **`user_roles`** for `tenant_id` and **OWNER / MANAGER / STAFF**
+- **APIs**: MVP uses **Supabase client + RLS** (and Edge Functions where needed), not a separate Node `/api` tier. Bearer JWT on all calls.
 
 ---
 
@@ -311,16 +315,17 @@ When payment allocated to `WRITTEN_OFF` lot:
 **GET /api/lots**
 - Query params: `warehouseID`, `status`, `customerID`, `sortBy=lodgementDate`
 - Response: Array of lots with calculated `daysOld`, `daysUntilStale`, `outstanding`
-- Role: OPS_MANAGER sees only active/stale, ADMIN/OWNER see all
+- Role: MANAGER/OWNER only, STAFF sees lots with status=ACTIVE/STALE
 
 **GET /api/lots/:id**
 - Response: Full lot details + accrual history + delivery history
 - Includes: `daysOld`, `daysUntilStale`, `isStale`, `outstanding`, `allChargesPaid`
+- Role: All Roles
 
 **POST /api/lots**
 - Body: `{ warehouseID, customerID, productID, originalBags, lodgementDate, rentalMode, rentalAmount }`
 - Response: Created lot with status=ACTIVE
-- Role: ADMIN/OWNER only
+- Role: MANAGER/OWNER only
 
 **POST /api/lots/:id/delivery** (NEW VALIDATION)
 ```
@@ -370,13 +375,16 @@ Behavior:
 #### Payments & Collections
 
 **GET /api/customers/:id/outstanding**
-- Response: `{ totalOutstanding, daysOutstanding, unpaidCharges: [...], unpaidRents: [...] }`
+Role: OWNER/MANAGER
+Response: `{ totalOutstanding, daysOutstanding, unpaidCharges: [...], unpaidRents: [...] }`
+Behavior:
 - `daysOutstanding` only if `totalOutstanding > 0`
 
 **POST /api/customers/:id/receipts**
 ```
 Body: { receiptDate, totalAmount, paymentMethod, notes }
 Response: receiptID
+Role: OWNER/MANAGER
 Behavior:
   - Create CustomerReceipt record
   - Auto-allocate to oldest unpaid charges (FIFO)
@@ -386,7 +394,7 @@ Behavior:
 **POST /api/customers/:id/receipts/:id/reallocate**
 ```
 Body: { allocations: [{ chargeID, amount }, ...] }
-Role: ADMIN/OWNER
+Role: OWNER/MANAGER
 Behavior:
   - Validate total = receipt.totalAmount
   - Clear old allocations, create new ones
@@ -396,6 +404,7 @@ Behavior:
 ---
 
 #### Warehouse Settings
+Role: OWNER only
 
 **GET /api/warehouse-settings/:warehouseID**
 ```
@@ -411,7 +420,7 @@ Response: {
 ```
 Body: { BLANKET_STALE_DAYS, FOLLOW_UP_OUTSTANDING_DAYS, ... }
 Response: Updated settings
-Role: ADMIN only
+Role: OWNER only
 ```
 
 ---
@@ -419,6 +428,7 @@ Role: ADMIN only
 #### Dashboard & Analytics
 
 **GET /api/dashboard/summary** (Home tab)
+Role: OWNER/MANAGER
 ```
 Response: {
   activeLotsCount,
@@ -433,6 +443,7 @@ Response: {
 ```
 
 **GET /api/dashboard/inventory** (Inventory tab)
+Role: OWNER/MANAGER
 ```
 Response: Lot list with:
   - daysOld, daysUntilStale, spoilageRiskLevel (green/yellow/red),
@@ -498,7 +509,7 @@ interface SettingsState {
 
   fetchSettings: (warehouseID) => Promise
   updateSettings: (warehouseID, values) => Promise
-    // ADMIN only, enforced in reducer
+    // OWNER only, enforced in reducer
 }
 ```
 
@@ -513,15 +524,29 @@ interface SettingsState {
 - Customer outstanding
 - Recent deliveries
 
-**OPS_MANAGER only sees**:
+**Shared navigation (web + mobile)**  
+Bottom tabs: **Home**, **Inventory**, **Parties**, **Receipts**, **Payments**. **Settings**, **warehouse switch**, and **profile** live under the **user avatar menu** (not tabs), with items **gated by role**.
+
+**STAFF only sees**:
 - ACTIVE + STALE lots only
 - Delivery form
-- No Settings tab
+- Lot form
+- Customer Receipts
+- Avatar: profile + warehouse switch (if assigned); **no** owner settings
 - No Write-off/Dispute options
 
-**ADMIN/OWNER sees**:
+**MANAGER only sees**:
+- All lots
+- Delivery form
+- Lot form
+- Customer Receipts
+- Payment reallocation
+- Avatar: profile + warehouse switch; **no** warehouse settings panel
+- No Write-off/Dispute options
+
+**OWNER sees**:
 - All lots (including DELIVERED, CLEARED, WRITTEN_OFF, DISPUTED)
-- Settings tab
+- Avatar: **Settings** (warehouse settings / owner config), warehouse switch, profile
 - Write-off/Dispute buttons
 - Payment reallocation
 - Audit log
@@ -554,7 +579,7 @@ interface SettingsState {
      Else: "Contact owner to override"
    ```
 
-3. **SettingsPanel** (ADMIN only)
+3. **SettingsPanel** (OWNER only — opened from avatar menu)
    ```
    Form:
      - BLANKET_STALE_DAYS
@@ -625,7 +650,7 @@ interface SettingsState {
 ### Phase 5: Admin & Settings (Week 9)
 
 - [ ] API: GET/POST /api/warehouse-settings/:warehouseID
-- [ ] Frontend: SettingsPanel (ADMIN only)
+- [ ] Frontend: SettingsPanel (OWNER only, avatar menu)
 - [ ] Frontend: Dashboard home tab
 - [ ] Role-based UI: Hide/show features per role
 
@@ -663,7 +688,7 @@ interface SettingsState {
 **What**: Oldest unpaid rent/charges paid first.
 **Why**: Standard accounting practice, transparent to customer.
 **Risk**: Customer might want custom allocation (e.g., pay specific lot only).
-**Mitigation**: Manual reallocation available to ADMIN/OWNER.
+**Mitigation**: Manual reallocation available to OWNER (and MANAGER where policy allows).
 
 ### Assumption 4: Accrual Continues in STALE Status
 **What**: Rent keeps accruing even if lot is STALE.
@@ -754,7 +779,7 @@ Garlic: 90 days
   "error": "User not authorized",
   "code": "UNAUTHORIZED_ROLE",
   "requiredRole": "OWNER",
-  "userRole": "OPS_MANAGER",
+  "userRole": "MANAGER",
   "action": "written_off"
 }
 ```
