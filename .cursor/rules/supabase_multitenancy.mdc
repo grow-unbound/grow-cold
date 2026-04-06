@@ -1,0 +1,215 @@
+---
+description: Supabase multitenancy, RLS, and tenant isolation rules for GrowCold
+globs: ["**/*.ts", "**/*.tsx", "supabase/**/*"]
+alwaysApply: true
+---
+
+# Supabase Multitenancy & RLS
+
+## Tenant Model
+```
+tenants
+  ├── users (tenant-scoped, carry a single role)
+  ├── warehouses (1..n)
+  └── user_warehouse_assignments (users ↔ warehouses, many-to-many)
+```
+- One tenant = one business (e.g. "Ravi Cold Storage Pvt Ltd")
+- Users belong to the **tenant**, not to a warehouse
+- Warehouse access is granted via `user_warehouse_assignments`
+- Role lives at the tenant level — one role per user across all their warehouses
+
+### Core identity tables
+```sql
+CREATE TABLE tenants (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name       TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE users (
+  id         UUID PRIMARY KEY,               -- matches auth.uid()
+  tenant_id  UUID NOT NULL REFERENCES tenants(id),
+  phone      TEXT NOT NULL,
+  name       TEXT,
+  role       user_role NOT NULL,             -- ENUM: OWNER, SUPERVISOR, STAFF
+  is_active  BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE user_warehouse_assignments (
+  user_id      UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  warehouse_id UUID NOT NULL REFERENCES warehouses(id) ON DELETE CASCADE,
+  assigned_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (user_id, warehouse_id)
+);
+```
+
+## Table Requirements
+Every operational table MUST have:
+```sql
+tenant_id    UUID NOT NULL REFERENCES tenants(id),    -- for RLS
+warehouse_id UUID NOT NULL REFERENCES warehouses(id), -- for data scope
+created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+updated_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+```
+Exceptions:
+- `tenants` — no tenant_id or warehouse_id
+- `warehouses` — `tenant_id` only, no warehouse_id
+- `users` — `tenant_id` only, no warehouse_id
+- `user_warehouse_assignments` — neither (it IS the mapping)
+
+New table missing `tenant_id`? Needs explicit justification in the PR.
+
+## RLS — Mandatory Patterns
+
+### Helper: resolve tenant from current user
+```sql
+CREATE OR REPLACE FUNCTION auth.tenant_id()
+RETURNS UUID AS $$
+  SELECT tenant_id FROM users
+  WHERE id = auth.uid();
+$$ LANGUAGE sql STABLE SECURITY DEFINER;
+```
+
+### Helper: list warehouse IDs accessible to current user
+```sql
+CREATE OR REPLACE FUNCTION auth.accessible_warehouse_ids()
+RETURNS SETOF UUID AS $$
+  SELECT warehouse_id FROM user_warehouse_assignments
+  WHERE user_id = auth.uid();
+$$ LANGUAGE sql STABLE SECURITY DEFINER;
+```
+
+### Auto-stamp trigger — derives tenant_id from warehouse_id on insert
+```sql
+CREATE OR REPLACE FUNCTION stamp_tenant_id()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.tenant_id := (SELECT tenant_id FROM warehouses WHERE id = NEW.warehouse_id);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Apply to every operational table (not users/tenants/warehouses)
+CREATE TRIGGER stamp_tenant_id_trigger
+  BEFORE INSERT ON <table>
+  FOR EACH ROW EXECUTE FUNCTION stamp_tenant_id();
+```
+
+### Standard RLS policy — tenant isolation + warehouse access
+```sql
+ALTER TABLE <table> ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "tenant_isolation" ON <table>
+  FOR SELECT USING (
+    tenant_id = auth.tenant_id()
+    AND warehouse_id = ANY(SELECT auth.accessible_warehouse_ids())
+  );
+
+CREATE POLICY "tenant_insert" ON <table>
+  FOR INSERT WITH CHECK (
+    tenant_id = auth.tenant_id()
+    AND warehouse_id = ANY(SELECT auth.accessible_warehouse_ids())
+  );
+
+CREATE POLICY "tenant_update" ON <table>
+  FOR UPDATE USING (tenant_id = auth.tenant_id());
+
+-- Prefer soft deletes; only add if hard delete is truly needed
+CREATE POLICY "tenant_delete" ON <table>
+  FOR DELETE USING (tenant_id = auth.tenant_id());
+```
+
+### Owner-only tables (e.g. warehouse_settings, audit_log writes)
+```sql
+CREATE POLICY "owner_only" ON warehouse_settings
+  FOR ALL USING (
+    tenant_id = auth.tenant_id()
+    AND EXISTS (
+      SELECT 1 FROM users
+      WHERE id = auth.uid() AND role = 'OWNER'
+    )
+  );
+```
+
+### Soft deletes — always preferred over hard deletes
+```sql
+is_deleted BOOLEAN NOT NULL DEFAULT false,
+deleted_at TIMESTAMPTZ
+```
+Add `AND is_deleted = false` to SELECT policies. Never expose deleted rows to client.
+
+## TypeScript — Tenant-Safe Patterns
+
+### ✅ Correct — RLS handles tenant + warehouse filtering
+```ts
+// Just query — RLS enforces tenant_id and warehouse access automatically
+const { data } = await supabase.from('lots').select('*');
+```
+
+### ❌ Wrong — never pass tenant_id from client
+```ts
+const { data } = await supabase
+  .from('lots')
+  .select('*')
+  .eq('tenant_id', currentTenantId); // redundant and misleading
+```
+
+### ✅ Correct — warehouse_id scoping is fine (it's data filtering, not security)
+```ts
+// Filtering by warehouse is application logic, not security
+const { data } = await supabase
+  .from('lots')
+  .select('*')
+  .eq('warehouse_id', selectedWarehouseId);
+```
+
+### ✅ Correct — insert without tenant_id (trigger stamps it)
+```ts
+await supabase.from('lots').insert({
+  warehouse_id: selectedWarehouseId,
+  customer_id: 'abc',
+  product_id: 'xyz',
+  original_bags: 100,
+  // tenant_id NOT included — stamped by DB trigger from warehouse_id
+});
+```
+
+## Edge Functions — Tenant Context
+```ts
+const { data: { user } } = await supabase.auth.getUser();
+const { data: currentUser } = await supabase
+  .from('users')
+  .select('tenant_id, role')
+  .eq('id', user.id)
+  .single();
+
+if (!currentUser) throw new Error('Unauthorized');
+// Use currentUser.tenant_id and currentUser.role for all checks
+```
+
+## Roles
+```ts
+type TenantRole = 'OWNER' | 'MANAGER' | 'STAFF';
+```
+- `OWNER` — full access across all warehouses, billing, settings, overrides
+- `MANAGER` — all ops and billing across assigned warehouses, no settings and overrides
+- `STAFF` — inward/outward entry only on assigned warehouses, no reports
+
+Role is enforced in RLS for sensitive tables and checked in Edge Functions for mutations.
+
+## Storage — Tenant Isolation
+```
+Path: {tenant_id}/{warehouse_id}/{resource_type}/{filename}
+e.g.: abc-123/wh-456/lot-photos/img_001.jpg
+```
+Storage bucket policies must restrict by `tenant_id` path prefix.
+
+## Checklist — New Table Review
+- [ ] Has `tenant_id` (FK → `tenants`) and `warehouse_id` (FK → `warehouses`)
+- [ ] RLS enabled with both tenant + warehouse access policies
+- [ ] `stamp_tenant_id` trigger attached
+- [ ] `updated_at` auto-update trigger attached
+- [ ] Soft delete columns if rows will ever be "removed"
+- [ ] Index on `(tenant_id, warehouse_id)` + primary filter column
