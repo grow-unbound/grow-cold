@@ -6,136 +6,49 @@ alwaysApply: false
 
 # Project Setup Prompt
 
-Set up the GrowCold monorepo from scratch based on the project specs.
+Monorepo is scaffolded under `apps/`, `packages/`. Extend it using [`specs/`](specs/) and [`specs/SUPABASE_CONVENTIONS.md`](specs/SUPABASE_CONVENTIONS.md).
 
 ## Read First
-Before writing any code, read these files in order:
-1. `CLAUDE.md` — stack, domain language, UX rules
-2. `.cursor/rules/supabase-multitenancy.mdc` — tenant isolation patterns
-3. `.cursorrules` — code style, file structure, offline-first patterns
-4. `spec/COLD_STORAGE_MVP_CTO_SPEC.md` — business logic and domain model
-5. `spec/API_AND_SCHEMA_SPEC.md` — database schema and API contracts
-6. `spec/ARCHITECTURE_AND_DECISIONS.md` — technical decisions and rationale
-7. `spec/FRONTEND_IMPLEMENTATION_GUIDE.md` — component patterns and state management
-8. `spec/IMPLEMENTATION_CHECKLIST.md` — phased delivery plan
 
-## What to Scaffold
+1. `CLAUDE.md`
+2. `.cursor/rules/supabase_multitenancy.mdc`
+3. `.cursorrules`
+4. `specs/COLD_STORAGE_MVP_CTO_SPEC.md`
+5. `specs/API_AND_SCHEMA_SPEC.md`
+6. `specs/ARCHITECTURE_AND_DECISIONS.md`
+7. `specs/FRONTEND_IMPLEMENTATION_GUIDE.md`
+8. `specs/IMPLEMENTATION_CHECKLIST.md`
 
-### 1. Monorepo skeleton
+## Layout
+
 ```
-growcold/
-  apps/
-    mobile/          # Expo + React Native + GlueStack UI
-    web/             # React + Vite + TypeScript
-  packages/
-    supabase/        # DB types, migrations, RLS policies
-    shared/          # Zod schemas, utils, i18n strings, constants
-  spec/              # All spec docs (already present)
-  CLAUDE.md
-  .cursorrules
-  .cursor/rules/
-  package.json       # Workspace root (pnpm)
+apps/mobile/       Expo + GlueStack + bottom tabs + TanStack Query + Zustand + expo-sqlite
+apps/web/          Vite + Tailwind + RR7 + TanStack Query + Zustand + i18n (te/en)
+packages/shared/   Zod, constants, formatINR/formatDate, i18n resources
+packages/supabase/ supabase/config.toml, migrations, types.ts
+specs/
 ```
 
-### 2. Mobile app (`apps/mobile`)
-- Expo SDK (latest stable) with TypeScript template
-- GlueStack UI v2
-- React Navigation (bottom tabs + native stack)
-- TanStack Query + Zustand
-- expo-sqlite for offline queue
-- expo-haptics, expo-localization
-- react-i18next wired with `hi` (Hindi) as default locale
-- Placeholder screens: Home, Inward, Outward, Stock, Parties
+## Product IA (web + mobile)
 
-### 3. Web app (`apps/web`)
-- Vite + React + TypeScript
-- Shadcn/ui + Tailwind CSS
-- TanStack Query + Zustand
-- React Router v6
-- Placeholder pages: Dashboard, Inventory, Parties, Payments, Settings
+- **Tabs:** Home, Inventory, Parties, Receipts, Payments
+- **Avatar menu:** Settings, warehouse switch, profile (role-gated: OWNER / MANAGER / STAFF)
 
-### 4. Supabase package (`packages/supabase`)
-- Supabase CLI config (`supabase/config.toml`)
-- Initial migration with full schema from `spec/API_AND_SCHEMA_SPEC.md`, with these additions:
+## Supabase (MVP)
 
-**Tenant model:**
-```
-tenants
-  ├── users (tenant-scoped, single role)
-  ├── warehouses (1..n)
-  └── user_warehouse_assignments (many-to-many)
-```
+- **No Node API** — PostgREST + RLS + Edge Functions when needed
+- **`auth.users`** + **`user_profiles`** + **`user_roles`** + **`user_warehouse_assignments`**
+- Roles: **OWNER**, **MANAGER**, **STAFF**
+- **`public.current_tenant_id()`** / **`public.accessible_warehouse_ids()`** — minimal triggers; prefer joins + `DEFAULT current_tenant_id()` on `tenant_id` columns
 
-**New/modified identity tables:**
-- `tenants` — new root table (id, name, created_at)
-- `warehouses` — add `tenant_id UUID NOT NULL REFERENCES tenants(id)`
-- `users` — replace `warehouse_id` FK with `tenant_id UUID NOT NULL REFERENCES tenants(id)` + `role user_role NOT NULL`. Remove the warehouse FK entirely.
-- `user_warehouse_assignments` — new join table (user_id, warehouse_id, assigned_at). This replaces the direct warehouse FK on users.
+## Commands
 
-**Add `tenant_id` to all operational tables** for fast RLS without joins:
-- `customers`, `products`, `lots`, `rent_accruals`, `transaction_charges`, `deliveries`, `customer_receipts`, `receipt_allocations`, `audit_log`, `lot_status_history`, `warehouse_settings`
-- These tables keep their existing `warehouse_id` FK — `tenant_id` is added alongside it
+- `pnpm install` — root
+- `pnpm dev:web` / `pnpm dev:mobile`
+- `pnpm db:start` then `pnpm db:reset` (Docker required)
 
-**RLS helpers:**
-```sql
--- Resolve tenant from current user
-CREATE OR REPLACE FUNCTION auth.tenant_id()
-RETURNS UUID AS $$
-  SELECT tenant_id FROM users WHERE id = auth.uid();
-$$ LANGUAGE sql STABLE SECURITY DEFINER;
+## Done When Extending
 
--- List warehouses the current user can access
-CREATE OR REPLACE FUNCTION auth.accessible_warehouse_ids()
-RETURNS SETOF UUID AS $$
-  SELECT warehouse_id FROM user_warehouse_assignments WHERE user_id = auth.uid();
-$$ LANGUAGE sql STABLE SECURITY DEFINER;
-```
-
-**Auto-stamp trigger (applied to all operational tables):**
-```sql
-CREATE OR REPLACE FUNCTION stamp_tenant_id()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.tenant_id := (SELECT tenant_id FROM warehouses WHERE id = NEW.warehouse_id);
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-```
-
-**RLS pattern — tenant isolation + warehouse access:**
-```sql
-CREATE POLICY "tenant_isolation" ON <table>
-  FOR SELECT USING (
-    tenant_id = auth.tenant_id()
-    AND warehouse_id = ANY(SELECT auth.accessible_warehouse_ids())
-  );
-```
-
-- All indexes from spec retained; add composite index `(tenant_id, warehouse_id)` on all operational tables
-- `supabase gen types` output committed as `packages/supabase/types.ts`
-
-### 5. Shared package (`packages/shared`)
-- Zod schemas matching every DB table
-- Constants: `LOT_STATUS`, `USER_ROLE`, `RENTAL_MODE`, `CHARGE_TYPE`, `PAYMENT_METHOD`
-- Currency formatter: `formatINR(amount)` — lakhs/crores notation
-- Date formatter: `formatDate(date)` — DD/MM/YYYY
-- i18n base strings in `hi` (Hindi) and `en` (English)
-
-## Constraints
-- Use `pnpm` workspaces
-- No email fields anywhere — phone number auth only
-- Keep `warehouses` table as-is from spec; add `tenants` table above it
-- `users` table: belongs to `tenant`, not `warehouse`. Replace `warehouse_id` FK with `tenant_id` + role. Warehouse access via `user_warehouse_assignments` join table.
-- Every operational table gets both `tenant_id` (RLS) and `warehouse_id` (data scope) — `tenant_id` never from client, always stamped by trigger
-- Never filter by `tenant_id` in client code — RLS handles it automatically
-- TypeScript strict mode in all packages
-- No hardcoded strings in UI — everything via i18n keys
-- Generate and commit Supabase types after migration
-
-## Done When
-- [ ] `pnpm install` succeeds from root
-- [ ] `apps/mobile`: `pnpm expo start` runs without errors
-- [ ] `apps/web`: `pnpm dev` serves the app without errors
-- [ ] `packages/supabase`: `supabase db reset` applies all migrations cleanly
-- [ ] `packages/supabase/types.ts` is generated and up to date
-- [ ] All placeholder screens/pages render without errors
+- Migrations apply cleanly; `pnpm db:types` refreshes types
+- RLS tested with real `user_roles` + assignments
+- No hardcoded user-facing strings (i18n keys)

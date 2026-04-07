@@ -6,9 +6,9 @@
     "dev:web": "pnpm --filter @growcold/web dev",
     "dev:mobile": "pnpm --filter @growcold/mobile start",
     "build:web": "pnpm --filter @growcold/web build",
-    "db:start": "pnpm --filter @growcold/supabase exec supabase start",
-    "db:reset": "pnpm --filter @growcold/supabase exec supabase db reset",
-    "db:types": "pnpm --filter @growcold/supabase exec supabase gen types typescript --local > packages/supabase/types.ts",
-    "typecheck": "pnpm -r run typecheck"
+    "db:start": "pnpm --filter @growcold/supabase db:start",
+    "db:reset": "pnpm --filter @growcold/supabase db:reset",
+    "db:types": "pnpm --filter @growcold/supabase db:types",
+    "typecheck": "pnpm --filter @growcold/shared typecheck && pnpm --filter @growcold/web typecheck && pnpm --filter @growcold/mobile typecheck"
   }
 }
