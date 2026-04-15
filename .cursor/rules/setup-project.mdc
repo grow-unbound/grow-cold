@@ -23,7 +23,7 @@ Monorepo is scaffolded under `apps/`, `packages/`. Extend it using [`specs/`](sp
 
 ```
 apps/mobile/       Expo + GlueStack + bottom tabs + TanStack Query + Zustand + expo-sqlite
-apps/web/          Vite + Tailwind + RR7 + TanStack Query + Zustand + i18n (te/en)
+apps/web/          Next.js + React + Typescript + Tailwind + TanStack Query + Zustand + i18n (te/en)
 packages/shared/   Zod, constants, formatINR/formatDate, i18n resources
 packages/supabase/ supabase/config.toml, migrations, types.ts
 specs/
@@ -31,7 +31,7 @@ specs/
 
 ## Product IA (web + mobile)
 
-- **Tabs:** Home, Inventory, Parties, Receipts, Payments
+- **Tabs:** Home, Inventory, Parties, Transactions
 - **Avatar menu:** Settings, warehouse switch, profile (role-gated: OWNER / MANAGER / STAFF)
 
 ## Supabase (MVP)

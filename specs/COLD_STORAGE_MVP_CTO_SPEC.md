@@ -166,6 +166,7 @@ Charges applied to each delivery transaction:
 - **Platform**: Transaction fee (fixed or %)
 - **KataCoolie**: Weight-based handling (₹/quintal)
 - **Mamulle**: Miscellaneous (fixed or %)
+- **Insurance**: Insurance per bag (₹/bag)
 
 Stored in `TransactionCharges` table, linked to `Delivery` record.
 
@@ -194,23 +195,31 @@ When payment allocated to `WRITTEN_OFF` lot:
 
 1. **Tenants** (business / org)
    ```
-   id (PK), name, createdAt
+   id (PK), name, phone (no email), address, createdAt, udpatedAt, createdBy, updatedBy
    ```
 
 2. **Warehouses**
    ```
-   id (PK), tenantID (FK → tenants), warehouseName, warehouseCode, city, state, ...
+   id (PK), tenantID (FK → tenants), warehouseName, warehouseCode, city, state, address, status (ENUM: ACTIVE, INACTIVE),
+   createdAt, updatedAt, createdBy, updatedBy, ...
    ```
 
 3. **Customers**
    ```
-   id (PK), customerName, phone (no email), warehouseID (FK), ...
+   id (PK), customerName, customerCode ([a-zA-Z/\-0-9]),  phone (no email), warehouseID (FK), 
+   mobile (no email), town, address, gstin, 
+   category (ENUM: FARMER, TRADER), 
+   createdAt, updatedAt, createdBy, updatedBy, ...
    ```
 
 4. **Products**
    ```
    id (PK), productName, productGroupID (FK), staleDaysLimit (INT, nullable),
-   createdAt, updatedAt
+   description,
+   monthlyRentPerKg (DECIMAL), yearlyRentPerKg (DECIMAL), bagSize (INT - in kgs)
+   monthlyRentPerBag (DECIMAL), yearlyRentPerBag (DECIMAL), staleDaysLimit (INT),
+   status (ENUM: ACTIVE, INACTIVE),
+   createdAt, updatedAt, createdBy, updatedBy, ...
    ```
 
 5. **Lots**
@@ -219,33 +228,37 @@ When payment allocated to `WRITTEN_OFF` lot:
    originalBags (INT), balanceBags (INT),
    lodgementDate (DATE),
    status (ENUM: ACTIVE, STALE, DELIVERED, CLEARED, WRITTEN_OFF, DISPUTED),
-   rentalMode (ENUM: YEARLY, MONTHLY, BROUGHT_FORWARD),
-   rentalAmount (DECIMAL),
-   chargesFrozen (BOOLEAN, default: false),
-   createdAt, updatedAt
+   rentalMode (ENUM: YEARLY, MONTHLY, BROUGHT_FORWARD), notes (array of notes {note, date}),
+   createdAt, updatedAt,
+   createdBy, updatedBy
    ```
 
 6. **RentAccruals**
    ```
    id (PK), lotID (FK), accrualDate (DATE),
    rentalAmount (DECIMAL), rentalMode (ENUM),
-   isPaid (BOOLEAN),
-   paidDate (DATE, nullable),
-   createdAt, updatedAt
+   isPaid (BOOLEAN: default false),
+   paidDare (DATE, nullable),
+   paidAmount (DECIMAL),
+   createdAt, updatedAt,
+   createdBy, updatedBy
    ```
 
-7. **TransactionCharges**
+7. **ChargeAccruals**
    ```
-   id (PK), deliveryID (FK), chargeType (ENUM: HAMALI, PLATFORM, KATA_COOLIE, MAMULLE),
-   chargeAmount (DECIMAL), ratePerUnit (DECIMAL, nullable),
-   isPaid (BOOLEAN),
-   createdAt, updatedAt
+   id (PK), lotId(FK), deliveryID (FK, nullable for lodgement), chargeTypeId (FK)
+   ratePerUnit (DECIMAL, nullable), numBags (INT), chargeAmount (DECIMAL), 
+   isPaid (BOOLEAN: default false),
+   paidDate (DATE, nullable),
+   paidAmount (DECIMAL: default 0),
+   createdAt, updatedAt,
+   createdBy, updatedBy
    ```
 
 8. **Deliveries**
    ```
    id (PK), lotID (FK), numBagsOut (INT), deliveryDate (DATE),
-   deliveryNotes (TEXT),
+   notes (TEXT),
    blockedReason (TEXT, nullable - if delivery was blocked/overridden),
    overriddenBy (USER_ID, FK nullable - owner who overrode block),
    overrideReason (TEXT, nullable),
@@ -257,13 +270,15 @@ When payment allocated to `WRITTEN_OFF` lot:
    id (PK), customerID (FK), receiptDate (DATE),
    totalAmount (DECIMAL), paymentMethod (TEXT),
    notes (TEXT),
-   createdAt, updatedAt
+   createdAt, updatedAt,
+   createdBy, updatedBy
    ```
 
-10. **ReceiptAllocations**
+10. **ReceiptAllocations** - Every Receipt is assigned to one or more charges/rents accrued
    ```
-   id (PK), receiptID (FK), chargeID (FK), amount (DECIMAL),
-   createdAt, updatedAt
+   id (PK), receiptID (FK), chargeID (FK nullable), rentId (FK nullable), amount (DECIMAL),
+   createdAt, updatedAt,
+   createdBy, updatedBy
    ```
 
 11. **Identity & membership** (Supabase: **`auth.users`** is golden source for phone auth)
@@ -275,7 +290,7 @@ When payment allocated to `WRITTEN_OFF` lot:
     ```
     id (PK), userID (FK → user_profiles), entityType (TEXT), entityID (TEXT), action (TEXT),
     oldValues (JSONB), newValues (JSONB), reason (TEXT),
-    createdAt
+    createdAt, createdBy
     ```
 
 ### NEW/UPDATED Tables
@@ -287,14 +302,39 @@ When payment allocated to `WRITTEN_OFF` lot:
     FOLLOW_UP_OUTSTANDING_DAYS (INT, default: 30),
     YEARLY_RENT_CUTOFF_DATE (DATE, e.g., Jan 1),
     GRACE_PERIOD_MONTHS (INT, default: 1),
-    createdAt, updatedAt
+    createdAt, updatedAt,
+    createdBy, updatedBy
     ```
 
 14. **LotStatusHistory** (for audit trail)
     ```
     id (PK), lotID (FK), oldStatus (ENUM), newStatus (ENUM),
     reason (TEXT), changedBy (USER_ID, FK),
-    createdAt
+    createdAt, updatedAt,
+    createdBy, updatedBy
+    ```
+
+15. **TransactionChargeTypes** (for tenant level customizations - e.g. Mamulle, Hamali, Insurance, KataCoolie, PlatformCoolie)
+    ```
+    id (PK), name, description, status (ENUM: ACTIVE, INACTIVE),
+    description,
+    createdAt, updatedAt,
+    createdBy, updatedBy
+    ```
+
+16. **TransactionCharges** (configuration per product)
+    ```
+    id (PK), productId (FK), chargeTypeId (FK), chargePerBag (DECIMAL),
+    description, status (ENUM: ACTIVE, INACTIVE)
+    createdAt, updatedAt,
+    createdBy, updatedBy
+    ```
+
+17. **ProductGroups** (allow subgroups e.g. Chillies 341, Chillies Endo 5, Chillies Talu, etc.)
+    ```
+    id (PK), name, parentGroupId (FK), description,
+    createdAt, updatedAt,
+    createdBy, updatedBy
     ```
 
 ---
@@ -302,7 +342,7 @@ When payment allocated to `WRITTEN_OFF` lot:
 ## PART 3: API SPECIFICATION
 
 ### Authentication
-- **Method**: Supabase Phone OTP (**no email** in product domain)
+- **Method**: Supabase Whatsapp OTP (**no email** in product domain)
 - **Identity**: **`auth.users`**; app reads **`user_profiles`** + **`user_roles`** for `tenant_id` and **OWNER / MANAGER / STAFF**
 - **APIs**: MVP uses **Supabase client + RLS** (and Edge Functions where needed), not a separate Node `/api` tier. Bearer JWT on all calls.
 
@@ -525,7 +565,8 @@ interface SettingsState {
 - Recent deliveries
 
 **Shared navigation (web + mobile)**  
-Bottom tabs: **Home**, **Inventory**, **Parties**, **Receipts**, **Payments**. **Settings**, **warehouse switch**, and **profile** live under the **user avatar menu** (not tabs), with items **gated by role**.
+Bottom tabs: **Home**, **Inventory**, **Parties**, **Transactions**,
+ **Settings**, **warehouse switch**, and **profile** live under the **user avatar menu** (not tabs), with items **gated by role**.
 
 **STAFF only sees**:
 - ACTIVE + STALE lots only

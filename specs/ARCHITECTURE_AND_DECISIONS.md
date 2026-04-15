@@ -12,10 +12,10 @@
 │  ┌──────────────────────┐      ┌──────────────────────┐         │
 │  │   React Web App      │      │  React Native Mobile │         │
 │  │  (Browser)           │      │  (iOS/Android)       │         │
-│  │  Tabs: Home, Inventory,      │  Same tab bar: Home, │         │
-│  │  Parties, Receipts, Payments │  Inventory, Parties, │         │
-│  │  Avatar menu: Settings,       │  Receipts, Payments  │         │
-│  │  warehouse switch, profile   │  + same avatar menu  │         │
+│  │  Tabs: Home, Inventory,     │  Same tab bar: Home, │         │
+│  │  Parties, Transactions|      |    Inventory, Parties,│         │
+│  │  Avatar menu: Settings,     │  Transactions        │         │
+│  │  warehouse switch, profile  │  + same avatar menu  │         │
 │  └──────────────────────┘      └──────────────────────┘         │
 │                 ↓                         ↓                       │
 └─────────────────────────────────────────────────────────────────┘
@@ -33,11 +33,11 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │                    SUPABASE BACKEND                              │
 ├─────────────────────────────────────────────────────────────────┤
-│                                                                   │
-│  Authentication:                                                 │
-│  • Supabase Auth (Phone OTP)                                     │
-│  • JWT token issuance & verification                             │
-│                                                                   │
+│                                                                 │
+│  Authentication:                                                │
+│  • Supabase Auth (Whatsapp OTP)                                 │
+│  • JWT token issuance & verification                            │
+│                                                                 │
 │  PostgreSQL Database:                                            │
 │  ┌─────────────────────────────────────────────────┐             │
 │  │ Tables:                                         │             │
@@ -46,16 +46,18 @@
 │  │ • products                                      │             │
 │  │ • lots (status, balanceBags, lodgementDate)     │             │
 │  │ • rent_accruals (isPaid, paidDate)              │             │
-│  │ • transaction_charges (isPaid, paidDate)        │             │
+│  │ • charge_accruals (isPaid, paidDate)            │             │
 │  │ • deliveries (with blocking info)               │             │
 │  │ • customer_receipts                             │             │
-│  │ • receipt_allocations (FIFO)                     │             │
+│  │ • receipt_allocations (FIFO)                    │             │
 │  │ • auth.users + user_profiles + user_roles       │             │
-│  │ • warehouse_settings (config)                    │             │
-│  │ • audit_log (compliance)                         │             │
-│  │ • lot_status_history (traceability)              │             │
+│  │ • warehouse_settings (config)                   │             │
+│  │ • audit_log (compliance)                        │             │
+│  │ • transaction_charge_types (tenant settings)    │             │
+│  │ • transaction_chargs (tenant settings)          │             │
+│  │ • product_groups (with subgroups in same table) │             │
 │  └─────────────────────────────────────────────────┘             │
-│                                                                   │
+│                                                                  │
 │  Row-Level Security (RLS):                                       │
 │  • Tenant + assigned-warehouse access (see multitenancy rules)   │
 │  • Role: OWNER / MANAGER / STAFF (legacy ADMIN→OWNER, etc.)      │
@@ -204,7 +206,7 @@ Customer sends payment:
 **Decision**: Use **Supabase as the only application backend for MVP** (PostgreSQL + Auth + PostgREST + RLS + Realtime + Edge Functions). **No dedicated Node/Express/Hono API** until a future version explicitly needs it.
 
 **Rationale**:
-- ✅ Authentication (Phone OTP) built-in; **`auth.users`** is identity source of truth
+- ✅ Authentication (Whatsapp OTP) built-in; **`auth.users`** is identity source of truth
 - ✅ Row-Level Security (RLS) enforces access control at DB level
 - ✅ PostgREST exposes CRUD; complex flows use **RPC or Edge Functions**
 - ✅ Realtime subscriptions for live updates
@@ -491,7 +493,7 @@ CREATE INDEX idx_audit_log_warehouseID_createdAt ON audit_log(warehouseID, creat
 | Manipulate outstanding amount | Audit log + immutable history |
 | Fake receipts | Audit log captures who recorded payment |
 | SQL injection | Supabase prepared statements + Drizzle ORM |
-| Replay attack | JWT expires in 24 hours, phone OTP one-time |
+| Replay attack | JWT expires in 24 hours, Whatsapp OTP one-time |
 | Data breach | Supabase encryption at rest + HTTPS in transit |
 
 ---
@@ -568,8 +570,8 @@ CREATE INDEX idx_audit_log_warehouseID_createdAt ON audit_log(warehouseID, creat
 ## APPENDIX: Tech Stack Summary
 
 - **Mobile:** React Native + Expo
-- **UI:** GlueStack UI, Shadcn/ui + Tailwind CSS (for web)
-- **Web:** React + TypeScript
+- **UI:** GlueStack UI, Shadcn/ui + Tailwind CSS + Zustand (for web)
+- **Web:** Next.js + React + TypeScript
 - **Backend/DB/Auth/Storage:** Supabase (PostgreSQL + RLS + Realtime)
 - **Auth:** Supabase Auth — phone number + WhatsApp OTP (no email)
 - **Validation:** Zod + TanStack Query

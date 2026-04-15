@@ -1057,9 +1057,10 @@ Record payment receipt (auto-allocates FIFO).
 ```
 
 **Logic**:
-- Sort unpaid items (rents + charges) by date (FIFO)
+- Sort unpaid or partially paid items (rents + charges) by date (FIFO)
 - Auto-allocate receipt amount to oldest items
-- If remainder, create ReceiptAllocation with unallocated flag
+- If remainder, allocate partially to the next unpaid item
+- Mark settled items (rents+charges) in accruals tables as well
 
 ---
 
@@ -1215,6 +1216,7 @@ Manually re-allocate receipt to different charges.
       {
         "id": "lot_123",
         "customerName": "ABC Traders",
+        "warehouseName": "Padala Store",
         "productName": "Potato",
         "balanceBags": 750,
         "daysOld": 34,
