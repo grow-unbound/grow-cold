@@ -1,0 +1,54 @@
+---
+description: Initial project scaffold for GrowCold
+globs: []
+alwaysApply: false
+---
+
+# Project Setup Prompt
+
+Monorepo is scaffolded under `apps/`, `packages/`. Extend it using [`specs/`](specs/) and [`specs/SUPABASE_CONVENTIONS.md`](specs/SUPABASE_CONVENTIONS.md).
+
+## Read First
+
+1. `CLAUDE.md`
+2. `.cursor/rules/supabase_multitenancy.mdc`
+3. `.cursorrules`
+4. `specs/COLD_STORAGE_MVP_CTO_SPEC.md`
+5. `specs/API_AND_SCHEMA_SPEC.md`
+6. `specs/ARCHITECTURE_AND_DECISIONS.md`
+7. `specs/FRONTEND_IMPLEMENTATION_GUIDE.md`
+8. `specs/IMPLEMENTATION_CHECKLIST.md`
+
+## Layout
+
+```
+apps/mobile/       Expo + GlueStack + bottom tabs + TanStack Query + Zustand + expo-sqlite
+apps/web/          Next.js + React + Typescript + Tailwind + TanStack Query + Zustand + i18n (te/en)
+packages/shared/   Zod, constants, formatINR/formatDate, i18n resources
+packages/supabase/ supabase/config.toml, migrations, types.ts
+specs/
+```
+
+## Product IA (web + mobile)
+
+- **Tabs:** Home, Inventory, Parties, Transactions
+- **Avatar menu:** Settings, warehouse switch, profile (role-gated: OWNER / MANAGER / STAFF)
+
+## Supabase (MVP)
+
+- **No Node API** — PostgREST + RLS + Edge Functions when needed
+- **`auth.users`** + **`user_profiles`** + **`user_roles`** + **`user_warehouse_assignments`**
+- Roles: **OWNER**, **MANAGER**, **STAFF**
+- **`public.current_tenant_id()`** / **`public.accessible_warehouse_ids()`** — minimal triggers; prefer joins + `DEFAULT current_tenant_id()` on `tenant_id` columns
+
+## Commands
+
+- `pnpm install` — root
+- `pnpm dev:web` / `pnpm dev:mobile`
+- `pnpm db:start` then `pnpm db:reset` (Docker required)
+
+## Done When Extending
+
+- Migrations apply cleanly; `pnpm db:types` refreshes types
+- RLS tested with real `user_roles` + assignments
+- No hardcoded user-facing strings (i18n keys)
