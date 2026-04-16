@@ -37,6 +37,7 @@ export const productSchema = z.object({
 
 export const lotSchema = z.object({
   id: uuidSchema,
+  lot_number: z.string().regex(/^[A-Za-z0-9]+\/[A-Za-z0-9]+$/),
   warehouse_id: uuidSchema,
   tenant_id: uuidSchema,
   customer_id: uuidSchema,
