@@ -719,32 +719,3 @@ GRANT ALL ON ALL TABLES IN SCHEMA public TO postgres, service_role;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO authenticated;
 GRANT EXECUTE ON FUNCTION public.current_tenant_id() TO authenticated;
 GRANT EXECUTE ON FUNCTION public.accessible_warehouse_ids() TO authenticated;
-
--- ---------------------------------------------------------------------------
--- Dev seed (no auth user — attach profile/roles in dashboard for local testing)
--- ---------------------------------------------------------------------------
-INSERT INTO public.tenants (id, name)
-VALUES ('11111111-1111-1111-1111-111111111111', 'Demo Cold Storage');
-
-INSERT INTO public.warehouses (
-  id,
-  tenant_id,
-  warehouse_name,
-  warehouse_code,
-  city,
-  state
-)
-VALUES (
-  '22222222-2222-2222-2222-222222222222',
-  '11111111-1111-1111-1111-111111111111',
-  'Main Godown',
-  'WH-001',
-  'Guntur',
-  'Andhra Pradesh'
-);
-
-INSERT INTO public.warehouse_settings (warehouse_id, tenant_id)
-VALUES (
-  '22222222-2222-2222-2222-222222222222',
-  '11111111-1111-1111-1111-111111111111'
-);
