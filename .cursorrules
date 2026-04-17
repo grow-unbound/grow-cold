@@ -54,7 +54,8 @@ async function recordInward(entry: InwardEntry) {
 - Sync status always visible to user (pending badge count)
 
 ## UI / UX Rules
-- GlueStack UI components only — no raw RN primitives unless unavoidable
+- **Web (`apps/web`):** Follow the GrowCold Tailwind design system — tokens and patterns in `apps/web/tailwind.config.ts`, `specs/DESIGN_SYSTEM_*.md`, `specs/COMPONENT_SPECS.md`, and `.cursor/rules/growcold-design-system.mdc`.
+- GlueStack UI components only (Expo mobile) — no raw RN primitives unless unavoidable
 - Every action must have haptic feedback (`expo-haptics`)
 - Use skeleton screens — never blank loading states
 - Optimistic updates: update UI before API confirms
