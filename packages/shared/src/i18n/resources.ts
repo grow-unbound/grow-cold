@@ -1,4 +1,4 @@
-/** Base namespaces for placeholder UIs — default locale te. */
+/** Base namespaces for placeholder UIs — web defaults to `en`; `te` for regional UX. */
 export const resources = {
   te: {
     nav: {

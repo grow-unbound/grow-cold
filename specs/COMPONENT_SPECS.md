@@ -25,11 +25,11 @@
 - Hover: `hover:bg-primary-600` (#D74A0A)
 - Active: `active:bg-primary-700` (#CC4A08)
 - Disabled: Opacity 0.5, cursor not-allowed
-- Padding: `px-4 py-3` (16px h, 12px v)
+- Padding: `px-3 py-2.5` (12px h, 10px v)
 - Border radius: `rounded-base` (8px)
 - Font: `font-semibold` (600 weight)
 - Transition: `transition-all duration-200`
-- Touch target: Minimum 48px height
+- Touch target: Minimum **40px** height/width (`min-h-touch` / `min-w-touch`); keep **16px** input `text-base` on fields to avoid iOS zoom
 - Width: Full width on mobile, auto on desktop
 
 #### Secondary Button
@@ -99,16 +99,15 @@
 // On mobile, buttons stack vertically
 export function DeliveryActions() {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2">
       <button className="btn-primary">Record Delivery</button>
       <button className="btn-secondary">Cancel</button>
     </div>
   );
 }
 
-// Minimum touch target: 48px
-// Fat-finger friendly: Space buttons 16px+ apart
-// Never use small buttons on mobile (max 20px height)
+// Minimum tap target: 40px (Tailwind `min-h-touch`); leave ≥8px between adjacent targets (WCAG 2.2 spacing)
+// Never use tiny icon-only targets without padding + aria-label
 ```
 
 ---
@@ -136,7 +135,7 @@ export function DeliveryActions() {
 ```
 
 **Specs:**
-- Height: `py-3` (48px including padding)
+- Height: `min-h-touch` + `py-2.5` (~40px target; 16px text)
 - Padding: `px-4` (left/right)
 - Border: `border-2 border-neutral-200`
 - Font size: `text-base` (16px) — NEVER smaller on mobile (prevents iOS zoom)
@@ -652,7 +651,7 @@ export function OfflineQueueBadge() {
 ## Design Checklist (Before Component Shipping)
 
 - [ ] Color contrast meets WCAG AA (4.5:1 for text)
-- [ ] Touch targets 48px minimum
+- [ ] Touch targets ≥40px primary chrome; ≥8px spacing between adjacent controls
 - [ ] Font size ≥14px (or 12px for secondary only)
 - [ ] Line height ≥1.5
 - [ ] All interactive elements focusable (tab order logical)

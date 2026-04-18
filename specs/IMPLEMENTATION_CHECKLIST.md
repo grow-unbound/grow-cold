@@ -39,7 +39,7 @@
 ### Week 2: Supabase client & RLS verification (no Node API)
 
 - [ ] **App ↔ Supabase wiring**
-  - Expo + Vite apps: Supabase JS client (anon key + user JWT); env via `expo-constants` / Vite `import.meta.env`
+  - Expo + Next.js web: Supabase JS client (anon key + user JWT); env via `expo-constants` / `process.env.NEXT_PUBLIC_*` (web)
   - [ ] Test authenticated `select` against one RLS-protected table
 
 - [ ] **Auth session usage**

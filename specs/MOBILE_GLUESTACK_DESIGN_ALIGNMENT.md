@@ -34,8 +34,8 @@ Design system rationale: system/native fonts, no custom webfonts required on mob
 
 ## Spacing, touch, motion
 
-- **Touch targets:** minimum **48×48px** (align with `min-h-touch` / `min-w-touch` on web).
-- **Between tap targets:** ≥ **16px** gap where possible.
+- **Touch targets:** web uses **~40×40px** minimum (`min-h-touch` / `min-w-touch`); GlueStack controls should keep **≥40px** effective tap area on mobile.
+- **Between tap targets:** ≥ **8px** gap between adjacent targets (WCAG 2.2 spacing); prefer **12–16px** for dense toolbars.
 - **Transitions:** ~**200ms** for buttons; skeleton shimmer **1.5s** loop per [COMPONENT_SPECS.md](./COMPONENT_SPECS.md) — mirror perceived timing, not necessarily CSS `animation-*`.
 - **Skeletons:** Prefer GlueStack `Skeleton` (or equivalent) with dimensions close to final layout to avoid layout shift.
 

@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss';
+import type { PluginAPI } from 'tailwindcss/types/config';
 
 const config: Config = {
   content: [
@@ -117,33 +118,28 @@ const config: Config = {
         },
       },
 
-      // Typography Scale (Mobile-first, optimized for readability)
+      // Typography: one step up from compact; `base` 17px (still ≥16 for comfortable inputs on most devices)
       fontSize: {
-        // Captions (secondary info only)
-        caption: ['12px', { lineHeight: '1.33', fontWeight: '400' }],
-        'caption-sm': ['11px', { lineHeight: '1.27', fontWeight: '400' }],
+        caption: ['11px', { lineHeight: '1.35', fontWeight: '400' }],
+        'caption-sm': ['10px', { lineHeight: '1.32', fontWeight: '400' }],
 
-        // Labels & small text
-        label: ['12px', { lineHeight: '1.33', fontWeight: '600' }],
-        'label-lg': ['14px', { lineHeight: '1.43', fontWeight: '600' }],
+        label: ['11px', { lineHeight: '1.35', fontWeight: '600' }],
+        'label-lg': ['12px', { lineHeight: '1.4', fontWeight: '600' }],
 
-        // Body text (minimum readable size on mobile)
-        base: ['16px', { lineHeight: '1.5', fontWeight: '400' }],
-        'body-sm': ['14px', { lineHeight: '1.43', fontWeight: '400' }],
-        'body-lg': ['18px', { lineHeight: '1.556', fontWeight: '400' }],
+        base: ['17px', { lineHeight: '1.45', fontWeight: '400' }],
+        'body-sm': ['13px', { lineHeight: '1.43', fontWeight: '400' }],
+        'body-lg': ['16px', { lineHeight: '1.5', fontWeight: '400' }],
 
-        // Headings
-        h3: ['20px', { lineHeight: '1.4', fontWeight: '600' }],
-        h2: ['24px', { lineHeight: '1.33', fontWeight: '700' }],
-        h1: ['32px', { lineHeight: '1.25', fontWeight: '700' }],
+        h3: ['16px', { lineHeight: '1.38', fontWeight: '600' }],
+        h2: ['18px', { lineHeight: '1.32', fontWeight: '700' }],
+        h1: ['24px', { lineHeight: '1.22', fontWeight: '700' }],
 
-        // Mobile-specific overrides (optional, use Tailwind responsive classes instead)
-        xs: ['12px', { lineHeight: '1.33' }],
-        sm: ['14px', { lineHeight: '1.43' }],
-        lg: ['18px', { lineHeight: '1.556' }],
-        xl: ['20px', { lineHeight: '1.4' }],
-        '2xl': ['24px', { lineHeight: '1.33' }],
-        '3xl': ['32px', { lineHeight: '1.25' }],
+        xs: ['11px', { lineHeight: '1.35' }],
+        sm: ['13px', { lineHeight: '1.43' }],
+        lg: ['16px', { lineHeight: '1.5' }],
+        xl: ['18px', { lineHeight: '1.32' }],
+        '2xl': ['18px', { lineHeight: '1.32' }],
+        '3xl': ['24px', { lineHeight: '1.22' }],
       },
 
       // Spacing Scale (8px base unit)
@@ -231,16 +227,14 @@ const config: Config = {
         '2': '2px',
       },
 
-      // Min height for touch targets
       minHeight: {
-        touch: '48px', // Minimum touch target
-        'touch-sm': '44px', // Minimum (Apple HIG)
+        touch: '34px',
+        'touch-sm': '30px',
       },
 
-      // Min width for touch targets
       minWidth: {
-        touch: '48px',
-        'touch-sm': '44px',
+        touch: '34px',
+        'touch-sm': '30px',
       },
     },
   },
@@ -249,11 +243,11 @@ const config: Config = {
   darkMode: 'class',
 
   plugins: [
-    function ({ addComponents }) {
+    function ({ addComponents }: PluginAPI) {
       addComponents({
         // Button base styles
         '.btn-base': {
-          '@apply px-4 py-3 rounded-base font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-h-touch min-w-touch': {},
+          '@apply px-2.5 py-1.5 text-sm rounded-base font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-h-touch min-w-touch': {},
         },
 
         // Primary button
@@ -263,7 +257,7 @@ const config: Config = {
 
         // Secondary button
         '.btn-secondary': {
-          '@apply btn-base border-2 border-secondary-500 text-secondary-500 hover:bg-secondary-50 active:bg-secondary-100 focus:outline-2 focus:outline-offset-2 focus:outline-secondary-500': {},
+          '@apply btn-base border border-secondary-500 text-secondary-500 hover:bg-secondary-50 active:bg-secondary-100 focus:outline-2 focus:outline-offset-2 focus:outline-secondary-500': {},
         },
 
         // Danger button
@@ -278,12 +272,12 @@ const config: Config = {
 
         // Input base styles
         '.input-base': {
-          '@apply w-full px-4 py-3 border-2 border-neutral-200 rounded-base text-base font-normal transition-all duration-200 focus:border-primary-500 focus:ring-0 focus:shadow-focus disabled:bg-neutral-100 disabled:opacity-50': {},
+          '@apply w-full min-h-touch px-2.5 py-2 border border-neutral-200 rounded-base text-base font-normal transition-all duration-200 focus:border-primary-500 focus:ring-0 focus:shadow-focus disabled:bg-neutral-100 disabled:opacity-50': {},
         },
 
         // Card base
         '.card': {
-          '@apply bg-white rounded-base border border-neutral-200 shadow-sm p-4 sm:p-5 md:p-6': {},
+          '@apply bg-white rounded-base border border-neutral-200 shadow-sm p-2 sm:p-3 md:p-4': {},
         },
 
         // Skeleton loading animation
@@ -293,7 +287,7 @@ const config: Config = {
 
         // Text field wrapper (label + input + error)
         '.form-field': {
-          '@apply flex flex-col gap-2': {},
+          '@apply flex flex-col gap-1.5': {},
         },
 
         // Heading hierarchy
@@ -309,16 +303,16 @@ const config: Config = {
 
         // Status badge
         '.badge-active': {
-          '@apply inline-flex items-center gap-1 px-2 py-1 rounded-sm bg-success-50 text-success-700 text-label font-semibold': {},
+          '@apply inline-flex items-center gap-0.5 rounded-sm bg-success-50 px-1.5 py-0.5 text-caption-sm font-semibold text-success-700': {},
         },
         '.badge-stale': {
-          '@apply inline-flex items-center gap-1 px-2 py-1 rounded-sm bg-warning-50 text-warning-700 text-label font-semibold': {},
+          '@apply inline-flex items-center gap-0.5 rounded-sm bg-warning-50 px-1.5 py-0.5 text-caption-sm font-semibold text-warning-700': {},
         },
         '.badge-disputed': {
-          '@apply inline-flex items-center gap-1 px-2 py-1 rounded-sm bg-danger-50 text-danger-700 text-label font-semibold': {},
+          '@apply inline-flex items-center gap-0.5 rounded-sm bg-danger-50 px-1.5 py-0.5 text-caption-sm font-semibold text-danger-700': {},
         },
         '.badge-cleared': {
-          '@apply inline-flex items-center gap-1 px-2 py-1 rounded-sm bg-success-50 text-success-700 text-label font-semibold': {},
+          '@apply inline-flex items-center gap-0.5 rounded-sm bg-success-50 px-1.5 py-0.5 text-caption-sm font-semibold text-success-700': {},
         },
 
         // Accessibility: Visible focus
@@ -326,9 +320,9 @@ const config: Config = {
           '@apply focus:outline-2 focus:outline-offset-2 focus:outline-primary-500': {},
         },
 
-        // Responsive containers
+        // Full-width content rail (no max-width; horizontal padding only)
         '.page-container': {
-          '@apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8': {},
+          '@apply mx-0 w-full max-w-none px-3 sm:px-4 lg:px-6': {},
         },
 
         // Grid for lot cards

@@ -1,3 +1,5 @@
+'use client';
+
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -22,59 +24,59 @@ export function UserMenu() {
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
-        <Button variant="outline" className="gap-1 px-3" type="button">
+        <Button variant="outline" className="gap-0.5 px-2" type="button">
           <span className="sr-only">User menu</span>
           <span
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-200 text-sm font-medium text-neutral-800"
+            className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-200 text-sm font-medium text-neutral-800"
             aria-hidden
           >
             U
           </span>
-          <ChevronDown className="h-4 w-4 opacity-60" />
+          <ChevronDown className="h-3.5 w-3.5 opacity-60" />
         </Button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
         <DropdownMenu.Content
-          className="z-50 min-w-[12rem] rounded-base border border-neutral-200 bg-white p-1 shadow-md"
+          className="z-50 min-w-[11rem] rounded-base border border-neutral-200 bg-white p-0.5 text-sm shadow-md"
           sideOffset={6}
           align="end"
         >
-          <div className="px-2 py-1.5 text-label text-neutral-500">
+          <div className="px-2 py-1 text-caption text-neutral-500">
             Role (dev): {roleLabel(role)}
           </div>
           <DropdownMenu.Item
-            className="cursor-pointer rounded-base px-2 py-2 text-body-sm outline-none hover:bg-neutral-100"
+            className="cursor-pointer rounded-base px-2 py-1.5 text-sm outline-none hover:bg-neutral-100"
             onSelect={() => {}}
           >
             {t('settings')}
           </DropdownMenu.Item>
           <DropdownMenu.Item
-            className="cursor-pointer rounded-base px-2 py-2 text-body-sm outline-none hover:bg-neutral-100"
+            className="cursor-pointer rounded-base px-2 py-1.5 text-sm outline-none hover:bg-neutral-100"
             onSelect={() => {}}
           >
             {t('warehouse')}
           </DropdownMenu.Item>
           <DropdownMenu.Item
-            className="cursor-pointer rounded-base px-2 py-2 text-body-sm outline-none hover:bg-neutral-100"
+            className="cursor-pointer rounded-base px-2 py-1.5 text-sm outline-none hover:bg-neutral-100"
             onSelect={() => {}}
           >
             {t('profile')}
           </DropdownMenu.Item>
-          <DropdownMenu.Separator className="my-1 h-px bg-neutral-200" />
+          <DropdownMenu.Separator className="my-0.5 h-px bg-neutral-200" />
           <DropdownMenu.Item
-            className="cursor-pointer rounded-base px-2 py-2 text-label text-neutral-500 outline-none hover:bg-neutral-100"
+            className="cursor-pointer rounded-base px-2 py-1.5 text-caption text-neutral-500 outline-none hover:bg-neutral-100"
             onSelect={() => setRole('STAFF')}
           >
             Simulate STAFF
           </DropdownMenu.Item>
           <DropdownMenu.Item
-            className="cursor-pointer rounded-base px-2 py-2 text-label text-neutral-500 outline-none hover:bg-neutral-100"
+            className="cursor-pointer rounded-base px-2 py-1.5 text-caption text-neutral-500 outline-none hover:bg-neutral-100"
             onSelect={() => setRole('MANAGER')}
           >
             Simulate MANAGER
           </DropdownMenu.Item>
           <DropdownMenu.Item
-            className="cursor-pointer rounded-base px-2 py-2 text-label text-neutral-500 outline-none hover:bg-neutral-100"
+            className="cursor-pointer rounded-base px-2 py-1.5 text-caption text-neutral-500 outline-none hover:bg-neutral-100"
             onSelect={() => setRole('OWNER')}
           >
             Simulate OWNER

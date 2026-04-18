@@ -37,7 +37,7 @@
 - **Haptic feedback** (medium for success, warning pattern for errors)
 - **Acknowledge-first pattern** (immediate feedback, sync in background)
 - **Perceived speed** (optimistic UI, 200-300ms transitions, fade-in/out)
-- **Fat-finger UX** (48px touch targets, 16px spacing between elements)
+- **Tap-friendly UX** (~40px primary targets via `min-h-touch`, ≥8px spacing between adjacent controls)
 - **Smooth transitions** (ease-out on entry, ease-in on exit, cubic-bezier functions)
 
 **Example flow:**
@@ -62,7 +62,7 @@ Toast disappears, queue updates
 
 ### 3. Accessibility & Localization
 - **Color contrast** (WCAG AAA minimum, 4.5:1 for text)
-- **Font sizes** (14px minimum, 16px base on mobile)
+- **Font sizes** (13px+ secondary copy; **16px** `text-base` for body + inputs to avoid iOS zoom)
 - **Line-height** (1.5 for body text, not cramped)
 - **Semantic HTML** (proper headings, labels, landmarks)
 - **Keyboard navigation** (all interactive elements focusable)
@@ -138,17 +138,17 @@ System fonts (-apple-system, BlinkMacSystemFont, Segoe UI, Roboto)
 → No custom fonts needed (faster offline)
 ```
 
-### Type Scale (Mobile-First)
+### Type Scale (Mobile-First, sleeker web chrome)
 ```
-H1: 32px | 40px line-height | 700 weight   (page titles)
-H2: 24px | 32px line-height | 700 weight   (section headings)
-H3: 20px | 28px line-height | 600 weight   (card titles)
-Body: 16px | 24px line-height | 400 weight (primary text)
-Small: 14px | 20px line-height | 400 weight (secondary text)
-Label: 12px | 16px line-height | 600 weight (form labels)
+H1: 26px | 700 weight   (page titles)
+H2: 20px | 700 weight   (section headings)
+H3: 18px | 600 weight   (card titles)
+Body: 16px | 400 weight (primary text + form controls)
+Small: 13px | 400 weight (secondary text)
+Label: 11px | 600 weight (form labels, nav tabs)
 ```
 
-**Key rule:** Never go below 14px on mobile (except labels). Older users, small screens. 16px base is generous but necessary for usability.
+**Key rule:** Keep **16px** on native inputs and primary reading blocks on mobile. Secondary UI may use **13px**; labels down to **11px** where hierarchy allows.
 
 ---
 
@@ -195,7 +195,7 @@ import { Input } from '@/components/ui/Input';
 ```
 320px+: Full-width cards, single column
         Bottom tab bar navigation
-        Large buttons (48px)
+        Primary buttons (~40px min height)
         Minimal information (only essential)
         Example: Inventory list, delivery form, payment page
 ```
@@ -274,7 +274,7 @@ Resolution:   User chooses, conflict logged to audit trail
 ✅ Don't rely on color alone (use icon + color + text)
 
 ### Typography
-✅ Minimum font size: 14px (12px only for secondary info)  
+✅ Secondary copy: 13px+; labels may use 11px where hierarchy is clear  
 ✅ Font family: System fonts (no decorative scripts)  
 ✅ Line-height: 1.5 minimum (we use 1.5-1.75)  
 ✅ Line length: 50-75 characters (mobile: full width okay)  
@@ -290,8 +290,8 @@ Resolution:   User chooses, conflict logged to audit trail
 ✅ Skip link: First focusable element
 
 ### Touch Targets
-✅ Buttons: 48px × 48px minimum  
-✅ Spacing: 16px minimum between interactive elements  
+✅ Primary controls: ~40px × 40px minimum (`min-h-touch` / `min-w-touch` on web)  
+✅ Spacing: ≥8px between adjacent interactive elements (WCAG 2.2 target spacing)  
 ✅ No hover states on mobile (use :active instead)
 
 ---

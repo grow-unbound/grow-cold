@@ -28,7 +28,7 @@ apps/
       hooks/       # Custom hooks (useStock, useSync, etc.)
       stores/      # Zustand stores for offline queue
       i18n/        # Translation files per language
-  web/             # React + Vite
+  web/             # Next.js App Router
 packages/
   supabase/        # DB types, RLS policies, migrations
   shared/          # Zod schemas, utils, constants shared across apps
@@ -60,11 +60,11 @@ async function recordInward(entry: InwardEntry) {
 - Use skeleton screens — never blank loading states
 - Optimistic updates: update UI before API confirms
 - No modals for primary actions — use full screens or bottom sheets
-- Minimum touch target: 48x48px
+- Minimum touch target: ~40×40px on web (`min-h-touch` / `min-w-touch`); ≥8px spacing between adjacent targets
 - All user-facing strings go through i18n — no hardcoded English text
 
 ## i18n
-- Default language: Telugu (`te`) for onboarding flows; detect via `expo-localization`
+- **Web (`apps/web`):** Default UI language is English (`en`) in `i18n` init. **Mobile:** prefer device locale via `expo-localization` (Telugu-first onboarding remains a product choice for AP/TS).
 - Translation keys: `namespace.screen.element` (e.g., `inward.form.quantity_label`)
 - Currency: always format with `Intl.NumberFormat('en-IN')` — lakhs/crores
 - Dates: DD/MM/YYYY always
@@ -103,7 +103,7 @@ async function recordInward(entry: InwardEntry) {
 ## FILE OWNERSHIP (CRITICAL - Prevents Conflicts)
 
 ### Frontend Agent (Web App)
-- **Owns:** `apps/web/src/**`, `apps/web/next.config.js`, `apps/web/tsconfig.json`
+- **Owns:** `apps/web/src/**`, `apps/web/next.config.ts`, `apps/web/tsconfig.json`
 - **Can edit:** React components, Next.js pages, web styles
 - **Cannot edit:** `packages/shared/`, `packages/supabase/`, `tests/`
 - **Blocked until:** Shared Agent creates API contracts in `packages/shared/api/endpoints/`
@@ -425,7 +425,7 @@ Only `apps/web/` is deployed to Vercel.
 ```
 vercel.json (in root):
 {
-  "buildCommand": "pnpm --filter=@grow-cold/web build",
+  "buildCommand": "pnpm --filter=@growcold/web build",
   "outputDirectory": "apps/web/.next"
 }
 ```

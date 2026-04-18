@@ -835,7 +835,7 @@
 - [ ] Pluralization: Handle "1 bag" vs "2 bags"
 
 ### Mobile-Responsive (Every component)
-- [ ] 5" viewport (minimum): Touch targets ≥48px, readable text
+- [ ] 5" viewport (minimum): Touch targets ≥40px primary chrome, readable text (16px on inputs)
 - [ ] 6.5" viewport: Optimal layout
 - [ ] Landscape mode: Functional (not hidden)
 - [ ] No horizontal scroll (acceptable: tables, minor exceptions)
@@ -843,7 +843,7 @@
 
 ### Accessibility (Minimum bar)
 - [ ] Color blind safe: Don't rely on color alone (add icons, text)
-- [ ] Touch targets: ≥48px for buttons
+- [ ] Touch targets: ≥40px for primary buttons (`min-h-touch`)
 - [ ] Text contrast: WCAG AA standard (4.5:1 for body text)
 - [ ] No keyboard traps: All interactive elements keyboard accessible
 

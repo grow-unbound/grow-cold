@@ -11,7 +11,7 @@ alwaysApply: false
 
 ## Stack boundaries
 
-- **`apps/web`** (Vite + React + Tailwind): Use this design system — tokens and component classes from `apps/web/tailwind.config.ts`.
+- **`apps/web`** (Next.js + React + Tailwind): Use this design system — tokens and component classes from `apps/web/tailwind.config.ts`.
 - **`apps/mobile`** (Expo + GlueStack): Do **not** apply Tailwind class names here; follow GlueStack theming and `specs/MOBILE_GLUESTACK_DESIGN_ALIGNMENT.md` when aligning colors/type/touch targets.
 
 ## Before changing UI
@@ -33,7 +33,7 @@ Read (or skim for relevance):
 ## Accessibility (non-negotiable)
 
 - Form controls: **`<label htmlFor>`** paired with **`id`**; **`aria-invalid`**, **`aria-describedby`** for errors; do not use placeholder as the only label.
-- Interactive controls: focus-visible affordance; minimum **14px** for non-label copy on small screens; **48px** minimum touch targets for primary actions (see COMPONENT_SPECS).
+- Interactive controls: focus-visible affordance; minimum **13px** for secondary copy on small screens; **~34px** minimum tap targets for primary actions (`min-h-touch`, see COMPONENT_SPECS).
 - Icon-only buttons: **`aria-label`**.
 
 ## What not to do

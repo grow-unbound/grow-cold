@@ -7,7 +7,7 @@ Core problem: 15-25% revenue loss from inventory shrinkage, zero visibility, del
 ## Stack (Non-Negotiable)
 - **Mobile:** React Native + Expo
 - **UI:** GlueStack UI
-- **Web:** React + TypeScript
+- **Web:** Next.js (App Router) + React + TypeScript
 - **Backend/DB/Auth/Storage:** Supabase (PostgreSQL + RLS + Realtime)
 - **Auth:** Supabase Auth — phone number + WhatsApp OTP (no email)
 - **Validation:** Zod + TanStack Query

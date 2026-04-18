@@ -88,17 +88,14 @@ Monospace:      'Monaco', 'Courier New', monospace (for numbers, codes)
 ### Type Scale (Mobile-First)
 
 ```
-H1 (Headline):      32px | 40px line-height | 700 weight
+H1 (Headline):      26px | 700 weight (web token `text-h1`)
                     Usage: Page titles, major section headers
-                    Mobile: 28px | 36px
 
-H2 (Section):       24px | 32px line-height | 700 weight
+H2 (Section):       20px | 700 weight (web token `text-h2`)
                     Usage: Section headings, lot details
-                    Mobile: 22px | 28px
 
-H3 (Subsection):    20px | 28px line-height | 600 weight
+H3 (Subsection):    18px | 600 weight (web token `text-h3`)
                     Usage: Form sections, card titles
-                    Mobile: 18px | 26px
 
 Body (Regular):     16px | 24px line-height | 400 weight
                     Usage: All body text, paragraphs
@@ -106,18 +103,14 @@ Body (Regular):     16px | 24px line-height | 400 weight
                     Minimum: DO NOT go below 16px on mobile
                     (Accessibility: Small text causes eye strain for older users)
 
-Body Small:         14px | 20px line-height | 400 weight
+Body Small:         13px | 400 weight (`text-body-sm`)
                     Usage: Secondary text, timestamps, hints
-                    Mobile: 14px | 20px
-                    Warning: Only for secondary info, never critical content
 
-Label:              12px | 16px line-height | 600 weight
-                    Usage: Form labels, badges, tags
-                    Mobile: 12px (only if necessary)
+Label:              11px | 600 weight (`text-label`)
+                    Usage: Form labels, badges, tags, bottom nav
 
-Button Text:        16px | 24px line-height | 600 weight
-                    Mobile: 16px (never smaller)
-                    Padding: 12px 16px (min 48px touch target)
+Button Text:        14px | 600 weight (`text-sm` in Button component)
+                    Padding: 10px 12px (`py-2.5 px-3`) with **~40px** min hit area (`min-h-touch`)
 ```
 
 ### Letter-Spacing & Tracking
@@ -164,8 +157,8 @@ Card/Section:   16px (mobile)
                 20px (tablet)
                 24px (desktop)
 
-Button/Input:   12px 16px (height: 48px minimum)
-                Never <44px on any touch device
+Button/Input:   10px 12px vertical/horizontal with **~40px** min height (`min-h-touch`)
+                Keep **16px** font on `<input>` / `<select>` (`text-base`) to avoid iOS zoom
 
 Form Field:     16px padding
                 8px between label and input
@@ -491,19 +484,16 @@ Swap timing:   Each skeleton fades to real data, staggered by 50ms
 
 #### Touch Targets
 ```
-Minimum:        44px × 44px (Apple HIG standard)
-Recommended:    48px × 48px (especially for older users)
-Spacing:        16px minimum between interactive elements
-                (Prevents accidental adjacent taps)
-
-Button padding: 12px vertical × 16px horizontal (gives 48px height)
-Input height:   48px (allow for padding)
+Primary chrome: ~40px × 40px (`min-h-touch` / `min-w-touch` on web)
+Spacing:        ≥8px between adjacent targets (WCAG 2.2); prefer 12px+ in dense toolbars
+Button padding: 10px × 12px with min-height token (sleek but tappable)
+Input height:   `min-h-touch` with 16px text on form fields
 
 Example spacing:
 ┌─────────────────────────────┐
-│ [ Save Button ]             │  ← 48px height
-│                             │  ← 16px space before next
-│ [ Cancel Button ]           │  ← 48px height
+│ [ Save Button ]             │  ← ~40px height
+│                             │  ← ≥8px gap
+│ [ Cancel Button ]           │  ← ~40px height
 └─────────────────────────────┘
 ```
 
@@ -1244,14 +1234,14 @@ Use this before shipping any feature:
 ### User Feel
 - [ ] Loading state uses skeleton (not spinner)
 - [ ] Buttons have :active state (not just :hover)
-- [ ] Touch targets are 48px minimum
+- [ ] Touch targets ≥40px on primary web controls; ≥8px between adjacent targets
 - [ ] Transitions are 200-300ms max
 - [ ] Offline indicator visible when offline
 - [ ] Acknowledge-first pattern (immediate feedback before sync)
 
 ### Accessibility
 - [ ] Text color contrast ≥4.5:1
-- [ ] Font size ≥14px (12px only for secondary)
+- [ ] Font size ≥13px for secondary copy; **16px** on inputs; labels may use 11px where hierarchy is clear
 - [ ] All inputs have labels
 - [ ] Error messages linked to inputs
 - [ ] Focus indicators visible (2px outline)
