@@ -9,6 +9,7 @@
     "db:start": "pnpm --filter @growcold/supabase db:start",
     "db:reset": "pnpm --filter @growcold/supabase db:reset",
     "db:types": "pnpm --filter @growcold/supabase db:types",
+    "linear:m0": "node scripts/linear-m0-closeout.mjs",
     "typecheck": "pnpm --filter @growcold/shared typecheck && pnpm --filter @growcold/web typecheck && pnpm --filter @growcold/mobile typecheck"
   }
 }
