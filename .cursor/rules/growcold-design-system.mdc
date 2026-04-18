@@ -1,0 +1,42 @@
+---
+description: Enforce GrowCold design system for web UI and design-spec work (Tailwind tokens, component classes, accessibility).
+globs:
+  - apps/web/**
+  - specs/DESIGN_SYSTEM*.md
+  - specs/COMPONENT_SPECS.md
+alwaysApply: false
+---
+
+# GrowCold design system (web)
+
+## Stack boundaries
+
+- **`apps/web`** (Next.js + React + Tailwind): Use this design system — tokens and component classes from `apps/web/tailwind.config.ts`.
+- **`apps/mobile`** (Expo + GlueStack): Do **not** apply Tailwind class names here; follow GlueStack theming and `specs/MOBILE_GLUESTACK_DESIGN_ALIGNMENT.md` when aligning colors/type/touch targets.
+
+## Before changing UI
+
+Read (or skim for relevance):
+
+- `specs/DESIGN_SYSTEM_V1.md`
+- `specs/DESIGN_SYSTEM_SUMMARY.md`
+- `specs/COMPONENT_SPECS.md`
+- `apps/web/tailwind.config.ts` (colors, `fontSize`, `@layer` plugins: `.btn-*`, `.card`, `.input-base`, etc.)
+
+## Tokens and classes (web)
+
+- Prefer **`primary`, `secondary`, `accent`, `success`, `warning`, `danger`, `neutral`** and **`status.*`** over ad hoc palette utilities such as `slate`, `zinc`, or `blue` for product chrome and text.
+- Prefer documented component utilities: **`btn-primary`**, **`btn-secondary`**, **`btn-danger`**, **`btn-ghost`**, **`input-base`**, **`form-field`**, **`card`**, **`skeleton`**, **`help-text`**, **`error-text`**, **`badge-*`**, **`page-container`**, **`lot-grid`**, heading helpers **`.h1` / `.h2` / `.h3`**, and semantic text sizes **`text-h1`**, **`text-body-sm`**, **`text-label`**, etc.
+- Use **`rounded-base`** (8px) for buttons and cards unless a spec calls for another token.
+- **`Button` component** (`apps/web/src/components/ui/button.tsx`): Use variants **`default`** (primary), **`secondary`**, **`outline`** (same as secondary outline), **`danger`**, **`ghost`** — align with COMPONENT_SPECS.
+
+## Accessibility (non-negotiable)
+
+- Form controls: **`<label htmlFor>`** paired with **`id`**; **`aria-invalid`**, **`aria-describedby`** for errors; do not use placeholder as the only label.
+- Interactive controls: focus-visible affordance; minimum **13px** for secondary copy on small screens; **~34px** minimum tap targets for primary actions (`min-h-touch`, see COMPONENT_SPECS).
+- Icon-only buttons: **`aria-label`**.
+
+## What not to do
+
+- Do not introduce one-off hex colors or default gray palettes for main surfaces when a token exists.
+- Do not shrink body text below **16px** for primary reading content on mobile web without an explicit product exception.

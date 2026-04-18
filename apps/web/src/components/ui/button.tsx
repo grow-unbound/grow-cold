@@ -1,16 +1,26 @@
+'use client';
+
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'inline-flex min-h-12 min-w-12 items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center gap-1 rounded-base px-2.5 py-1.5 text-sm font-semibold transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
   {
     variants: {
       variant: {
-        default: 'bg-slate-900 text-white hover:bg-slate-800',
-        ghost: 'hover:bg-slate-100',
-        outline: 'border border-slate-300 bg-white hover:bg-slate-50',
+        default:
+          'min-h-touch min-w-touch bg-primary-500 text-white hover:bg-primary-600 active:bg-primary-700 focus-visible:outline-primary-500',
+        secondary:
+          'min-h-touch min-w-touch border border-secondary-500 bg-transparent text-secondary-500 hover:bg-secondary-50 active:bg-secondary-100 focus-visible:outline-secondary-500',
+        danger:
+          'min-h-touch min-w-touch bg-danger-500 text-white hover:bg-danger-600 active:bg-danger-700 focus-visible:outline-danger-500',
+        ghost:
+          'min-h-touch min-w-0 border-0 bg-transparent px-2.5 py-1.5 text-secondary-500 hover:underline active:text-secondary-700',
+        /** Alias for secondary (teal outline); matches COMPONENT_SPECS secondary button */
+        outline:
+          'min-h-touch min-w-touch border border-secondary-500 bg-transparent text-secondary-500 hover:bg-secondary-50 active:bg-secondary-100 focus-visible:outline-secondary-500',
       },
     },
     defaultVariants: {

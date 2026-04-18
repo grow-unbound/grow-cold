@@ -3,8 +3,8 @@ import { initReactI18next } from 'react-i18next';
 import { resources } from '@growcold/shared';
 
 void i18n.use(initReactI18next).init({
-  lng: 'te',
-  fallbackLng: 'en',
+  lng: 'en',
+  fallbackLng: 'te',
   ns: ['nav', 'menu', 'common'],
   defaultNS: 'nav',
   resources: {

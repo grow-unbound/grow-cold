@@ -1,6 +1,6 @@
 # GrowCold
 
-Mobile-first cold storage (WMS) for Indian SMBs. Monorepo: **Expo** (mobile), **Vite + React** (web), **Supabase** (Postgres + Auth + RLS), **shared** (Zod, i18n strings, formatters).
+Mobile-first cold storage (WMS) for Indian SMBs. Monorepo: **Expo** (mobile), **Next.js** (web), **Supabase** (Postgres + Auth + RLS), **shared** (Zod, i18n strings, formatters).
 
 ## Prerequisites
 
@@ -18,7 +18,7 @@ pnpm install
 
 | Script            | Description                                      |
 | ----------------- | ------------------------------------------------ |
-| `pnpm dev:web`    | Vite dev server (http://localhost:5173)          |
+| `pnpm dev:web`    | Next.js dev server (http://localhost:3000)       |
 | `pnpm dev:mobile` | Expo dev server                                    |
 | `pnpm build:web`  | Production web build                               |
 | `pnpm typecheck`  | TypeScript across packages                         |
@@ -47,7 +47,7 @@ If `db:reset` says Supabase is not running, start Docker and run `pnpm db:start`
 
 ```
 apps/mobile/     Expo + GlueStack + React Navigation + TanStack Query + Zustand
-apps/web/        Vite + Tailwind + Radix/shadcn-style UI + RR7 + Query + Zustand
+apps/web/        Next.js App Router + Tailwind + Radix/shadcn-style UI + Query + Zustand
 packages/shared/ Zod schemas, constants, formatINR / formatDate, i18n resources (te/en)
 packages/supabase/ supabase/config.toml, migrations, types.ts
 ```

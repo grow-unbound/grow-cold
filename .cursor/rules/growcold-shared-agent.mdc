@@ -45,7 +45,7 @@ You CANNOT edit:
 ## Technical rules
 
 - Use TypeScript strict mode and Zod at boundaries.
-- Shared code must be platform-agnostic (works for Vite web and future Expo mobile).
+- Shared code must be platform-agnostic (works for Next.js web and future Expo mobile).
 - No DOM-only APIs (`window`, `document`, browser-only globals) in shared package code.
 - Supabase auth/data access uses `@supabase/supabase-js` in shared code. Do not use `@supabase/ssr` here.
 - Accept runtime config from app layers (`supabaseUrl`, `supabaseAnonKey`) rather than reading env directly in shared.
