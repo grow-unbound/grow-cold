@@ -1,18 +1,6 @@
-export interface JsonMap {
-  [key: string]: JsonValue | undefined;
-}
+import type { Database as GrowColdDatabase } from '@growcold/supabase/types';
 
-export type JsonValue = string | number | boolean | null | JsonMap | JsonValue[];
-
-export interface Database {
-  public: {
-    Tables: Record<string, unknown>;
-    Views: Record<string, unknown>;
-    Functions: Record<string, unknown>;
-    Enums: Record<string, string>;
-    CompositeTypes: Record<string, unknown>;
-  };
-}
+export type Database = GrowColdDatabase;
 
 export interface ApiError {
   code: string;

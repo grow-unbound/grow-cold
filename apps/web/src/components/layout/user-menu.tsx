@@ -2,6 +2,7 @@
 
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { ChevronDown } from 'lucide-react';
+import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { useSessionStore, type AppRole } from '@/stores/session-store';
@@ -44,6 +45,14 @@ export function UserMenu() {
           <div className="px-2 py-1 text-caption text-neutral-500">
             Role (dev): {roleLabel(role)}
           </div>
+          <DropdownMenu.Item asChild>
+            <Link
+              href="/login"
+              className="block cursor-pointer rounded-base px-2 py-1.5 text-sm text-primary-700 outline-none hover:bg-neutral-100"
+            >
+              {t('sign_in')}
+            </Link>
+          </DropdownMenu.Item>
           <DropdownMenu.Item
             className="cursor-pointer rounded-base px-2 py-1.5 text-sm outline-none hover:bg-neutral-100"
             onSelect={() => {}}

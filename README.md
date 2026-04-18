@@ -25,6 +25,9 @@ pnpm install
 | `pnpm db:start`   | `supabase start` (Docker)                         |
 | `pnpm db:reset`   | Reset DB and apply migrations (`packages/supabase`) |
 | `pnpm db:types`   | Regenerate `packages/supabase/types.ts` (needs local DB up) |
+| `pnpm linear:m0`  | Post M0 closeout comments + Done state in Linear (`LINEAR_API_KEY`) |
+
+Web auth: copy [`apps/web/.env.example`](apps/web/.env.example) to `apps/web/.env.local` and fill Supabase URL + anon key (`pnpm exec supabase status` when local stack is up).
 
 ## Local Supabase
 
@@ -49,5 +52,5 @@ If `db:reset` says Supabase is not running, start Docker and run `pnpm db:start`
 apps/mobile/     Expo + GlueStack + React Navigation + TanStack Query + Zustand
 apps/web/        Next.js App Router + Tailwind + Radix/shadcn-style UI + Query + Zustand
 packages/shared/ Zod schemas, constants, formatINR / formatDate, i18n resources (te/en)
-packages/supabase/ supabase/config.toml, migrations, types.ts
+packages/supabase/ `supabase/config.toml`, `supabase/migrations/`, `supabase/seed.sql`, `types.ts`
 ```
