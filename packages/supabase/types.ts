@@ -47,7 +47,7 @@ export type Database = {
           reason: string | null
           tenant_id: string
           user_id: string | null
-          warehouse_id: string
+          warehouse_id: string | null
         }
         Insert: {
           action: string
@@ -61,7 +61,7 @@ export type Database = {
           reason?: string | null
           tenant_id?: string
           user_id?: string | null
-          warehouse_id: string
+          warehouse_id?: string | null
         }
         Update: {
           action?: string
@@ -75,7 +75,7 @@ export type Database = {
           reason?: string | null
           tenant_id?: string
           user_id?: string | null
-          warehouse_id?: string
+          warehouse_id?: string | null
         }
         Relationships: [
           {
@@ -100,6 +100,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      auth_otp_challenges: {
+        Row: {
+          attempt_count: number
+          consumed_at: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          locked_until: string | null
+          otp_hash: string
+          purpose: string
+          resend_count: number
+          user_id: string
+        }
+        Insert: {
+          attempt_count?: number
+          consumed_at?: string | null
+          created_at?: string
+          expires_at: string
+          id?: string
+          locked_until?: string | null
+          otp_hash: string
+          purpose: string
+          resend_count?: number
+          user_id: string
+        }
+        Update: {
+          attempt_count?: number
+          consumed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          locked_until?: string | null
+          otp_hash?: string
+          purpose?: string
+          resend_count?: number
+          user_id?: string
+        }
+        Relationships: []
       }
       customer_receipts: {
         Row: {
@@ -665,27 +704,36 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           display_name: string | null
+          email: string | null
+          email_verified_at: string | null
           id: string
           is_active: boolean
           phone: string
+          terms_accepted_at: string | null
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
+          email?: string | null
+          email_verified_at?: string | null
           id: string
           is_active?: boolean
           phone: string
+          terms_accepted_at?: string | null
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
+          email?: string | null
+          email_verified_at?: string | null
           id?: string
           is_active?: boolean
           phone?: string
+          terms_accepted_at?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -811,13 +859,13 @@ export type Database = {
         Row: {
           address: string | null
           capacity_bags: number
-          city: string
+          city: string | null
           created_at: string
           id: string
           manager_name: string | null
           manager_phone: string | null
           pincode: string | null
-          state: string
+          state: string | null
           tenant_id: string
           updated_at: string
           warehouse_code: string
@@ -826,13 +874,13 @@ export type Database = {
         Insert: {
           address?: string | null
           capacity_bags?: number
-          city: string
+          city?: string | null
           created_at?: string
           id?: string
           manager_name?: string | null
           manager_phone?: string | null
           pincode?: string | null
-          state: string
+          state?: string | null
           tenant_id: string
           updated_at?: string
           warehouse_code: string
@@ -841,13 +889,13 @@ export type Database = {
         Update: {
           address?: string | null
           capacity_bags?: number
-          city?: string
+          city?: string | null
           created_at?: string
           id?: string
           manager_name?: string | null
           manager_phone?: string | null
           pincode?: string | null
-          state?: string
+          state?: string | null
           tenant_id?: string
           updated_at?: string
           warehouse_code?: string
