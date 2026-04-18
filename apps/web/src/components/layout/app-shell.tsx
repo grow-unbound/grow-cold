@@ -4,11 +4,10 @@ import type { LucideIcon } from 'lucide-react';
 import { Home, Package, Receipt, Users, Wallet } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { ReactNode } from 'react';
 import { UserMenu } from '@/components/layout/user-menu';
-import { createBrowserSupabaseClient } from '@/lib/supabase-browser';
-import { useSelectedWarehouseName, useSessionStore } from '@/stores/session-store';
+import { useSessionStore } from '@/stores/session-store';
 import { cn } from '@/lib/utils';
 
 type NavKey = 'home' | 'inventory' | 'parties' | 'receipts' | 'payments';
@@ -34,20 +33,8 @@ function isTabActive(pathname: string, href: string, end?: boolean) {
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { t } = useTranslation('common');
+  const { role } = useSessionStore();
   const pathname = usePathname();
-  const warehouseName = useSelectedWarehouseName();
-  const hydrate = useSessionStore((s) => s.hydrate);
-
-  useEffect(() => {
-    const supabase = createBrowserSupabaseClient();
-    void hydrate(supabase);
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
-      void hydrate(supabase);
-    });
-    return () => subscription.unsubscribe();
-  }, [pathname, hydrate]);
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-primary-50 lg:flex-row">
@@ -56,15 +43,8 @@ export function AppShell({ children }: { children: ReactNode }) {
         className="hidden w-48 shrink-0 flex-col border-r border-neutral-200/80 bg-white lg:flex"
         aria-label="Main"
       >
-        <div className="flex min-h-[3.25rem] flex-col justify-center border-b border-neutral-200/80 px-3 py-2">
+        <div className="flex h-11 items-center border-b border-neutral-200/80 px-3">
           <span className="text-sm font-semibold tracking-tight text-neutral-900">{t('app_name')}</span>
-          {warehouseName ? (
-            <span className="mt-0.5 truncate text-caption text-neutral-500" title={warehouseName}>
-              {warehouseName}
-            </span>
-          ) : (
-            <span className="mt-0.5 truncate text-caption text-neutral-400">{t('warehouse_placeholder')}</span>
-          )}
         </div>
         <nav className="flex flex-1 flex-col gap-0.5 p-1.5">
           {tabs.map((tab) => (
@@ -79,6 +59,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           ))}
         </nav>
         <div className="flex flex-col gap-1.5 border-t border-neutral-200/80 p-2">
+          <span className="truncate text-caption-sm text-neutral-500" title={role}>
+            {role}
+          </span>
           <UserMenu />
         </div>
       </aside>
@@ -86,17 +69,11 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* Main column: header (mobile/tablet) + content */}
       <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col">
         <header className="flex w-full items-center justify-between border-b border-neutral-200/80 bg-white px-3 py-2 shadow-sm lg:hidden">
-          <div className="min-w-0 flex-1">
-            <h1 className="text-sm font-semibold tracking-tight text-neutral-900">{t('app_name')}</h1>
-            {warehouseName ? (
-              <p className="truncate text-caption text-neutral-500" title={warehouseName}>
-                {warehouseName}
-              </p>
-            ) : (
-              <p className="truncate text-caption text-neutral-400">{t('warehouse_placeholder')}</p>
-            )}
+          <h1 className="text-sm font-semibold tracking-tight text-neutral-900">{t('app_name')}</h1>
+          <div className="flex items-center gap-2">
+            <span className="hidden text-caption-sm text-neutral-500 sm:inline">{role}</span>
+            <UserMenu />
           </div>
-          <UserMenu />
         </header>
 
         <main className="page-container min-h-0 w-full max-w-none flex-1 self-stretch overflow-auto pb-14 pt-2 lg:pb-4 lg:pt-4">

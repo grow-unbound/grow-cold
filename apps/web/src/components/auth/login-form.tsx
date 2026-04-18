@@ -1,138 +1,72 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { LoginPhoneRequestSchema, type LoginPhoneRequest } from '@growcold/shared';
+import {
+  SendOtpRequestSchema,
+  VerifyOtpRequestSchema,
+  sendPhoneOtp,
+  verifyPhoneOtp,
+  type SendOtpRequest,
+  type VerifyOtpRequest,
+} from '@growcold/shared';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { SixDigitOtp } from '@/components/auth/six-digit-otp';
+import { createBrowserSupabaseClient } from '@/lib/supabase-browser';
 
 type Step = 'phone' | 'otp';
 
 export function LoginForm() {
   const { t } = useTranslation('login');
-  const router = useRouter();
   const [step, setStep] = useState<Step>('phone');
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const [otpHint, setOtpHint] = useState('');
+  const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [otpResetKey, setOtpResetKey] = useState(0);
-  const [resendIn, setResendIn] = useState(0);
-  const [verifying, setVerifying] = useState(false);
-  const [redirecting, setRedirecting] = useState(false);
-  const [sendingCode, setSendingCode] = useState(false);
-  const [resending, setResending] = useState(false);
-  const verifyInFlightRef = useRef(false);
 
-  useEffect(() => {
-    verifyInFlightRef.current = false;
-  }, [sessionId, otpResetKey]);
-
-  const phoneForm = useForm<LoginPhoneRequest>({
-    resolver: zodResolver(LoginPhoneRequestSchema),
+  const phoneForm = useForm<SendOtpRequest>({
+    resolver: zodResolver(SendOtpRequestSchema),
     defaultValues: { phone: '' },
   });
 
-  useEffect(() => {
-    if (resendIn <= 0) return;
-    const tmr = setInterval(() => setResendIn((s) => Math.max(0, s - 1)), 1000);
-    return () => clearInterval(tmr);
-  }, [resendIn]);
+  const otpForm = useForm<VerifyOtpRequest>({
+    resolver: zodResolver(VerifyOtpRequestSchema),
+    defaultValues: { phone: '', token: '' },
+  });
 
   const onSendOtp = phoneForm.handleSubmit(async (values) => {
-    if (sendingCode || redirecting) return;
     setError(null);
-    setSendingCode(true);
+    setMessage(null);
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
-      });
-      const json = (await res.json()) as {
-        session_id?: string;
-        otp_sent_to?: string;
-        error?: string;
-      };
-      if (!res.ok) {
-        setError(json.error ?? t('config_error'));
+      const supabase = createBrowserSupabaseClient();
+      const result = await sendPhoneOtp(supabase, values);
+      if (!result.ok) {
+        setError(result.error.message);
         return;
       }
-      if (json.session_id) {
-        setSessionId(json.session_id);
-        setOtpHint(json.otp_sent_to ?? '');
-        setStep('otp');
-        setResendIn(30);
-        setOtpResetKey((k) => k + 1);
-      }
-    } finally {
-      setSendingCode(false);
+      otpForm.setValue('phone', values.phone);
+      setStep('otp');
+      setMessage(t('otp_sent'));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : t('config_error'));
     }
   });
 
-  const verify = async (code: string) => {
-    if (!sessionId || verifyInFlightRef.current) return;
-    verifyInFlightRef.current = true;
+  const onVerify = otpForm.handleSubmit(async (values) => {
     setError(null);
-    setVerifying(true);
+    setMessage(null);
     try {
-      const res = await fetch('/api/auth/verify-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ session_id: sessionId, code }),
-      });
-      const json = (await res.json()) as { error?: string; next?: string };
-      if (!res.ok) {
-        setError(json.error ?? t('config_error'));
-        setOtpResetKey((k) => k + 1);
-        setVerifying(false);
-        verifyInFlightRef.current = false;
+      const supabase = createBrowserSupabaseClient();
+      const result = await verifyPhoneOtp(supabase, values);
+      if (!result.ok) {
+        setError(result.error.message);
         return;
       }
-      setRedirecting(true);
-      const q = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
-      const fromQuery = q.get('next');
-      const destination =
-        json.next === 'create_warehouse'
-          ? '/onboarding/create-warehouse'
-          : fromQuery?.startsWith('/')
-            ? fromQuery
-            : '/';
-      router.replace(destination);
-      router.refresh();
-    } catch {
-      setVerifying(false);
-      verifyInFlightRef.current = false;
+      setMessage(t('signed_in'));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : t('config_error'));
     }
-  };
-
-  const onResend = async () => {
-    if (!sessionId || resendIn > 0 || resending || redirecting) return;
-    setError(null);
-    setResending(true);
-    try {
-      const res = await fetch('/api/auth/resend-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ session_id: sessionId }),
-      });
-      const json = (await res.json()) as { error?: string };
-      if (!res.ok) {
-        setError(json.error ?? t('config_error'));
-        return;
-      }
-      setResendIn(30);
-      setOtpResetKey((k) => k + 1);
-    } finally {
-      setResending(false);
-    }
-  };
-
-  const phoneBusy = phoneForm.formState.isSubmitting || sendingCode || redirecting;
-  const otpBusy = verifying || redirecting;
+  });
 
   return (
     <div className="mx-auto flex w-full max-w-sm flex-col gap-4 rounded-base border border-neutral-200 bg-white p-4 shadow-sm">
@@ -152,8 +86,7 @@ export function LoginForm() {
               type="tel"
               autoComplete="tel"
               placeholder={t('phone_placeholder')}
-              disabled={phoneBusy}
-              className="rounded-base border border-neutral-200 px-3 py-2 text-sm outline-none ring-primary-500 focus:border-primary-500 focus:ring-1 disabled:bg-neutral-50"
+              className="rounded-base border border-neutral-200 px-3 py-2 text-sm outline-none ring-primary-500 focus:border-primary-500 focus:ring-1"
               {...phoneForm.register('phone')}
             />
             {phoneForm.formState.errors.phone?.message ? (
@@ -162,51 +95,44 @@ export function LoginForm() {
               </p>
             ) : null}
           </div>
-          <Button type="submit" disabled={phoneBusy}>
-            {phoneBusy ? t('sending_code') : t('send_otp')}
-          </Button>
+          <Button type="submit">{t('send_otp')}</Button>
         </form>
       ) : (
-        <div className="flex flex-col gap-3">
-          <p className="text-caption text-neutral-600">
-            {t('otp_sent_email', { email: otpHint })}
-          </p>
-          <SixDigitOtp
-            key={otpResetKey}
-            disabled={otpBusy}
-            onComplete={(code) => void verify(code)}
-          />
-          {otpBusy ? (
-            <p className="text-center text-caption text-neutral-600" role="status">
-              {redirecting ? t('redirecting') : t('verifying')}
-            </p>
-          ) : null}
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              className="flex-1"
-              disabled={otpBusy}
-              onClick={() => setStep('phone')}
-            >
+        <form className="flex flex-col gap-3" onSubmit={onVerify} noValidate>
+          <input type="hidden" {...otpForm.register('phone')} />
+          <div className="flex flex-col gap-1">
+            <label htmlFor="token" className="text-caption-sm font-medium text-neutral-800">
+              {t('otp_label')}
+            </label>
+            <input
+              id="token"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              className="rounded-base border border-neutral-200 px-3 py-2 text-sm outline-none ring-primary-500 focus:border-primary-500 focus:ring-1"
+              {...otpForm.register('token')}
+            />
+            {otpForm.formState.errors.token?.message ? (
+              <p className="text-caption text-red-600" role="alert">
+                {otpForm.formState.errors.token.message}
+              </p>
+            ) : null}
+          </div>
+          <div className="flex gap-2">
+            <Button type="button" variant="outline" className="flex-1" onClick={() => setStep('phone')}>
               {t('back')}
             </Button>
-            {resendIn > 0 ? (
-              <span className="text-caption text-neutral-500">{t('resend_in', { seconds: resendIn })}</span>
-            ) : (
-              <button
-                type="button"
-                disabled={resending || otpBusy}
-                className="text-caption font-medium text-primary-600 underline-offset-2 hover:underline disabled:opacity-50"
-                onClick={() => void onResend()}
-              >
-                {resending ? t('verifying') : t('resend')}
-              </button>
-            )}
+            <Button type="submit" className="flex-1">
+              {t('verify')}
+            </Button>
           </div>
-        </div>
+        </form>
       )}
 
+      {message ? (
+        <p className="text-caption text-green-700" role="status">
+          {message}
+        </p>
+      ) : null}
       {error ? (
         <p className="text-caption text-red-600" role="alert">
           {error}
@@ -214,10 +140,6 @@ export function LoginForm() {
       ) : null}
 
       <p className="text-caption text-neutral-500">
-        <Link href="/signup" className="text-primary-600 underline-offset-2 hover:underline">
-          {t('create_account')}
-        </Link>
-        {' · '}
         <Link href="/" className="text-primary-600 underline-offset-2 hover:underline">
           {t('back_home')}
         </Link>
