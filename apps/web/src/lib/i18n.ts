@@ -5,7 +5,7 @@ import { resources } from '@growcold/shared';
 void i18n.use(initReactI18next).init({
   lng: 'en',
   fallbackLng: 'te',
-  ns: ['nav', 'menu', 'common', 'login'],
+  ns: ['nav', 'menu', 'common', 'login', 'signup', 'authVerify', 'onboarding'],
   defaultNS: 'nav',
   resources: {
     te: {
@@ -13,12 +13,18 @@ void i18n.use(initReactI18next).init({
       menu: resources.te.menu,
       common: resources.te.common,
       login: resources.te.login,
+      signup: resources.te.signup,
+      authVerify: resources.te.authVerify,
+      onboarding: resources.te.onboarding,
     },
     en: {
       nav: resources.en.nav,
       menu: resources.en.menu,
       common: resources.en.common,
       login: resources.en.login,
+      signup: resources.en.signup,
+      authVerify: resources.en.authVerify,
+      onboarding: resources.en.onboarding,
     },
   },
   interpolation: { escapeValue: false },
