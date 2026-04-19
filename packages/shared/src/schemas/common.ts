@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import {
-  CHARGE_TYPE,
+  CUSTOMER_CATEGORY,
+  DELIVERY_STATUS,
   LOT_STATUS,
   PAYMENT_METHOD,
   RENTAL_MODE,
@@ -15,7 +16,9 @@ export const userRoleSchema = z.enum(USER_ROLE);
 
 export const rentalModeSchema = z.enum(RENTAL_MODE);
 
-export const chargeTypeSchema = z.enum(CHARGE_TYPE);
+export const customerCategorySchema = z.enum(CUSTOMER_CATEGORY);
+
+export const deliveryStatusSchema = z.enum(DELIVERY_STATUS);
 
 export const paymentMethodSchema = z.enum(PAYMENT_METHOD);
 

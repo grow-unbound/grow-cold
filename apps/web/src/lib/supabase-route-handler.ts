@@ -1,10 +1,11 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import type { Database } from '@growcold/shared';
 
 type CookieToSet = { name: string; value: string; options: CookieOptions };
 
-export async function createSupabaseRouteHandlerClient() {
+export async function createSupabaseRouteHandlerClient(): Promise<SupabaseClient<Database>> {
   const cookieStore = await cookies();
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -27,5 +28,5 @@ export async function createSupabaseRouteHandlerClient() {
         }
       },
     },
-  });
+  }) as unknown as SupabaseClient<Database>;
 }

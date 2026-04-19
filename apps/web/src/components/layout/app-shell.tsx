@@ -1,7 +1,7 @@
 'use client';
 
 import type { LucideIcon } from 'lucide-react';
-import { Home, Package, Receipt, Users, Wallet } from 'lucide-react';
+import { ArrowLeftRight, Home, Package, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
@@ -11,7 +11,7 @@ import { createBrowserSupabaseClient } from '@/lib/supabase-browser';
 import { useSelectedWarehouseName, useSessionStore } from '@/stores/session-store';
 import { cn } from '@/lib/utils';
 
-type NavKey = 'home' | 'inventory' | 'parties' | 'receipts' | 'payments';
+type NavKey = 'home' | 'inventory' | 'parties' | 'transactions';
 
 const tabs: {
   href: string;
@@ -22,8 +22,7 @@ const tabs: {
   { href: '/', end: true, i18nKey: 'home', Icon: Home },
   { href: '/inventory', i18nKey: 'inventory', Icon: Package },
   { href: '/parties', i18nKey: 'parties', Icon: Users },
-  { href: '/receipts', i18nKey: 'receipts', Icon: Receipt },
-  { href: '/payments', i18nKey: 'payments', Icon: Wallet },
+  { href: '/transactions', i18nKey: 'transactions', Icon: ArrowLeftRight },
 ];
 
 function isTabActive(pathname: string, href: string, end?: boolean) {

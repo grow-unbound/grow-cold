@@ -7,8 +7,7 @@ export type RootTabParamList = {
   Home: undefined;
   Inventory: undefined;
   Parties: undefined;
-  Receipts: undefined;
-  Payments: undefined;
+  Transactions: undefined;
 };
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
@@ -22,11 +21,8 @@ function InventoryScreen() {
 function PartiesScreen() {
   return <PlaceholderScreen titleKey="parties" />;
 }
-function ReceiptsScreen() {
-  return <PlaceholderScreen titleKey="receipts" />;
-}
-function PaymentsScreen() {
-  return <PlaceholderScreen titleKey="payments" />;
+function TransactionsScreen() {
+  return <PlaceholderScreen titleKey="transactions" />;
 }
 
 export function RootTabs() {
@@ -47,14 +43,9 @@ export function RootTabs() {
       />
       <Tab.Screen name="Parties" component={PartiesScreen} options={{ title: t('parties') }} />
       <Tab.Screen
-        name="Receipts"
-        component={ReceiptsScreen}
-        options={{ title: t('receipts') }}
-      />
-      <Tab.Screen
-        name="Payments"
-        component={PaymentsScreen}
-        options={{ title: t('payments') }}
+        name="Transactions"
+        component={TransactionsScreen}
+        options={{ title: t('transactions') }}
       />
     </Tab.Navigator>
   );

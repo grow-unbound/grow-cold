@@ -140,6 +140,47 @@ export type Database = {
         }
         Relationships: []
       }
+      charge_types: {
+        Row: {
+          code: string
+          created_at: string
+          display_name: string
+          id: string
+          is_active: boolean
+          sort_order: number
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          display_name: string
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          tenant_id?: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          display_name?: string
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "charge_types_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_receipts: {
         Row: {
           created_at: string
@@ -217,12 +258,15 @@ export type Database = {
       customers: {
         Row: {
           address: string | null
+          category: Database["public"]["Enums"]["customer_category"]
           created_at: string
           credit_limit: number
+          customer_code: string
           customer_name: string
           gstin: string | null
           id: string
           is_active: boolean
+          mobile: string | null
           notes: string | null
           phone: string
           tenant_id: string
@@ -231,12 +275,15 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          category?: Database["public"]["Enums"]["customer_category"]
           created_at?: string
           credit_limit?: number
+          customer_code: string
           customer_name: string
           gstin?: string | null
           id?: string
           is_active?: boolean
+          mobile?: string | null
           notes?: string | null
           phone: string
           tenant_id?: string
@@ -245,12 +292,15 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          category?: Database["public"]["Enums"]["customer_category"]
           created_at?: string
           credit_limit?: number
+          customer_code?: string
           customer_name?: string
           gstin?: string | null
           id?: string
           is_active?: boolean
+          mobile?: string | null
           notes?: string | null
           phone?: string
           tenant_id?: string
@@ -279,43 +329,49 @@ export type Database = {
           blocked_reason: string | null
           created_at: string
           delivery_date: string
-          delivery_notes: string | null
+          driver_name: string | null
           id: string
           lot_id: string
+          notes: string | null
           num_bags_out: number
           overridden_by: string | null
           override_at: string | null
           override_reason: string | null
-          status: string
+          status: Database["public"]["Enums"]["delivery_status"]
           updated_at: string
+          vehicle_number: string | null
         }
         Insert: {
           blocked_reason?: string | null
           created_at?: string
           delivery_date: string
-          delivery_notes?: string | null
+          driver_name?: string | null
           id?: string
           lot_id: string
+          notes?: string | null
           num_bags_out: number
           overridden_by?: string | null
           override_at?: string | null
           override_reason?: string | null
-          status?: string
+          status?: Database["public"]["Enums"]["delivery_status"]
           updated_at?: string
+          vehicle_number?: string | null
         }
         Update: {
           blocked_reason?: string | null
           created_at?: string
           delivery_date?: string
-          delivery_notes?: string | null
+          driver_name?: string | null
           id?: string
           lot_id?: string
+          notes?: string | null
           num_bags_out?: number
           overridden_by?: string | null
           override_at?: string | null
           override_reason?: string | null
-          status?: string
+          status?: Database["public"]["Enums"]["delivery_status"]
           updated_at?: string
+          vehicle_number?: string | null
         }
         Relationships: [
           {
@@ -330,6 +386,45 @@ export type Database = {
             columns: ["overridden_by"]
             isOneToOne: false
             referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      locations: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          tenant_id: string
+          warehouse_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          tenant_id?: string
+          warehouse_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          tenant_id?: string
+          warehouse_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "locations_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "locations_warehouse_id_fkey"
+            columns: ["warehouse_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
             referencedColumns: ["id"]
           },
         ]
@@ -382,56 +477,59 @@ export type Database = {
       lots: {
         Row: {
           balance_bags: number
-          charges_frozen: boolean
           created_at: string
           customer_id: string
+          driver_name: string | null
           id: string
+          location_ids: string[]
           lodgement_date: string
           lot_number: string
           notes: string | null
           original_bags: number
           product_id: string
-          rental_amount: number
           rental_mode: Database["public"]["Enums"]["rental_mode"]
           status: Database["public"]["Enums"]["lot_status"]
           tenant_id: string
           updated_at: string
+          vehicle_number: string | null
           warehouse_id: string
         }
         Insert: {
           balance_bags: number
-          charges_frozen?: boolean
           created_at?: string
           customer_id: string
+          driver_name?: string | null
           id?: string
+          location_ids?: string[]
           lodgement_date: string
           lot_number: string
           notes?: string | null
           original_bags: number
           product_id: string
-          rental_amount: number
           rental_mode: Database["public"]["Enums"]["rental_mode"]
           status?: Database["public"]["Enums"]["lot_status"]
           tenant_id?: string
           updated_at?: string
+          vehicle_number?: string | null
           warehouse_id: string
         }
         Update: {
           balance_bags?: number
-          charges_frozen?: boolean
           created_at?: string
           customer_id?: string
+          driver_name?: string | null
           id?: string
+          location_ids?: string[]
           lodgement_date?: string
           lot_number?: string
           notes?: string | null
           original_bags?: number
           product_id?: string
-          rental_amount?: number
           rental_mode?: Database["public"]["Enums"]["rental_mode"]
           status?: Database["public"]["Enums"]["lot_status"]
           tenant_id?: string
           updated_at?: string
+          vehicle_number?: string | null
           warehouse_id?: string
         }
         Relationships: [
@@ -465,44 +563,143 @@ export type Database = {
           },
         ]
       }
-      products: {
+      product_groups: {
         Row: {
           created_at: string
-          description: string | null
           id: string
-          is_active: boolean
-          product_group_id: string | null
-          product_name: string
-          stale_days_limit: number | null
-          storage_temperature: string | null
+          name: string
+          parent_product_group_id: string | null
           tenant_id: string
           updated_at: string
         }
         Insert: {
           created_at?: string
-          description?: string | null
           id?: string
-          is_active?: boolean
-          product_group_id?: string | null
-          product_name: string
-          stale_days_limit?: number | null
-          storage_temperature?: string | null
+          name: string
+          parent_product_group_id?: string | null
           tenant_id?: string
           updated_at?: string
         }
         Update: {
           created_at?: string
+          id?: string
+          name?: string
+          parent_product_group_id?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_groups_parent_product_group_id_fkey"
+            columns: ["parent_product_group_id"]
+            isOneToOne: false
+            referencedRelation: "product_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_groups_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_charges: {
+        Row: {
+          charge_type_id: string
+          charges_per_bag: number
+          created_at: string
+          product_id: string
+          updated_at: string
+        }
+        Insert: {
+          charge_type_id: string
+          charges_per_bag: number
+          created_at?: string
+          product_id: string
+          updated_at?: string
+        }
+        Update: {
+          charge_type_id?: string
+          charges_per_bag?: number
+          created_at?: string
+          product_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_charges_charge_type_id_fkey"
+            columns: ["charge_type_id"]
+            isOneToOne: false
+            referencedRelation: "charge_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_charges_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          bag_size: number | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          monthly_rent_per_bag: number | null
+          monthly_rent_per_kg: number | null
+          product_group_id: string
+          product_name: string
+          stale_days_limit: number | null
+          storage_temperature: string | null
+          tenant_id: string
+          updated_at: string
+          yearly_rent_per_bag: number | null
+          yearly_rent_per_kg: number | null
+        }
+        Insert: {
+          bag_size?: number | null
+          created_at?: string
           description?: string | null
           id?: string
           is_active?: boolean
-          product_group_id?: string | null
+          monthly_rent_per_kg?: number | null
+          product_group_id: string
+          product_name: string
+          stale_days_limit?: number | null
+          storage_temperature?: string | null
+          tenant_id?: string
+          updated_at?: string
+          yearly_rent_per_kg?: number | null
+        }
+        Update: {
+          bag_size?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          monthly_rent_per_kg?: number | null
+          product_group_id?: string
           product_name?: string
           stale_days_limit?: number | null
           storage_temperature?: string | null
           tenant_id?: string
           updated_at?: string
+          yearly_rent_per_kg?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "products_product_group_id_fkey"
+            columns: ["product_group_id"]
+            isOneToOne: false
+            referencedRelation: "product_groups"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "products_tenant_id_fkey"
             columns: ["tenant_id"]
@@ -580,6 +777,8 @@ export type Database = {
       rent_accruals: {
         Row: {
           accrual_date: string
+          accrual_from: string
+          accrual_to: string
           created_at: string
           id: string
           is_paid: boolean
@@ -592,6 +791,8 @@ export type Database = {
         }
         Insert: {
           accrual_date: string
+          accrual_from: string
+          accrual_to: string
           created_at?: string
           id?: string
           is_paid?: boolean
@@ -604,6 +805,8 @@ export type Database = {
         }
         Update: {
           accrual_date?: string
+          accrual_from?: string
+          accrual_to?: string
           created_at?: string
           id?: string
           is_paid?: boolean
@@ -645,7 +848,7 @@ export type Database = {
       transaction_charges: {
         Row: {
           charge_amount: number
-          charge_type: Database["public"]["Enums"]["charge_type"]
+          charge_type_id: string
           created_at: string
           delivery_id: string
           id: string
@@ -658,7 +861,7 @@ export type Database = {
         }
         Insert: {
           charge_amount: number
-          charge_type: Database["public"]["Enums"]["charge_type"]
+          charge_type_id: string
           created_at?: string
           delivery_id: string
           id?: string
@@ -671,7 +874,7 @@ export type Database = {
         }
         Update: {
           charge_amount?: number
-          charge_type?: Database["public"]["Enums"]["charge_type"]
+          charge_type_id?: string
           created_at?: string
           delivery_id?: string
           id?: string
@@ -683,6 +886,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "transaction_charges_charge_type_id_fkey"
+            columns: ["charge_type_id"]
+            isOneToOne: false
+            referencedRelation: "charge_types"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "transaction_charges_delivery_id_fkey"
             columns: ["delivery_id"]
@@ -920,7 +1130,8 @@ export type Database = {
       current_tenant_id: { Args: never; Returns: string }
     }
     Enums: {
-      charge_type: "HAMALI" | "PLATFORM" | "KATA_COOLIE" | "MAMULLE"
+      customer_category: "TRADER" | "FARMER"
+      delivery_status: "SCHEDULED" | "DELIVERED" | "BLOCKED"
       lot_status:
         | "ACTIVE"
         | "STALE"
@@ -1061,7 +1272,8 @@ export const Constants = {
   },
   public: {
     Enums: {
-      charge_type: ["HAMALI", "PLATFORM", "KATA_COOLIE", "MAMULLE"],
+      customer_category: ["TRADER", "FARMER"],
+      delivery_status: ["SCHEDULED", "DELIVERED", "BLOCKED"],
       lot_status: [
         "ACTIVE",
         "STALE",
