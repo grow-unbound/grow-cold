@@ -53,8 +53,11 @@ INSERT INTO public.customers (
   id,
   warehouse_id,
   tenant_id,
+  customer_code,
   customer_name,
   phone,
+  mobile,
+  category,
   address,
   gstin,
   credit_limit,
@@ -65,8 +68,11 @@ VALUES (
     'a0000000-0000-4000-8000-000000000003'::uuid,
     'a0000000-0000-4000-8000-000000000002'::uuid,
     'a0000000-0000-4000-8000-000000000001'::uuid,
+    'DEMO/CUST1',
     'Demo Customer',
     '+919876543210',
+    NULL,
+    'TRADER',
     'Sample address',
     NULL,
     0,
@@ -74,11 +80,77 @@ VALUES (
     true
   );
 
+INSERT INTO public.product_groups (
+  id,
+  tenant_id,
+  name,
+  parent_product_group_id
+)
+VALUES (
+    'a0000000-0000-4000-8000-000000000020'::uuid,
+    'a0000000-0000-4000-8000-000000000001'::uuid,
+    'Vegetables',
+    NULL
+  );
+
+INSERT INTO public.charge_types (
+  id,
+  tenant_id,
+  code,
+  display_name,
+  sort_order
+)
+VALUES
+  (
+    'a0000000-0000-4000-8000-000000000021'::uuid,
+    'a0000000-0000-4000-8000-000000000001'::uuid,
+    'HAMALI',
+    'Hamali',
+    1
+  ),
+  (
+    'a0000000-0000-4000-8000-000000000022'::uuid,
+    'a0000000-0000-4000-8000-000000000001'::uuid,
+    'PLATFORM',
+    'Platform',
+    2
+  ),
+  (
+    'a0000000-0000-4000-8000-000000000023'::uuid,
+    'a0000000-0000-4000-8000-000000000001'::uuid,
+    'KATA_COOLIE',
+    'Kata Coolie',
+    3
+  ),
+  (
+    'a0000000-0000-4000-8000-000000000024'::uuid,
+    'a0000000-0000-4000-8000-000000000001'::uuid,
+    'MAMULLE',
+    'Mamulle',
+    4
+  );
+
+INSERT INTO public.locations (
+  id,
+  tenant_id,
+  warehouse_id,
+  name
+)
+VALUES (
+    'a0000000-0000-4000-8000-000000000040'::uuid,
+    'a0000000-0000-4000-8000-000000000001'::uuid,
+    'a0000000-0000-4000-8000-000000000002'::uuid,
+    'A1/12A'
+  );
+
 INSERT INTO public.products (
   id,
   tenant_id,
   product_name,
   product_group_id,
+  bag_size,
+  monthly_rent_per_kg,
+  yearly_rent_per_kg,
   stale_days_limit,
   storage_temperature,
   description,
@@ -88,11 +160,25 @@ VALUES (
     'a0000000-0000-4000-8000-000000000004'::uuid,
     'a0000000-0000-4000-8000-000000000001'::uuid,
     'Demo Potatoes (bags)',
-    NULL,
+    'a0000000-0000-4000-8000-000000000020'::uuid,
+    50,
+    2.5,
+    25,
     90,
     '2–4°C',
     'Seed catalog row',
     true
+  );
+
+INSERT INTO public.product_charges (
+  product_id,
+  charge_type_id,
+  charges_per_bag
+)
+VALUES (
+    'a0000000-0000-4000-8000-000000000004'::uuid,
+    'a0000000-0000-4000-8000-000000000021'::uuid,
+    12.5
   );
 
 INSERT INTO public.lots (
@@ -106,9 +192,10 @@ INSERT INTO public.lots (
   balance_bags,
   lodgement_date,
   rental_mode,
-  rental_amount,
+  location_ids,
+  driver_name,
+  vehicle_number,
   status,
-  charges_frozen,
   notes
 )
 VALUES (
@@ -122,10 +209,36 @@ VALUES (
     100,
     '2026-01-15',
     'MONTHLY',
-    2500.00,
+    ARRAY['a0000000-0000-4000-8000-000000000040'::uuid],
+    NULL,
+    NULL,
     'ACTIVE',
-    false,
     'Seed lot for UI dev'
+  );
+
+INSERT INTO public.customer_receipts (
+  id,
+  customer_id,
+  warehouse_id,
+  tenant_id,
+  receipt_date,
+  total_amount,
+  payment_method,
+  reference_number,
+  notes,
+  recorded_by
+)
+VALUES (
+    'a0000000-0000-4000-8000-000000000030'::uuid,
+    'a0000000-0000-4000-8000-000000000003'::uuid,
+    'a0000000-0000-4000-8000-000000000002'::uuid,
+    'a0000000-0000-4000-8000-000000000001'::uuid,
+    '2026-02-01',
+    5000.00,
+    'CASH',
+    'SEED-REF-1',
+    'Seed receipt for Transactions tab',
+    NULL
   );
 
 COMMIT;

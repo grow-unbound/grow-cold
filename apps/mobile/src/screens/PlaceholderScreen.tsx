@@ -2,7 +2,7 @@ import { Box, Text } from '@gluestack-ui/themed';
 import { useTranslation } from 'react-i18next';
 
 interface PlaceholderScreenProps {
-  titleKey: 'home' | 'inventory' | 'parties' | 'receipts' | 'payments';
+  titleKey: 'home' | 'inventory' | 'parties' | 'transactions';
 }
 
 export function PlaceholderScreen({ titleKey }: PlaceholderScreenProps) {
