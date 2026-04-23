@@ -49,7 +49,7 @@ export default function PartiesPage() {
     <div className="flex w-full flex-col gap-3">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="h2">{t('parties.title')}</h1>
-        <button type="button" className="btn-primary btn-base w-full sm:w-auto" onClick={() => setDialogOpen(true)}>
+        <button type="button" className="btn-primary w-full sm:w-auto" onClick={() => setDialogOpen(true)}>
           {t('parties.add_party')}
         </button>
       </div>
@@ -66,7 +66,10 @@ export default function PartiesPage() {
       {listQ.data && listQ.data.data.length > 0 && (
         <ul className="flex flex-col gap-2">
           {listQ.data.data.map((c) => (
-            <li key={c.id} className="card">
+            <li
+              key={c.id}
+              className="card-elevated transition-transform active:scale-[0.99]"
+            >
               <p className="text-sm font-semibold text-neutral-900">{c.customer_name}</p>
               <p className="text-caption text-neutral-600">
                 {c.customer_code} · {c.category}
@@ -87,7 +90,7 @@ export default function PartiesPage() {
           onClick={() => setDialogOpen(false)}
         >
           <div
-            className="card max-h-[90vh] w-full max-w-md overflow-y-auto"
+            className="card-elevated max-h-[90vh] w-full max-w-md overflow-y-auto rounded-t-2xl sm:rounded-2xl"
             role="dialog"
             aria-labelledby="party-title"
             onClick={(e) => e.stopPropagation()}
@@ -118,7 +121,7 @@ export default function PartiesPage() {
               })}
             >
               <div className="form-field">
-                <label className="text-label font-semibold text-neutral-700" htmlFor="customer_code">
+                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="customer_code">
                   {t('parties.customer_code')} *
                 </label>
                 <input
@@ -129,7 +132,7 @@ export default function PartiesPage() {
                 />
               </div>
               <div className="form-field">
-                <label className="text-label font-semibold text-neutral-700" htmlFor="customer_name">
+                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="customer_name">
                   {t('parties.name')} *
                 </label>
                 <input
@@ -139,7 +142,7 @@ export default function PartiesPage() {
                 />
               </div>
               <div className="form-field">
-                <label className="text-label font-semibold text-neutral-700" htmlFor="category">
+                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="category">
                   {t('parties.category')}
                 </label>
                 <select id="category" className="input-base" {...form.register('category')}>
@@ -151,35 +154,35 @@ export default function PartiesPage() {
                 </select>
               </div>
               <div className="form-field">
-                <label className="text-label font-semibold text-neutral-700" htmlFor="phone">
+                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="phone">
                   {t('parties.phone')} *
                 </label>
                 <input id="phone" className="input-base" {...form.register('phone', { required: true })} />
               </div>
               <div className="form-field">
-                <label className="text-label font-semibold text-neutral-700" htmlFor="mobile">
+                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="mobile">
                   {t('parties.mobile_alt')}
                 </label>
                 <input id="mobile" className="input-base" {...form.register('mobile')} />
               </div>
               <div className="form-field">
-                <label className="text-label font-semibold text-neutral-700" htmlFor="address">
+                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="address">
                   Address
                 </label>
                 <textarea id="address" className="input-base min-h-[3rem]" {...form.register('address')} />
               </div>
               <div className="form-field">
-                <label className="text-label font-semibold text-neutral-700" htmlFor="pnotes">
+                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="pnotes">
                   Notes
                 </label>
                 <textarea id="pnotes" className="input-base min-h-[3rem]" {...form.register('notes')} />
               </div>
-              {create.isError && <p className="text-caption text-danger-600">{t('save_error')}</p>}
-              <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
-                <button type="button" className="btn-secondary btn-base" onClick={() => setDialogOpen(false)}>
+              {create.isError && <p className="error-text">{t('save_error')}</p>}
+              <div className="flex flex-col gap-4 sm:flex-row sm:justify-end">
+                <button type="button" className="btn-secondary" onClick={() => setDialogOpen(false)}>
                   Cancel
                 </button>
-                <button type="submit" className="btn-primary btn-base" disabled={create.isPending}>
+                <button type="submit" className="btn-primary" disabled={create.isPending}>
                   {t('parties.submit')}
                 </button>
               </div>

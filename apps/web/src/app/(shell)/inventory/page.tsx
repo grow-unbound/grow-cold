@@ -67,7 +67,7 @@ export default function InventoryPage() {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="h2">{t('inventory.title')}</h1>
         {role !== 'STAFF' && (
-          <button type="button" className="btn-primary btn-base w-full sm:w-auto" onClick={() => setDialogOpen(true)}>
+          <button type="button" className="btn-primary w-full sm:w-auto" onClick={() => setDialogOpen(true)}>
             {t('inventory.add_lot')}
           </button>
         )}
@@ -79,9 +79,9 @@ export default function InventoryPage() {
             key={s}
             type="button"
             className={cn(
-              'min-h-touch rounded-base border px-2.5 py-1 text-caption font-semibold transition-colors',
+              'min-h-10 rounded-full border-2 px-3 py-1.5 text-label font-semibold transition-colors',
               statusFilter === s
-                ? 'border-primary-500 bg-primary-50 text-primary-700'
+                ? 'border-primary-500 bg-primary-50 text-primary-800 shadow-sm'
                 : 'border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50',
             )}
             onClick={() => setStatusFilter(s)}
@@ -103,7 +103,10 @@ export default function InventoryPage() {
       {lotsQ.data && lotsQ.data.data.length > 0 && (
         <ul className="flex flex-col gap-2">
           {lotsQ.data.data.map((lot) => (
-            <li key={lot.id} className="card flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <li
+              key={lot.id}
+              className="card-elevated flex flex-col gap-2 transition-transform active:scale-[0.99] sm:flex-row sm:items-center sm:justify-between"
+            >
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <Link href={`/inventory/${lot.id}`} className="text-sm font-semibold text-primary-600 hover:underline">
@@ -119,7 +122,7 @@ export default function InventoryPage() {
                   {lot.lodgement_date}
                 </p>
               </div>
-              <Link href={`/inventory/${lot.id}`} className="btn-secondary btn-base shrink-0 self-start sm:self-center">
+              <Link href={`/inventory/${lot.id}`} className="btn-secondary shrink-0 self-start sm:self-center">
                 {t('view')}
               </Link>
             </li>
@@ -134,7 +137,7 @@ export default function InventoryPage() {
           onClick={() => setDialogOpen(false)}
         >
           <div
-            className="card max-h-[90vh] w-full max-w-md overflow-y-auto"
+            className="card-elevated max-h-[90vh] w-full max-w-md overflow-y-auto rounded-t-2xl sm:rounded-2xl"
             role="dialog"
             aria-labelledby="new-lot-title"
             onClick={(e) => e.stopPropagation()}
@@ -173,13 +176,13 @@ export default function InventoryPage() {
               })}
             >
               <div className="form-field">
-                <label className="text-label font-semibold text-neutral-700" htmlFor="lot_number">
+                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="lot_number">
                   {t('inventory.lot_number')} *
                 </label>
                 <input id="lot_number" className="input-base" {...form.register('lot_number', { required: true })} />
               </div>
               <div className="form-field">
-                <label className="text-label font-semibold text-neutral-700" htmlFor="customer_id">
+                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="customer_id">
                   {t('inventory.customer')} *
                 </label>
                 <select id="customer_id" className="input-base" {...form.register('customer_id', { required: true })}>
@@ -192,7 +195,7 @@ export default function InventoryPage() {
                 </select>
               </div>
               <div className="form-field">
-                <label className="text-label font-semibold text-neutral-700" htmlFor="product_id">
+                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="product_id">
                   {t('inventory.product')} *
                 </label>
                 <select id="product_id" className="input-base" {...form.register('product_id', { required: true })}>
@@ -205,7 +208,7 @@ export default function InventoryPage() {
                 </select>
               </div>
               <div className="form-field">
-                <label className="text-label font-semibold text-neutral-700" htmlFor="original_bags">
+                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="original_bags">
                   {t('inventory.bags')} *
                 </label>
                 <input
@@ -217,13 +220,13 @@ export default function InventoryPage() {
                 />
               </div>
               <div className="form-field">
-                <label className="text-label font-semibold text-neutral-700" htmlFor="lodgement_date">
+                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="lodgement_date">
                   {t('inventory.lodgement')} *
                 </label>
                 <input id="lodgement_date" type="date" className="input-base" {...form.register('lodgement_date')} />
               </div>
               <div className="form-field">
-                <label className="text-label font-semibold text-neutral-700" htmlFor="rental_mode">
+                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="rental_mode">
                   {t('inventory.rental_mode')}
                 </label>
                 <select id="rental_mode" className="input-base" {...form.register('rental_mode')}>
@@ -233,29 +236,29 @@ export default function InventoryPage() {
                 </select>
               </div>
               <div className="form-field">
-                <label className="text-label font-semibold text-neutral-700" htmlFor="driver_name">
+                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="driver_name">
                   {t('inventory.driver_name')}
                 </label>
                 <input id="driver_name" className="input-base" {...form.register('driver_name')} />
               </div>
               <div className="form-field">
-                <label className="text-label font-semibold text-neutral-700" htmlFor="vehicle_number">
+                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="vehicle_number">
                   {t('inventory.vehicle_number')}
                 </label>
                 <input id="vehicle_number" className="input-base" {...form.register('vehicle_number')} />
               </div>
               <div className="form-field">
-                <label className="text-label font-semibold text-neutral-700" htmlFor="notes">
+                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="notes">
                   Notes
                 </label>
                 <textarea id="notes" className="input-base min-h-[4rem]" {...form.register('notes')} />
               </div>
-              {createLot.isError && <p className="text-caption text-danger-600">{t('save_error')}</p>}
-              <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
-                <button type="button" className="btn-secondary btn-base" onClick={() => setDialogOpen(false)}>
+              {createLot.isError && <p className="error-text">{t('save_error')}</p>}
+              <div className="flex flex-col gap-4 sm:flex-row sm:justify-end">
+                <button type="button" className="btn-secondary" onClick={() => setDialogOpen(false)}>
                   Cancel
                 </button>
-                <button type="submit" className="btn-primary btn-base" disabled={createLot.isPending}>
+                <button type="submit" className="btn-primary" disabled={createLot.isPending}>
                   {t('inventory.submit')}
                 </button>
               </div>

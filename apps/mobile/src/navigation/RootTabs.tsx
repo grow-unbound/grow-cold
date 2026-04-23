@@ -1,7 +1,8 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useTranslation } from 'react-i18next';
-import { PlaceholderScreen } from '../screens/PlaceholderScreen';
 import { AppHeader } from '../components/AppHeader';
+import { rootTabBarLabelStyle } from './tabBarTypography';
+import { PlaceholderScreen } from '../screens/PlaceholderScreen';
 
 export type RootTabParamList = {
   Home: undefined;
@@ -32,7 +33,12 @@ export function RootTabs() {
     <Tab.Navigator
       screenOptions={{
         header: () => <AppHeader />,
-        tabBarLabelStyle: { fontSize: 11 },
+        tabBarActiveTintColor: '#00B14F',
+        tabBarInactiveTintColor: '#9CA0AD',
+        tabBarStyle: {
+          borderTopColor: '#E2E4E8',
+        },
+        tabBarLabelStyle: rootTabBarLabelStyle,
       }}
     >
       <Tab.Screen name="Home" component={HomeScreen} options={{ title: t('home') }} />

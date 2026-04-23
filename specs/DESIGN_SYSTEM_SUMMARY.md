@@ -1,30 +1,30 @@
 # GrowCold Design System: Complete Summary
 
-**Version:** 1.0  
+**Version:** 1.1 (Grab-inspired)  
 **Status:** Ready for Implementation  
-**Created:** April 15, 2026
+**Created:** April 15, 2026 · **Updated:** April 23, 2026
 
 ---
 
 ## What You Now Have
 
 ✅ **Complete design system** covering all aspects of your app's UX  
-✅ **Color palette** (warm, approachable, accessibility-compliant)  
-✅ **Typography system** (mobile-first, readable for older users)  
+✅ **Color palette** (Grab-inspired green primary, Tuna text, contrast-aware)  
+✅ **Typography system** (mobile-first, app-like scale)  
 ✅ **Component specs** (Button, Input, Card, Modal, Skeleton, etc.)  
 ✅ **Tailwind configuration** (ready to use, all tokens exported)  
 ✅ **Responsive strategy** (mobile-first → tablet → desktop)  
 ✅ **Offline UX patterns** (queue, sync status, conflict handling)  
-✅ **Accessibility checklist** (WCAG 2.1 AA compliant)  
+✅ **Semantics & contrast** (labels, focus, WCAG-oriented contrast targets)  
 ✅ **Localization guidelines** (i18n, date/currency formatting)  
-✅ **User feel specs** (loading states, haptics, transitions, fat-finger UX)
+✅ **User feel specs** (loading states, haptics, transitions, standard tap targets)
 
 ---
 
 ## Design Philosophy
 
-**Core Feeling:** Simple & Relieved  
-**Visual Style:** Warm & Approachable  
+**Core Feeling:** Simple & clear  
+**Visual Style:** Grab-inspired super-app (green CTAs, light surfaces, rounded modules — not affiliated with Grab)  
 **Mobile Strategy:** Mobile-first, progressive enhancement  
 **Information Architecture:** Balanced (show what's needed, hide advanced)
 
@@ -37,7 +37,7 @@
 - **Haptic feedback** (medium for success, warning pattern for errors)
 - **Acknowledge-first pattern** (immediate feedback, sync in background)
 - **Perceived speed** (optimistic UI, 200-300ms transitions, fade-in/out)
-- **Tap-friendly UX** (~40px primary targets via `min-h-touch`, ≥8px spacing between adjacent controls)
+- **Standard tap targets** (44px minimum height via `min-h-touch` / `min-h-11`, ≥8px between adjacent controls)
 - **Smooth transitions** (ease-out on entry, ease-in on exit, cubic-bezier functions)
 
 **Example flow:**
@@ -60,10 +60,10 @@ Toast disappears, queue updates
 
 **Example:** User records 3 deliveries offline. Badge shows "3 deliveries queued ↻". When online, badge shows "3 syncing..." with spinner, then "3 synced ✓" before fading away.
 
-### 3. Accessibility & Localization
-- **Color contrast** (WCAG AAA minimum, 4.5:1 for text)
-- **Font sizes** (13px+ secondary copy; **16px** `text-base` for body + inputs to avoid iOS zoom)
-- **Line-height** (1.5 for body text, not cramped)
+### 3. Contrast, semantics & localization
+- **Color contrast** (target WCAG 2.1 AA: 4.5:1 for normal text; large text 3:1)
+- **Standard UI type sizes** (body + inputs **16px**; **12px+** caption/label tokens; iOS: use **16px** on real inputs so the browser does not zoom on focus)
+- **Line-height** (1.5 for body text)
 - **Semantic HTML** (proper headings, labels, landmarks)
 - **Keyboard navigation** (all interactive elements focusable)
 - **Screen readers** (aria-labels, aria-describedby, aria-live regions)
@@ -86,46 +86,41 @@ Desktop:  Multi-column, complex tables, admin features
 
 ---
 
-## Color Palette (Warm & Approachable)
+## Color Palette (Grab-inspired)
 
-### Primary: Warm Orange (#EA580C)
+### Primary: Green Haze (#00B14F)
 ```
-Main CTA buttons, focus states, key highlights
-Hover: #D74A0A (darker 15%)
-Active: #CC4A08 (darker 25%)
-Accessibility: 6.1:1 contrast on white (WCAG AAA)
-```
-
-### Secondary: Calm Teal (#0891B2)
-```
-Secondary buttons, links, stability cues
-Accessibility: 4.8:1 contrast on white (WCAG AAA)
+Main CTA buttons, focus rings, key highlights, link text (primary-600)
+Hover/Active: see primary-600 / primary-700 in tailwind.config.ts
+White-on-green primary buttons: verify contrast for small type
 ```
 
-### Accent: Modern Purple (#7C3AED)
+### Secondary: Neutral outline
 ```
-Notifications, premium features, special actions
-Accessibility: AA compliant
+Secondary / cancel: gray border (neutral-300), dark text (neutral-800)
+Optional `outline` button variant: green border, primary-700 text
+```
+
+### Accent: Mint / Bermuda family (#7BDCB5–#1FB77E)
+```
+Alternate row types (e.g. receipt), chips, non-primary highlights
 ```
 
 ### Semantic Colors
 ```
-Success:  #34D399 (Soft Green - confirmations)
-Warning:  #FBBF24 (Warm Amber - caution, aging lots)
-Danger:   #FB6B3C (Warm Red - errors, alerts, destructive actions)
+Success / warning / danger: see `success`, `warning`, `danger` scales in tailwind.config.ts
+Lot `status.*` tokens: distinct hues (green / amber / blue / red / gray)
 ```
 
-### Neutral Grays
+### Neutral + Tuna
 ```
-50:   #F9FAFB (Lightest)
-100:  #F3F4F6 (Light backgrounds)
-200:  #E5E7EB (Borders)
+50:   #F7F7F8 (Page background)
+200:  #E2E4E8 (Borders)
 500:  #6B7280 (Secondary text)
-700:  #374151 (Primary text)
-900:  #111827 (Darkest)
+900:  #363A45 (Tuna — headings, high-emphasis body)
 ```
 
-**Why warm colors?** Not corporate (cold blues/grays). More approachable for 35-60 year old warehouse operators. Less intimidating. Feels like you're working with a human, not a machine.
+**Why this direction?** Clear hierarchy, app-native feel, high legibility in the field. Inspired by a leading super-app palette without using its trademarks.
 
 ---
 
@@ -138,17 +133,17 @@ System fonts (-apple-system, BlinkMacSystemFont, Segoe UI, Roboto)
 → No custom fonts needed (faster offline)
 ```
 
-### Type Scale (Mobile-First, sleeker web chrome)
+### Type Scale (Mobile-First, app-like chrome)
 ```
-H1: 26px | 700 weight   (page titles)
+H1: 24px | 700 weight   (page titles) — `text-h1`
 H2: 20px | 700 weight   (section headings)
 H3: 18px | 600 weight   (card titles)
 Body: 16px | 400 weight (primary text + form controls)
-Small: 13px | 400 weight (secondary text)
-Label: 11px | 600 weight (form labels, nav tabs)
+Small: 14px | 400 weight (secondary text)
+Caption/label: 12px | 600 weight (form labels, dense nav)
 ```
 
-**Key rule:** Keep **16px** on native inputs and primary reading blocks on mobile. Secondary UI may use **13px**; labels down to **11px** where hierarchy allows.
+**Key rule:** Keep **16px** on native inputs and primary reading blocks on mobile. Secondary UI may use **14px**; **12px** minimum for critical secondary chrome.
 
 ---
 
@@ -166,11 +161,11 @@ Label: 11px | 600 weight (form labels, nav tabs)
 
 ### Custom Tailwind Classes (tailwind.config.ts)
 ```
-.btn-primary        - Orange button with hover/active states
-.btn-secondary      - Teal bordered button
+.btn-primary        - Green (primary) filled button
+.btn-secondary      - Gray outline button
 .btn-danger         - Red destructive button
-.input-base         - Text input with focus/error states
-.card               - White card with border and shadow
+.input-base         - Text input with green focus ring
+.card               - White card, 12px radius, subtle shadow
 .skeleton           - Shimmer loading animation
 .badge-active       - Green status badge
 .offline-indicator  - Top bar "Offline" indicator
@@ -195,7 +190,7 @@ import { Input } from '@/components/ui/Input';
 ```
 320px+: Full-width cards, single column
         Bottom tab bar navigation
-        Primary buttons (~40px min height)
+        Primary buttons (44px min height, `min-h-touch`)
         Minimal information (only essential)
         Example: Inventory list, delivery form, payment page
 ```
@@ -265,21 +260,21 @@ Resolution:   User chooses, conflict logged to audit trail
 
 ---
 
-## Accessibility (WCAG 2.1 AA Compliant)
+## Contrast, semantics & standard UI metrics
 
-### Color Contrast
-✅ Regular text: 4.5:1 minimum (we target WCAG AAA 7:1)  
+### Color contrast
+✅ Regular text: 4.5:1 minimum (AA); strive higher where easy  
 ✅ Large text (18px+): 3:1 minimum  
-✅ All interactive elements: 4.5:1 minimum  
+✅ All interactive elements: 4.5:1 minimum for associated text  
 ✅ Don't rely on color alone (use icon + color + text)
 
 ### Typography
-✅ Secondary copy: 13px+; labels may use 11px where hierarchy is clear  
+✅ Caption/label tokens: **12px+** for important secondary chrome  
 ✅ Font family: System fonts (no decorative scripts)  
-✅ Line-height: 1.5 minimum (we use 1.5-1.75)  
-✅ Line length: 50-75 characters (mobile: full width okay)  
+✅ Line-height: 1.5 minimum (we use 1.5–1.75)  
+✅ Line length: 50–75 characters (mobile: full width okay)  
 ✅ No justified text (creates rivers on mobile)  
-✅ No ALL CAPS or italics (harder to read)
+✅ No ALL CAPS or italics for long reading text
 
 ### Semantics
 ✅ Heading hierarchy: H1 → H2 → H3 (no skipping)  
@@ -289,10 +284,10 @@ Resolution:   User chooses, conflict logged to audit trail
 ✅ Focus indicators: 2px outline, 4px offset (not hidden)  
 ✅ Skip link: First focusable element
 
-### Touch Targets
-✅ Primary controls: ~40px × 40px minimum (`min-h-touch` / `min-w-touch` on web)  
-✅ Spacing: ≥8px between adjacent interactive elements (WCAG 2.2 target spacing)  
-✅ No hover states on mobile (use :active instead)
+### Touch targets (standard platform UI)
+✅ **Min height 44px** for primary controls (`min-h-11` / `min-h-touch`); no extra “accessibility sizing” layer — this **is** the app default (HIG-style minimum)  
+✅ **Spacing:** ≥8px between adjacent interactive elements (industry / WCAG 2.2 spacing for pointer targets)  
+✅ **Mobile:** prefer `:active` for press feedback; avoid relying on hover alone
 
 ---
 
@@ -359,12 +354,12 @@ Plurals:    Handled by i18next (Hindi/Telugu rules differ from English)
 - [ ] Create shared component library in Figma
 
 ### Testing (Week 1-2)
-- [ ] Accessibility test (axe DevTools)
+- [ ] Automated contrast / semantics check (e.g. axe DevTools)
 - [ ] Color contrast test (WebAIM)
 - [ ] Responsive test (320px, 768px, 1200px)
 - [ ] Keyboard navigation test
 - [ ] Screen reader test (NVDA, JAWS)
-- [ ] Mobile fat-finger test (real device)
+- [ ] Mobile tap-target spot check on a real device
 
 ### i18n Setup (Week 2)
 - [ ] Setup react-i18next
@@ -387,14 +382,15 @@ Plurals:    Handled by i18next (Hindi/Telugu rules differ from English)
 ### Version Control
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.0 | 2026-04-15 | Initial system (color, typography, components, responsive, offline, a11y, i18n) |
-| 1.1 | TBD | Dark mode, micro-animations library, advanced components |
+| 1.0 | 2026-04-15 | Initial system (color, typography, components, responsive, offline, semantics, i18n) |
+| 1.1 | 2026-04-23 | Grab-inspired palette, radii, secondary/outline buttons, Tuna text |
+| 1.2 | TBD | Dark mode, micro-animations library, advanced components |
 | 2.0 | TBD | Major refresh after user feedback from pilots |
 
 ### When to Update
 - **Add component:** If new UI pattern needed (e.g., new modal type)
 - **Update spacing:** If mobile usability issue found (e.g., buttons too close)
-- **Update colors:** If accessibility audit finds issue
+- **Update colors:** If a contrast or brand audit flags an issue
 - **Extend i18n:** When adding new language
 - **Add feature:** Dark mode, RTL support, new devices
 
@@ -403,7 +399,7 @@ Plurals:    Handled by i18next (Hindi/Telugu rules differ from English)
 2. Update `DESIGN_SYSTEM_V1.md` (documentation)
 3. Update `COMPONENT_SPECS.md` (component specs)
 4. Test across all breakpoints
-5. Validate accessibility
+5. Validate contrast and focus behavior
 6. Increment version number
 7. Commit with clear message: `[design]: [M#] Update spacing/colors`
 
@@ -439,18 +435,18 @@ Plurals:    Handled by i18next (Hindi/Telugu rules differ from English)
 
 ### Color Usage
 ```tsx
-// Primary actions (orange)
-className="bg-primary-500 hover:bg-primary-600"
+// Primary actions (green)
+className="bg-primary-500 hover:bg-primary-600 text-white"
 
-// Secondary actions (teal)
-className="bg-secondary-500 hover:bg-secondary-600"
+// Secondary (neutral outline) / outline (green border)
+className="btn-secondary" // or Button variant="outline" for green outline
 
 // Errors and warnings
-className="bg-danger-500"  // Red
-className="bg-warning-300" // Amber
+className="bg-danger-500"
+className="bg-warning-300"
 
 // Success feedback
-className="bg-success-500"  // Green
+className="bg-success-500"
 ```
 
 ### Typography
@@ -468,15 +464,15 @@ className="bg-success-500"  // Green
 ## Design System is Complete ✅
 
 You now have:
-1. **Color palette** (warm, approachable, accessible)
+1. **Color palette** (Grab-inspired green, Tuna text, contrast-friendly)
 2. **Typography system** (mobile-friendly, readable)
 3. **Component specs** (detailed, with code examples)
 4. **Tailwind config** (ready to use, all tokens exported)
 5. **Responsive guidelines** (mobile → tablet → desktop)
 6. **Offline UX patterns** (visibility, queue, sync, conflict resolution)
-7. **Accessibility checklist** (WCAG 2.1 AA compliant)
+7. **Contrast & semantics** (WCAG 2.1 AA-oriented)
 8. **Localization framework** (i18n ready, date/currency formatting)
-9. **User feel specs** (loading, haptics, transitions, fat-finger)
+9. **User feel specs** (loading, haptics, transitions, standard tap targets)
 10. **Implementation guide** (step-by-step checklist)
 
 **Next:** Frontend Agent uses this design system to build components in `apps/web/src/components/`. All components inherit from the Tailwind config and follow COMPONENT_SPECS.md patterns.

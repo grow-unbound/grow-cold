@@ -2,6 +2,8 @@
 
 > Building blocks for the design system. Every component must follow these specs.
 
+**Sizing:** Controls follow **standard platform UI** metrics — **44px** minimum height for primary buttons and inputs (`min-h-11` / `min-h-touch`), **16px** text on real form fields, **≥8px** between adjacent tap targets. This is the **product default**, not a separate “accessibility sizing” mode.
+
 ---
 
 ## COMPONENT: Button
@@ -21,18 +23,18 @@
 ```
 
 **Specs:**
-- Background: `bg-primary-500` (#EA580C)
-- Hover: `hover:bg-primary-600` (#D74A0A)
-- Active: `active:bg-primary-700` (#CC4A08)
+- Background: `bg-primary-500` (#00B14F)
+- Hover: `hover:bg-primary-600` (#009948)
+- Active: `active:bg-primary-700` (#007A3A)
 - Disabled: Opacity 0.5, cursor not-allowed
-- Padding: `px-3 py-2.5` (12px h, 10px v)
-- Border radius: `rounded-base` (8px)
-- Font: `font-semibold` (600 weight)
+- Padding: `px-3.5 py-2.5` (~44px height with 16px label)
+- Border radius: `rounded-base` (12px)
+- Font: `text-base font-semibold` (16px, 600 weight)
 - Transition: `transition-all duration-200`
-- Touch target: Minimum **40px** height/width (`min-h-touch` / `min-w-touch`); keep **16px** input `text-base` on fields to avoid iOS zoom
+- Touch target: Minimum **44px** height (`min-h-11` / `min-h-touch`); no default `min-width` on text buttons (use full width in forms as needed)
 - Width: Full width on mobile, auto on desktop
 
-#### Secondary Button
+#### Secondary Button (neutral outline)
 ```tsx
 <button className="btn-secondary">Cancel</button>
 
@@ -44,11 +46,14 @@
 ```
 
 **Specs:**
-- Border: `border-2 border-secondary-500` (#0891B2)
-- Text color: `text-secondary-500`
-- Background: Transparent
-- Hover: `hover:bg-secondary-50` (light background)
-- Active: `active:bg-secondary-100` (darker background)
+- Border: `border-2 border-neutral-300`
+- Text color: `text-neutral-800`
+- Background: White
+- Hover: `hover:bg-neutral-50`
+- Active: `active:bg-neutral-100`
+
+#### Outline Button (green border — strong secondary CTA)
+Use `Button` `variant="outline"`: `border-primary-500`, `text-primary-700`, `hover:bg-primary-50`. Document in the same feature where a “Record” / “Continue” is secondary to a dismiss action.
 
 #### Danger Button (Delete/Write-off)
 ```tsx
@@ -56,7 +61,7 @@
 ```
 
 **Specs:**
-- Background: `bg-danger-500` (#FB6B3C)
+- Background: `bg-danger-500` (#EF4444)
 - Hover: `hover:bg-danger-600`
 - Active: `active:bg-danger-700`
 - Use: Only for destructive actions
@@ -70,7 +75,7 @@
 
 **Specs:**
 - Background: Transparent
-- Text: `text-secondary-500`
+- Text: `text-primary-600`
 - Hover: `hover:underline` (underline appears)
 - No border
 - Minimal visual weight
@@ -99,14 +104,14 @@
 // On mobile, buttons stack vertically
 export function DeliveryActions() {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-4">
       <button className="btn-primary">Record Delivery</button>
       <button className="btn-secondary">Cancel</button>
     </div>
   );
 }
 
-// Minimum tap target: 40px (Tailwind `min-h-touch`); leave ≥8px between adjacent targets (WCAG 2.2 spacing)
+// Minimum tap target: ~44px primary chrome (`min-h-touch` / `min-h-11`); leave ≥8px between adjacent targets (WCAG 2.2 spacing)
 // Never use tiny icon-only targets without padding + aria-label
 ```
 
@@ -117,7 +122,7 @@ export function DeliveryActions() {
 ### Text Input
 ```tsx
 <div className="form-field">
-  <label htmlFor="customer-name" className="text-label font-semibold text-neutral-700">
+  <label htmlFor="customer-name" className="text-label-lg font-semibold text-neutral-700">
     Customer Name <span className="text-danger-500">*</span>
   </label>
   <input
@@ -135,8 +140,8 @@ export function DeliveryActions() {
 ```
 
 **Specs:**
-- Height: `min-h-touch` + `py-2.5` (~40px target; 16px text)
-- Padding: `px-4` (left/right)
+- Height: **44px** minimum (`min-h-11` with `py-2.5 px-3.5` via `.input-base`); font **16px** (`text-base`) always on inputs
+- Padding: `px-3.5 py-2.5`
 - Border: `border-2 border-neutral-200`
 - Font size: `text-base` (16px) — NEVER smaller on mobile (prevents iOS zoom)
 - Focus: `focus:border-primary-500 focus:shadow-focus`
@@ -146,14 +151,14 @@ export function DeliveryActions() {
 ### Select Dropdown
 ```tsx
 <div className="form-field">
-  <label htmlFor="status-select" className="text-label font-semibold text-neutral-700">
+  <label htmlFor="status-select" className="text-label-lg font-semibold text-neutral-700">
     Status
   </label>
   <select
     id="status-select"
     className="input-base appearance-none cursor-pointer bg-white pr-8"
     style={{
-      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23374151' d='M1 1l5 5 5-5'/%3E%3C/svg%3E")`,
+      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23363A45' d='M1 1l5 5 5-5'/%3E%3C/svg%3E")`,
       backgroundRepeat: 'no-repeat',
       backgroundPosition: 'right 12px center',
     }}
@@ -174,7 +179,7 @@ export function DeliveryActions() {
 ### Radio Buttons
 ```tsx
 <fieldset className="form-field">
-  <legend className="text-label font-semibold text-neutral-700 mb-3">
+  <legend className="text-label-lg font-semibold text-neutral-700 mb-3">
     Rental Mode
   </legend>
   <div className="space-y-3">
@@ -210,7 +215,7 @@ export function DeliveryActions() {
 ### Form Field with Error
 ```tsx
 <div className="form-field">
-  <label htmlFor="bags" className="text-label font-semibold text-neutral-700">
+  <label htmlFor="bags" className="text-label-lg font-semibold text-neutral-700">
     Number of Bags <span className="text-danger-500">*</span>
   </label>
   <input
@@ -302,8 +307,8 @@ export function LotCard({ lot }: { lot: Lot }) {
 **Specs:**
 - Background: `bg-white`
 - Border: `border border-neutral-200`
-- Padding: `p-4` (mobile), `p-6` (desktop)
-- Border radius: `rounded-base` (8px)
+- Padding: `p-4 md:p-5 lg:p-6` (16px / 20px / 24px)
+- Border radius: `rounded-base` (12px)
 - Shadow: `shadow-sm` (default), `hover:shadow-lg` (on hover)
 - Transition: `transition-shadow duration-200`
 
@@ -485,7 +490,7 @@ export function DeliveryModal({ lotId, isOpen, onClose }: Props) {
           {/* Content */}
           <div className="p-4 space-y-4">
             <div className="form-field">
-              <label htmlFor="bags-input" className="text-label font-semibold">
+              <label htmlFor="bags-input" className="text-label-lg font-semibold text-neutral-700">
                 Bags Delivered <span className="text-danger-500">*</span>
               </label>
               <input
@@ -501,7 +506,7 @@ export function DeliveryModal({ lotId, isOpen, onClose }: Props) {
           </div>
 
           {/* Footer */}
-          <div className="flex gap-3 p-4 border-t border-neutral-200">
+          <div className="flex gap-4 p-4 border-t border-neutral-200">
             <button
               className="btn-secondary flex-1"
               onClick={onClose}
@@ -651,11 +656,11 @@ export function OfflineQueueBadge() {
 ## Design Checklist (Before Component Shipping)
 
 - [ ] Color contrast meets WCAG AA (4.5:1 for text)
-- [ ] Touch targets ≥40px primary chrome; ≥8px spacing between adjacent controls
-- [ ] Font size ≥14px (or 12px for secondary only)
-- [ ] Line height ≥1.5
+- [ ] Touch targets ≥44px primary chrome (buttons, inputs); ≥8px spacing between adjacent controls
+- [ ] Font size ≥16px on inputs/buttons; ≥14px for secondary copy; ≥12px for errors only
+- [ ] Line height ≥1.5 on body scale
 - [ ] All interactive elements focusable (tab order logical)
-- [ ] Focus indicators visible (2px outline, offset 2px)
+- [ ] Focus indicators visible (2px outline, offset 4px)
 - [ ] Hover states only on desktop (use :active for mobile)
 - [ ] Loading states show spinner + text
 - [ ] Error states show icon + message

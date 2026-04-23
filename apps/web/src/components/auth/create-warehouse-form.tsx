@@ -63,41 +63,31 @@ export function CreateWarehouseForm() {
   const busy = form.formState.isSubmitting || redirecting;
 
   return (
-    <div className="mx-auto flex w-full max-w-sm flex-col gap-4 rounded-base border border-neutral-200 bg-white p-4 shadow-sm">
+    <div className="auth-panel">
       <div>
         <h1 className="text-lg font-semibold text-neutral-900">{t('title')}</h1>
         <p className="mt-1 text-caption text-neutral-600">{t('subtitle')}</p>
       </div>
       <form className="flex flex-col gap-3" onSubmit={onSubmit} noValidate>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="wh-name" className="text-caption-sm font-medium text-neutral-800">
+        <div className="form-field">
+          <label htmlFor="wh-name" className="text-label-lg font-semibold text-neutral-700">
             {t('name_label')}
           </label>
-          <input
-            id="wh-name"
-            disabled={busy}
-            className="rounded-base border border-neutral-200 px-3 py-2 text-sm outline-none ring-primary-500 focus:border-primary-500 focus:ring-1 disabled:bg-neutral-50"
-            {...form.register('name')}
-          />
+          <input id="wh-name" disabled={busy} className="input-base" {...form.register('name')} />
           {form.formState.errors.name?.message ? (
-            <p className="text-caption text-red-600" role="alert">
+            <p className="error-text" role="alert">
               {form.formState.errors.name.message}
             </p>
           ) : null}
         </div>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="wh-loc" className="text-caption-sm font-medium text-neutral-800">
+        <div className="form-field">
+          <label htmlFor="wh-loc" className="text-label-lg font-semibold text-neutral-700">
             {t('location_label')}
           </label>
-          <input
-            id="wh-loc"
-            disabled={busy}
-            className="rounded-base border border-neutral-200 px-3 py-2 text-sm outline-none ring-primary-500 focus:border-primary-500 focus:ring-1 disabled:bg-neutral-50"
-            {...form.register('location')}
-          />
+          <input id="wh-loc" disabled={busy} className="input-base" {...form.register('location')} />
         </div>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="wh-cap" className="text-caption-sm font-medium text-neutral-800">
+        <div className="form-field">
+          <label htmlFor="wh-cap" className="text-label-lg font-semibold text-neutral-700">
             {t('capacity_label')}
           </label>
           <input
@@ -106,7 +96,7 @@ export function CreateWarehouseForm() {
             inputMode="numeric"
             min={1}
             disabled={busy}
-            className="rounded-base border border-neutral-200 px-3 py-2 text-sm outline-none ring-primary-500 focus:border-primary-500 focus:ring-1 disabled:bg-neutral-50"
+            className="input-base"
             {...form.register('capacity_bags')}
           />
         </div>
@@ -115,7 +105,7 @@ export function CreateWarehouseForm() {
         </Button>
       </form>
       {error ? (
-        <p className="text-caption text-red-600" role="alert">
+        <p className="error-text" role="alert">
           {error}
         </p>
       ) : null}
