@@ -28,7 +28,7 @@ export default function LotDetailPage() {
     return (
       <div className="card w-full">
         <p className="text-danger-600 text-body-sm">{t('error_load')}</p>
-        <Link href="/inventory" className="btn-secondary btn-base mt-2 inline-flex">
+        <Link href="/inventory" className="btn-secondary mt-2 inline-flex">
           {t('back')}
         </Link>
       </div>

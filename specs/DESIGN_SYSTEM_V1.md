@@ -1,8 +1,8 @@
 # GrowCold Design System v1.0
 
-**Design Philosophy:** Simple & Relieved. Warm & Approachable. Mobile-first with progressive enhancement.
+**Design Philosophy:** Simple & clear. **Grab-inspired** (not affiliated): super-app iOS feel — green brand primary, Tuna dark text, light surfaces, rounded modules. Mobile-first with progressive enhancement.
 
-> "No more paper registers. Things just work." — Core feeling we design for
+> "No more paper registers. Things just work." — Core feeling we design for. Visual language follows public Grab-style color roles (e.g. Green Haze) without copying trademark assets or illustrations.
 
 ---
 
@@ -11,57 +11,52 @@
 ### Primary Color System
 
 ```
-PRIMARY:     #EA580C (Warm Orange)
-  └─ Usage: Primary actions, focus states, key CTAs
-  └─ Meaning: Warmth, approachability, action
-  └─ Accessibility: AA compliant text (dark text on white)
+PRIMARY:     #00B14F (Green Haze — Grab-inspired)
+  └─ Usage: Primary actions, focus states, key CTAs, active tab, links (text-primary-600)
+  └─ Meaning: Go, success, energy (super-app “drive”)
+  └─ White text on primary buttons: AA+ on filled buttons; focus ring: rgba(0, 177, 79, 0.15)
 
-SECONDARY:   #0891B2 (Calm Teal)
-  └─ Usage: Secondary actions, links, subtle highlights
-  └─ Meaning: Stability, calm, reliability
-  └─ Accessibility: AA compliant
+SECONDARY:   Neutrals (e.g. border-neutral-300, text-neutral-800)
+  └─ Usage: Secondary / cancel buttons (gray outline on white)
+  └─ Meaning: De-emphasized actions vs green primary
+  └─ “Outline” variant (green border on white) in Button for strong secondary CTAs
 
-ACCENT:      #7C3AED (Modern Purple)
-  └─ Usage: Notifications, special features, micro-interactions
-  └─ Meaning: Modern, premium, thoughtful
-  └─ Accessibility: AA compliant
+ACCENT:      #7BDCB5 (Bermuda mint) + extended accent scale
+  └─ Usage: Alternating row types, highlights, success-adjacent chips (not the main CTA)
+  └─ Meaning: Fresh, secondary brand family
 
-DANGER:      #FB6B3C (Warm Red)
-  └─ Usage: Errors, warnings, destructive actions
-  └─ Meaning: Alert but not harsh
-  └─ Accessibility: WCAG AAA contrast (not cold red)
+DANGER:      #EF4444 (and danger scale in Tailwind)
+  └─ Usage: Errors, destructive actions
+  └─ Meaning: Unmistakable but not “cold” clinical red
 
-SUCCESS:     #34D399 (Soft Green)
-  └─ Usage: Confirmations, positive feedback
-  └─ Meaning: Growth, success, relief
-  └─ Accessibility: AA compliant
+SUCCESS:     success.* scale (e.g. #1FA85A at 500)
+  └─ Usage: Status badges, positive lot states, toasts
+  └─ Meaning: On-track, cleared, active storage
 ```
 
-### Neutral Color System (Grays)
+### Neutral Color System (Grays + Tuna)
 
 ```
-Neutral-50:  #F9FAFB (Lightest - Backgrounds)
-Neutral-100: #F3F4F6 (Light backgrounds, hover states)
-Neutral-200: #E5E7EB (Borders, dividers)
-Neutral-300: #D1D5DB (Secondary borders)
+Neutral-50:  #F7F7F8 (Page / shell canvas)
+Neutral-200: #E2E4E8 (Borders, dividers)
 Neutral-500: #6B7280 (Secondary text)
-Neutral-700: #374151 (Primary text)
-Neutral-900: #111827 (Darkest - Headings, high contrast)
+Neutral-700: #4A505C (Strong secondary text)
+Neutral-900: #363A45 (Tuna — headings, high-emphasis body; not pure black)
 ```
 
 ### Status Colors (Semantic)
 
 ```
-ACTIVE:      #34D399 (Soft Green - Lot in storage)
-STALE:       #FBBF24 (Warm Amber - Aging concern)
-DELIVERED:   #60A5FA (Light Blue - Completed action)
-CLEARED:     #34D399 (Soft Green - Fully paid)
-WRITTEN_OFF: #9CA3AF (Gray - Resolved loss)
-DISPUTED:    #FB6B3C (Warm Red - Needs attention)
+ACTIVE:      success family (e.g. #1FA85A) — in storage
+STALE:       warning amber (e.g. #F59E0B)
+DELIVERED:   blue (e.g. #3B82F6) — completed transport
+CLEARED:     success family — fully paid
+WRITTEN_OFF: neutral-400/500 — resolved loss
+DISPUTED:    danger / red — needs attention
 ```
 
 ### Dark Mode (Future - v1.1)
-When implemented, darken backgrounds but keep warm color palette:
+When implemented, use neutral dark surfaces; keep **green** accents for primary actions (not the legacy orange look):
 ```
 Background:  #1F2937 (Very dark gray, not black)
 Surface:     #374151 (Card backgrounds)
@@ -81,36 +76,25 @@ Monospace:      'Monaco', 'Courier New', monospace (for numbers, codes)
 ```
 
 **Rationale:**
-- System fonts: Best readability, native feel on all devices
-- Warm fallback: Georgia feels more approachable than Arial
-- No custom fonts: Faster load, better offline experience
+- System fonts: Best readability, native feel (SF on iOS, Roboto on Android)
+- Georgia fallback: optional secondary only; body stays sans-first
+- No custom webfonts required: fast load, offline-friendly
 
 ### Type Scale (Mobile-First)
 
 ```
-H1 (Headline):      26px | 700 weight (web token `text-h1`)
-                    Usage: Page titles, major section headers
+H1 (`text-h1`):     24px | line-height 1.25 | 700 | Page titles, major headers
+H2 (`text-h2`):     20px | line-height 1.33 | 700 | Section headings
+H3 (`text-h3`):     18px | line-height 1.40 | 600 | Card titles, form sections
 
-H2 (Section):       20px | 700 weight (web token `text-h2`)
-                    Usage: Section headings, lot details
+Body (`text-base`): 16px | line-height 1.5 | 400 | Body copy, button text, input text (never smaller on inputs — iOS zoom)
+Small (`text-body-sm`, `text-sm`): 14px | line-height 1.43 | 400 | Secondary text, help text
 
-H3 (Subsection):    18px | 600 weight (web token `text-h3`)
-                    Usage: Form sections, card titles
+Field label (`text-label-lg`): 14px | 600 | `<label>` above inputs (hierarchy vs 16px field text)
+Compact label (`text-label`):  12px | 600 | Badges, dense filter chips
+Caption (`text-caption`):      12px | 400 | Fine print, timestamps (avoid for critical UI)
 
-Body (Regular):     16px | 24px line-height | 400 weight
-                    Usage: All body text, paragraphs
-                    Mobile: 16px | 24px
-                    Minimum: DO NOT go below 16px on mobile
-                    (Accessibility: Small text causes eye strain for older users)
-
-Body Small:         13px | 400 weight (`text-body-sm`)
-                    Usage: Secondary text, timestamps, hints
-
-Label:              11px | 600 weight (`text-label`)
-                    Usage: Form labels, badges, tags, bottom nav
-
-Button Text:        14px | 600 weight (`text-sm` in Button component)
-                    Padding: 10px 12px (`py-2.5 px-3`) with **~40px** min hit area (`min-h-touch`)
+Button:             16px | 600 | `text-base`; padding `py-2.5 px-3.5`; min height 44px (`min-h-11` / `min-h-touch`)
 ```
 
 ### Letter-Spacing & Tracking
@@ -121,9 +105,9 @@ Labels, Buttons:    0.25px (subtle expansion, clarity)
 ```
 
 ### Text Hierarchy
-**Warm & Approachable means:**
+**Clear & scannable (super-app style) means:**
 - ✅ Use weight contrast (600 for important, 400 for regular)
-- ✅ Use color contrast (dark text on light, warm colors for emphasis)
+- ✅ Use color contrast (Tuna `neutral-900` on light surfaces; **green** for links/CTAs)
 - ✅ Generous line-height (not cramped)
 - ❌ No all-caps (looks corporate, harder to read)
 - ❌ No italics (confuses older readers)
@@ -153,16 +137,14 @@ Page:           16px (all sides on mobile)
                 24px (all sides on tablet)
                 32px (horizontal on desktop)
 
-Card/Section:   16px (mobile)
-                20px (tablet)
-                24px (desktop)
+Card/Section:   16px mobile → 20px tablet → 24px desktop
+                Tailwind: `p-4 md:p-5 lg:p-6` on `.card`
 
-Button/Input:   10px 12px vertical/horizontal with **~40px** min height (`min-h-touch`)
-                Keep **16px** font on `<input>` / `<select>` (`text-base`) to avoid iOS zoom
+Button/Input:   `py-2.5 px-3.5`, min height **44px**; input `border-2`; input text **16px** always
+                **16px** text on `<input>` / `<select>` (`text-base`) — prevents iOS zoom
 
-Form Field:     16px padding
-                8px between label and input
-                12px between fields
+Form Field:     Wrapper `.form-field`: `gap-2` (8px stack)
+                Labels: `text-label-lg`; help: `text-sm` (14px); errors: `.error-text` / `text-xs` (12px)
 ```
 
 ### Margin Rules
@@ -202,44 +184,46 @@ DESKTOP (1025px+):
 
 #### Primary Button (Main CTA)
 ```
-Background:     #EA580C (Warm Orange)
+Background:     #00B14F (Green Haze)
 Text:           White (#FFFFFF)
-Padding:        12px 16px (48px height minimum)
-Border-radius:  8px (modern but not rounded pill)
+Padding:        10px 14px (44px height minimum, `min-h-11`)
+Border-radius:  12px (Grab-style module rounding)
 Font:           16px 600 weight
 Transition:     200ms ease-out (all properties)
 
 States:
-├─ Default:     #EA580C
-├─ Hover:       #CC4A08 (darken 15%)
-├─ Active:      #B84207 (darken 25%)
+├─ Default:     #00B14F
+├─ Hover:       #009948
+├─ Active:      #007A3A
 ├─ Disabled:    #D1D5DB (gray, opacity 0.5)
 └─ Loading:     Show spinner inside button
 
-Touch Target:   48px minimum (including padding)
-Fat-finger UX:  Buttons spaced 16px apart minimum
+Touch Target:   44px minimum (iOS HIG–style; including padding)
+Tap spacing:     Buttons spaced 16px apart minimum
 ```
 
 #### Secondary Button (Less important action)
 ```
-Background:     Transparent
-Border:         2px solid #0891B2 (Teal)
-Text:           #0891B2
-Padding:        10px 14px (48px height with border)
+Background:     White
+Border:         2px solid #E2E4E8 (neutral-200)
+Text:           #3D424D (neutral-800)
+Padding:        10px 14px (44px min height with border, matches primary)
 
 States:
-├─ Default:     Teal border, teal text
-├─ Hover:       Light teal background (#ECFDF5)
-├─ Active:      Teal background, white text
+├─ Default:     Gray border, dark gray text
+├─ Hover:       #F7F7F8 background (neutral-50)
+├─ Active:      Slightly darker gray background
 └─ Disabled:    Gray border, gray text
 ```
 
+Optional **green outline** (`Button` variant `outline`): `border-primary-500`, `text-primary-700`, `hover:bg-primary-50`.
+
 #### Danger Button (Delete, write-off, etc.)
 ```
-Background:     #FB6B3C (Warm Red)
+Background:     #EF4444 (danger-500)
 Text:           White
 Padding:        12px 16px
-Same as Primary Button but warm red
+Same as Primary Button but danger red
 Requires confirmation modal for destructive actions
 ```
 
@@ -247,7 +231,7 @@ Requires confirmation modal for destructive actions
 ```
 Background:     Transparent
 Border:         None
-Text:           #0891B2 (Teal)
+Text:           #009948 (primary-600) or link-style
 Padding:        12px 16px
 Underline on hover (not color change)
 ```
@@ -256,17 +240,17 @@ Underline on hover (not color change)
 
 #### Text Input
 ```
-Height:         48px (mobile), 44px (desktop acceptable)
-Padding:        12px 16px
-Border:         2px solid #E5E7EB (light gray)
-Border-radius:  8px
+Height:         44px minimum (min-h-11), all viewports
+Padding:        10px 14px (py-2.5 px-3.5 in Tailwind utilities)
+Border:         2px solid #E2E4E8 (light gray)
+Border-radius:  12px
 Font:           16px 400 weight (prevents iOS zoom on mobile)
 Background:     #FFFFFF (white)
 
 States:
 ├─ Default:     Gray border
-├─ Focus:       2px solid #EA580C (orange), shadow: 0 0 0 3px rgba(234, 88, 12, 0.1)
-├─ Error:       2px solid #FB6B3C (warm red)
+├─ Focus:       2px solid #00B14F, shadow: 0 0 0 3px rgba(0, 177, 79, 0.15)
+├─ Error:       2px solid #EF4444
 ├─ Disabled:    Background #F3F4F6, opacity 0.5
 └─ Filled:      Border color darkens to #D1D5DB
 
@@ -284,7 +268,7 @@ Help Text:
 
 Error Message:
 ├─ Font:        12px 400 weight
-├─ Color:       #FB6B3C (warm red)
+├─ Color:       #DC2626 (danger-600)
 ├─ Icon:        ⚠ emoji or icon
 ├─ Position:    Below input, replaces help text
 ```
@@ -307,10 +291,10 @@ Accessibility:
 #### Lot Card (Core component)
 ```
 Background:     #FFFFFF (white)
-Border:         1px solid #E5E7EB (light gray)
-Border-radius:  8px
+Border:         1px solid #E2E4E8 (light gray)
+Border-radius:  12px
 Padding:        16px
-Shadow:         0 1px 2px rgba(0,0,0,0.05) (subtle, not heavy)
+Shadow:         0 1px 2px rgba(0,0,0,0.04) (subtle, not heavy)
 Spacing:        16px gap between cards (CSS grid)
 
 Hover State:
@@ -338,7 +322,7 @@ Status Badge positioning:
 
 #### Empty State
 ```
-Illustration:   Warm color (#EA580C) with simple line art
+Illustration:   Brand green tint (primary-100) with simple line art
 Heading:        "No lots yet" (H3)
 Description:    "Start by adding a lot. Tap the + button."
 CTA Button:     "Add Lot" (Primary button)
@@ -378,7 +362,7 @@ Show for: 200-500ms (never show skeleton briefly, feels janky)
 
 #### Loading Spinner (Only for inline actions)
 ```
-Color:       #EA580C (Warm orange, not generic gray)
+Color:       #00B14F (primary green, not generic gray)
 Size:        24px (mobile), 32px (desktop)
 Speed:       1200ms per rotation (not too fast)
 Animation:   Smooth rotation using CSS @keyframes
@@ -390,7 +374,7 @@ Text:        "Saving..." or "Syncing..." (show context)
 ```
 Type:        Linear progress bar (not circular for long operations)
 Height:      4px (thin, not distracting)
-Color:       #EA580C gradient to #0891B2
+Color:       #00B14F gradient to #7BDCB5
 Background:  #E5E7EB (light)
 Rounded:     4px
 Animation:   Smooth transition (no jumpy increments)
@@ -480,28 +464,29 @@ Swap timing:   Each skeleton fades to real data, staggered by 50ms
                Total for 10 items: ~500ms (feels responsive)
 ```
 
-### 5.5 Fat-Finger UX
+### 5.5 Touch targets & tap feedback
 
-#### Touch Targets
+#### Standard UI metrics
 ```
-Primary chrome: ~40px × 40px (`min-h-touch` / `min-w-touch` on web)
-Spacing:        ≥8px between adjacent targets (WCAG 2.2); prefer 12px+ in dense toolbars
-Button padding: 10px × 12px with min-height token (sleek but tappable)
-Input height:   `min-h-touch` with 16px text on form fields
+Min height:     44px primary chrome (`min-h-11` / `min-h-touch` on web)
+Width:         No default min-width on text buttons; icon-only: at least 44×44px effective tappable area
+Spacing:        ≥8px between adjacent targets (industry / WCAG 2.2 spacing); prefer 12px+ in dense toolbars
+Button padding: py-2.5 px-3.5 with `min-h-touch` (HIG-style minimum; product default)
+Input height:   `min-h-touch` with 16px (`text-base`) on form fields (iOS focus zoom rule)
 
 Example spacing:
 ┌─────────────────────────────┐
-│ [ Save Button ]             │  ← ~40px height
+│ [ Save Button ]             │  ← 44px min height
 │                             │  ← ≥8px gap
-│ [ Cancel Button ]           │  ← ~40px height
+│ [ Cancel Button ]           │  ← 44px min height
 └─────────────────────────────┘
 ```
 
-#### Tap Feedback
+#### Visual tap feedback
 ```
 Visual:         Slight darken or highlight (not instant, 50ms delay)
 Timing:         Fade back to normal after 100ms (not held, feels laggy)
-Color:          Use context (primary orange darkens to #CC4A08)
+Color:          Use context (primary green darkens to #007A3A)
 Animation:      background-color 100ms ease-out
 
 Never:          0-delay instant feedback (feels unnatural)
@@ -517,20 +502,20 @@ Instead:        Use :active (when finger touches down)
 
 CSS Example:
 button {
-  background: #EA580C;
+  background: #00B14F;
   transition: background 200ms ease-out;
 }
 
 button:hover {
-  background: #CC4A08;  /* Desktop only */
+  background: #009948;  /* Desktop only */
 }
 
 button:active {
-  background: #B84207;  /* Mobile + desktop */
+  background: #007A3A;  /* Mobile + desktop */
 }
 
 button:focus {
-  outline: 2px solid #EA580C;  /* Keyboard users */
+  outline: 2px solid #00B14F;  /* Keyboard users */
   outline-offset: 2px;
 }
 ```
@@ -653,9 +638,11 @@ Which to trust?
 
 ---
 
-## PART 7: ACCESSIBILITY & LOCALIZATION
+## PART 7: CONTRAST, SEMANTIC HTML & LOCALIZATION
 
-### 7.1 WCAG 2.1 AA Compliance Checklist
+Touch and type **dimensions** for controls live in **Part 4 (components)** and **§5.5** — standard **platform UI** metrics (44px min height, 16px on inputs), not a separate “accessibility sizing” track.
+
+### 7.1 WCAG 2.1 AA–oriented checklist
 
 #### Color Contrast
 ```
@@ -665,11 +652,11 @@ Which to trust?
 ✅ Disabled states:    Test with gray text (should still be readable)
 
 Test tool: WebAIM Contrast Checker
-Target palette already tested:
-  ✅ #EA580C (orange) on white:        6.1:1 (AAA)
-  ✅ #0891B2 (teal) on white:          4.8:1 (AAA)
-  ✅ #6B7280 (gray) on white:          4.5:1 (AA)
-  ✅ #FB6B3C (warm red) on white:      5.2:1 (AAA)
+Target palette: verify with WebAIM when changing tokens; typical checks:
+  ✅ White on #00B14F (primary button):  meets contrast for large controls
+  ✅ #363A45 (Tuna / neutral-900) on #FFFFFF:  strong body/heading contrast
+  ✅ #6B7280 (gray) on white:          4.5:1 (AA) for secondary text
+  ✅ White on #EF4444 (danger CTA):    verify 4.5:1
 ```
 
 #### Typography
@@ -1145,37 +1132,33 @@ Sidebar:
 {
   "color": {
     "primary": {
-      "50": "#FEF6F0",
-      "100": "#FED5B8",
-      "200": "#FDB07D",
-      "500": "#EA580C",
-      "600": "#D74A0A",
-      "700": "#CC4A08"
+      "50": "#E8F8EF",
+      "100": "#C4ECD4",
+      "500": "#00B14F",
+      "600": "#009948",
+      "700": "#007A3A"
     },
     "secondary": {
-      "500": "#0891B2",
-      "600": "#0369A1"
+      "500": "#6B7280",
+      "700": "#3D4450"
     },
     "accent": {
-      "500": "#7C3AED",
-      "600": "#6D28D9"
+      "300": "#7BDCB5",
+      "500": "#1FB77E"
     },
     "danger": {
-      "500": "#FB6B3C",
-      "600": "#EA5621"
+      "500": "#EF4444",
+      "600": "#DC2626"
     },
     "success": {
-      "500": "#34D399",
-      "600": "#10B981"
+      "500": "#1FA85A",
+      "600": "#168A4A"
     },
     "neutral": {
-      "50": "#F9FAFB",
-      "100": "#F3F4F6",
-      "200": "#E5E7EB",
-      "300": "#D1D5DB",
+      "50": "#F7F7F8",
+      "200": "#E2E4E8",
       "500": "#6B7280",
-      "700": "#374151",
-      "900": "#111827"
+      "900": "#363A45"
     }
   }
 }
@@ -1186,7 +1169,7 @@ Sidebar:
 {
   "typography": {
     "h1": {
-      "font-size": "32px",
+      "font-size": "24px",
       "font-weight": "700",
       "line-height": "1.25"
     },
@@ -1275,7 +1258,7 @@ Use this before shipping any feature:
 
 | Version | Date       | Changes |
 |---------|-----------|---------|
-| 1.0     | 2026-04-15 | Initial system (color, typography, components, responsive, offline, a11y, i18n) |
+| 1.0     | 2026-04-15 | Initial system (color, typography, components, responsive, offline, semantics, i18n) |
 | 1.1     | TBD       | Dark mode, micro-animations library, advanced components |
 | 2.0     | TBD       | Major refresh after user feedback from pilots |
 

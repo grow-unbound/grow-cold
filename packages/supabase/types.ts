@@ -268,7 +268,7 @@ export type Database = {
           is_active: boolean
           mobile: string | null
           notes: string | null
-          phone: string
+          phone: string | null
           tenant_id: string
           updated_at: string
           warehouse_id: string
@@ -285,7 +285,7 @@ export type Database = {
           is_active?: boolean
           mobile?: string | null
           notes?: string | null
-          phone: string
+          phone?: string | null
           tenant_id?: string
           updated_at?: string
           warehouse_id: string
@@ -302,7 +302,7 @@ export type Database = {
           is_active?: boolean
           mobile?: string | null
           notes?: string | null
-          phone?: string
+          phone?: string | null
           tenant_id?: string
           updated_at?: string
           warehouse_id?: string
@@ -330,7 +330,10 @@ export type Database = {
           created_at: string
           delivery_date: string
           driver_name: string | null
+          external_reference_id: string | null
           id: string
+          legacy_locations: string | null
+          location_ids: string[]
           lot_id: string
           notes: string | null
           num_bags_out: number
@@ -346,7 +349,10 @@ export type Database = {
           created_at?: string
           delivery_date: string
           driver_name?: string | null
+          external_reference_id?: string | null
           id?: string
+          legacy_locations?: string | null
+          location_ids?: string[]
           lot_id: string
           notes?: string | null
           num_bags_out: number
@@ -362,7 +368,10 @@ export type Database = {
           created_at?: string
           delivery_date?: string
           driver_name?: string | null
+          external_reference_id?: string | null
           id?: string
+          legacy_locations?: string | null
+          location_ids?: string[]
           lot_id?: string
           notes?: string | null
           num_bags_out?: number
@@ -480,7 +489,9 @@ export type Database = {
           created_at: string
           customer_id: string
           driver_name: string | null
+          external_reference_id: string | null
           id: string
+          legacy_locations: string | null
           location_ids: string[]
           lodgement_date: string
           lot_number: string
@@ -499,7 +510,9 @@ export type Database = {
           created_at?: string
           customer_id: string
           driver_name?: string | null
+          external_reference_id?: string | null
           id?: string
+          legacy_locations?: string | null
           location_ids?: string[]
           lodgement_date: string
           lot_number: string
@@ -518,7 +531,9 @@ export type Database = {
           created_at?: string
           customer_id?: string
           driver_name?: string | null
+          external_reference_id?: string | null
           id?: string
+          legacy_locations?: string | null
           location_ids?: string[]
           lodgement_date?: string
           lot_number?: string
@@ -610,6 +625,7 @@ export type Database = {
           charge_type_id: string
           charges_per_bag: number
           created_at: string
+          product_charge_type_id: string
           product_id: string
           updated_at: string
         }
@@ -617,6 +633,7 @@ export type Database = {
           charge_type_id: string
           charges_per_bag: number
           created_at?: string
+          product_charge_type_id?: string
           product_id: string
           updated_at?: string
         }
@@ -624,6 +641,7 @@ export type Database = {
           charge_type_id?: string
           charges_per_bag?: number
           created_at?: string
+          product_charge_type_id?: string
           product_id?: string
           updated_at?: string
         }
@@ -646,7 +664,7 @@ export type Database = {
       }
       products: {
         Row: {
-          bag_size: number | null
+          chargeable_bag_size: number | null
           created_at: string
           description: string | null
           id: string
@@ -663,7 +681,7 @@ export type Database = {
           yearly_rent_per_kg: number | null
         }
         Insert: {
-          bag_size?: number | null
+          chargeable_bag_size?: number | null
           created_at?: string
           description?: string | null
           id?: string
@@ -678,7 +696,7 @@ export type Database = {
           yearly_rent_per_kg?: number | null
         }
         Update: {
-          bag_size?: number | null
+          chargeable_bag_size?: number | null
           created_at?: string
           description?: string | null
           id?: string
@@ -848,51 +866,50 @@ export type Database = {
       transaction_charges: {
         Row: {
           charge_amount: number
-          charge_type_id: string
+          charge_date: string
           created_at: string
-          delivery_id: string
+          delivery_id: string | null
           id: string
           is_paid: boolean
+          legacy_amount_paid: number | null
           lot_id: string
           notes: string | null
+          num_bags: number | null
           paid_date: string | null
-          rate_per_unit: number | null
+          product_charge_type_id: string
           updated_at: string
         }
         Insert: {
           charge_amount: number
-          charge_type_id: string
+          charge_date: string
           created_at?: string
-          delivery_id: string
+          delivery_id?: string | null
           id?: string
           is_paid?: boolean
+          legacy_amount_paid?: number | null
           lot_id: string
           notes?: string | null
+          num_bags?: number | null
           paid_date?: string | null
-          rate_per_unit?: number | null
+          product_charge_type_id: string
           updated_at?: string
         }
         Update: {
           charge_amount?: number
-          charge_type_id?: string
+          charge_date?: string
           created_at?: string
-          delivery_id?: string
+          delivery_id?: string | null
           id?: string
           is_paid?: boolean
+          legacy_amount_paid?: number | null
           lot_id?: string
           notes?: string | null
+          num_bags?: number | null
           paid_date?: string | null
-          rate_per_unit?: number | null
+          product_charge_type_id?: string
           updated_at?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "transaction_charges_charge_type_id_fkey"
-            columns: ["charge_type_id"]
-            isOneToOne: false
-            referencedRelation: "charge_types"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "transaction_charges_delivery_id_fkey"
             columns: ["delivery_id"]
@@ -906,6 +923,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "lots"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transaction_charges_product_charge_type_id_fkey"
+            columns: ["product_charge_type_id"]
+            isOneToOne: false
+            referencedRelation: "product_charges"
+            referencedColumns: ["product_charge_type_id"]
           },
         ]
       }

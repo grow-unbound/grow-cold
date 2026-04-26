@@ -11,7 +11,7 @@ export function LotStatusBadge({ status }: { status: LotStatus }) {
           ? 'badge-disputed'
           : status === 'CLEARED' || status === 'DELIVERED'
             ? 'badge-cleared'
-            : 'inline-flex items-center rounded-sm bg-neutral-100 px-1.5 py-0.5 text-caption-sm font-semibold text-neutral-700';
+            : 'inline-flex items-center rounded-sm bg-neutral-100 px-1.5 py-0.5 text-label font-semibold text-neutral-700';
 
   return <span className={cn(cls)}>{status.replaceAll('_', ' ')}</span>;
 }

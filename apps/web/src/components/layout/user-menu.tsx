@@ -74,13 +74,13 @@ function WarehousePicker({
   }
 
   return (
-    <div className="flex flex-col gap-1 px-2 py-1.5">
+      <div className="flex flex-col gap-2 px-2 py-1.5">
       <div className="flex items-center gap-2">
         <Building2 className="h-4 w-4 shrink-0 text-neutral-500" aria-hidden />
-        <span className="text-caption-sm font-medium text-neutral-600">{t('warehouse')}</span>
+        <span className="text-label-lg font-semibold text-neutral-700">{t('warehouse')}</span>
       </div>
       <select
-        className="w-full rounded-base border border-neutral-200 bg-white px-2 py-1.5 text-caption text-neutral-900 outline-none ring-primary-500 focus:border-primary-500 focus:ring-1"
+        className="input-base"
         value={selectedId ?? ''}
         onChange={(e) => onSelect(e.target.value)}
         aria-label={t('warehouse_select_aria')}
@@ -128,7 +128,11 @@ export function UserMenu() {
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
-        <Button variant="outline" className="gap-0.5 px-2" type="button">
+        <Button
+          variant="secondary"
+          className="min-h-touch gap-0.5 rounded-full border-neutral-200 px-2.5 py-0"
+          type="button"
+        >
           <span className="sr-only">{t('user_menu')}</span>
           <span
             className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-200 text-caption font-semibold text-neutral-800"

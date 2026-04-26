@@ -45,7 +45,7 @@ export function AppHeader() {
       pt={insets.top + 12}
     >
       <HStack justifyContent="space-between" alignItems="center">
-        <Text fontSize="$lg" fontWeight="$semibold" color="$textLight900">
+        <Text fontSize="$lg" fontWeight="$semibold" color="$primary500">
           {tCommon('app_name')}
         </Text>
         <HStack space="sm" alignItems="center">

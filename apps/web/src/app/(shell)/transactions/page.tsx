@@ -48,7 +48,7 @@ export default function TransactionsPage() {
     <div className="flex w-full flex-col gap-3">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="h2">{t('transactions.title')}</h1>
-        <button type="button" className="btn-primary btn-base w-full sm:w-auto" onClick={() => setDialogOpen(true)}>
+        <button type="button" className="btn-primary w-full sm:w-auto" onClick={() => setDialogOpen(true)}>
           {t('transactions.record_receipt')}
         </button>
       </div>
@@ -72,8 +72,8 @@ export default function TransactionsPage() {
             <li
               key={row.id}
               className={cn(
-                'card flex flex-col gap-1 border-l-4 sm:flex-row sm:items-center sm:justify-between',
-                row.kind === 'receipt' ? 'border-l-secondary-500 bg-white' : 'border-l-primary-500 bg-white',
+                'card-elevated flex flex-col gap-1 border-0 border-l-4 border-solid sm:flex-row sm:items-center sm:justify-between',
+                row.kind === 'receipt' ? 'border-l-accent-500' : 'border-l-primary-500',
               )}
             >
               <div className="min-w-0 flex-1">
@@ -82,7 +82,7 @@ export default function TransactionsPage() {
                     className={cn(
                       'rounded-full px-2 py-0.5 text-caption font-semibold',
                       row.kind === 'receipt'
-                        ? 'bg-secondary-100 text-secondary-800'
+                        ? 'bg-accent-100 text-accent-800'
                         : 'bg-primary-100 text-primary-800',
                     )}
                   >
@@ -111,7 +111,7 @@ export default function TransactionsPage() {
           onClick={() => setDialogOpen(false)}
         >
           <div
-            className="card max-h-[90vh] w-full max-w-md overflow-y-auto"
+            className="card-elevated max-h-[90vh] w-full max-w-md overflow-y-auto"
             role="dialog"
             aria-labelledby="receipt-title"
             onClick={(e) => e.stopPropagation()}
@@ -148,7 +148,7 @@ export default function TransactionsPage() {
               })}
             >
               <div className="form-field">
-                <label className="text-label font-semibold text-neutral-700" htmlFor="rcustomer">
+                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="rcustomer">
                   {t('transactions.customer')} *
                 </label>
                 <select id="rcustomer" className="input-base" {...form.register('customer_id', { required: true })}>
@@ -161,19 +161,19 @@ export default function TransactionsPage() {
                 </select>
               </div>
               <div className="form-field">
-                <label className="text-label font-semibold text-neutral-700" htmlFor="rdate">
+                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="rdate">
                   {t('transactions.date')} *
                 </label>
                 <input id="rdate" type="date" className="input-base" {...form.register('receipt_date')} />
               </div>
               <div className="form-field">
-                <label className="text-label font-semibold text-neutral-700" htmlFor="ramount">
+                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="ramount">
                   {t('transactions.amount')} *
                 </label>
                 <input id="ramount" inputMode="decimal" className="input-base" {...form.register('total_amount')} />
               </div>
               <div className="form-field">
-                <label className="text-label font-semibold text-neutral-700" htmlFor="pmethod">
+                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="pmethod">
                   {t('transactions.method')}
                 </label>
                 <select id="pmethod" className="input-base" {...form.register('payment_method')}>
@@ -186,23 +186,23 @@ export default function TransactionsPage() {
                 </select>
               </div>
               <div className="form-field">
-                <label className="text-label font-semibold text-neutral-700" htmlFor="ref">
+                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="ref">
                   Reference
                 </label>
                 <input id="ref" className="input-base" {...form.register('reference_number')} />
               </div>
               <div className="form-field">
-                <label className="text-label font-semibold text-neutral-700" htmlFor="rnotes">
+                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="rnotes">
                   Notes
                 </label>
                 <textarea id="rnotes" className="input-base min-h-[3rem]" {...form.register('notes')} />
               </div>
-              {create.isError && <p className="text-caption text-danger-600">{t('save_error')}</p>}
-              <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
-                <button type="button" className="btn-secondary btn-base" onClick={() => setDialogOpen(false)}>
+              {create.isError && <p className="error-text">{t('save_error')}</p>}
+              <div className="flex flex-col gap-4 sm:flex-row sm:justify-end">
+                <button type="button" className="btn-secondary" onClick={() => setDialogOpen(false)}>
                   Cancel
                 </button>
-                <button type="submit" className="btn-primary btn-base" disabled={create.isPending}>
+                <button type="submit" className="btn-primary" disabled={create.isPending}>
                   {t('parties.submit')}
                 </button>
               </div>

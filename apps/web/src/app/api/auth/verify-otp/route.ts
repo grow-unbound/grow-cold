@@ -4,8 +4,8 @@ import { verifyOtpCode } from '@/lib/otp-secret';
 import { createSupabaseAdminClient } from '@/lib/supabase-admin';
 import { createSupabaseRouteHandlerClient } from '@/lib/supabase-route-handler';
 
-const MAX_OTP_ATTEMPTS = 5;
-const LOCKOUT_MS = 5 * 60 * 1000;
+/** Wrong-code tries per challenge before verify is blocked until resend. */
+const MAX_OTP_ATTEMPTS = 3;
 
 export async function POST(request: Request) {
   let body: unknown;
@@ -49,38 +49,52 @@ export async function POST(request: Request) {
   }
 
   const now = Date.now();
-  if (challenge.locked_until && new Date(challenge.locked_until).getTime() > now) {
-    return NextResponse.json(
-      { error: 'Too many attempts. Try again in 5 minutes.', code: 'LOCKED' },
-      { status: 429 },
-    );
-  }
 
   if (new Date(challenge.expires_at).getTime() < now) {
     return NextResponse.json({ error: 'Code expired. Request a new one.', code: 'EXPIRED' }, { status: 400 });
   }
 
+  if (challenge.attempt_count >= MAX_OTP_ATTEMPTS) {
+    return NextResponse.json(
+      {
+        error: 'Too many incorrect codes. Request a new OTP.',
+        code: 'MUST_RESEND',
+      },
+      { status: 400 },
+    );
+  }
+
   const valid = await verifyOtpCode(code, challenge.otp_hash);
   if (!valid) {
     const nextAttempt = challenge.attempt_count + 1;
-    const lockedUntil =
-      nextAttempt >= MAX_OTP_ATTEMPTS ? new Date(now + LOCKOUT_MS).toISOString() : null;
 
     await admin
       .from('auth_otp_challenges')
       .update({
         attempt_count: nextAttempt,
-        locked_until: lockedUntil,
+        locked_until: null,
       })
       .eq('id', session_id);
 
-    if (lockedUntil) {
+    if (nextAttempt >= MAX_OTP_ATTEMPTS) {
       return NextResponse.json(
-        { error: 'Too many attempts. Try again in 5 minutes.', code: 'LOCKED' },
-        { status: 429 },
+        {
+          error: 'Too many incorrect codes. Request a new OTP.',
+          code: 'MUST_RESEND',
+          attempts_remaining: 0,
+        },
+        { status: 400 },
       );
     }
-    return NextResponse.json({ error: 'Code is incorrect. Try again.', code: 'INVALID_OTP' }, { status: 400 });
+
+    return NextResponse.json(
+      {
+        error: 'Code is incorrect.',
+        code: 'INVALID_OTP',
+        attempts_remaining: MAX_OTP_ATTEMPTS - nextAttempt,
+      },
+      { status: 400 },
+    );
   }
 
   const verifiedAt = new Date().toISOString();
