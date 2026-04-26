@@ -19,7 +19,7 @@ export const customerSchema = z.object({
   tenant_id: uuidSchema,
   customer_code: customerCodeSchema,
   customer_name: z.string().min(1),
-  phone: z.string().min(1),
+  phone: z.string().min(1).nullable(),
   mobile: z.string().nullable().optional(),
   address: z.string().nullable().optional(),
   gstin: z.string().nullable().optional(),
@@ -45,7 +45,7 @@ export const productSchema = z.object({
   tenant_id: uuidSchema,
   product_name: z.string().min(1),
   product_group_id: uuidSchema,
-  bag_size: z.number().positive().nullish(),
+  chargeable_bag_size: z.number().positive().nullish(),
   monthly_rent_per_kg: z.number().nullish(),
   monthly_rent_per_bag: z.number().nullish(),
   yearly_rent_per_kg: z.number().nullish(),
@@ -70,6 +70,7 @@ export const chargeTypeRowSchema = z.object({
 });
 
 export const productChargeSchema = z.object({
+  product_charge_type_id: uuidSchema,
   product_id: uuidSchema,
   charge_type_id: uuidSchema,
   charges_per_bag: z.string(),
@@ -87,7 +88,7 @@ export const locationSchema = z.object({
 
 export const lotSchema = z.object({
   id: uuidSchema,
-  lot_number: z.string().regex(/^[A-Za-z0-9]+\/[A-Za-z0-9]+$/),
+  lot_number: z.string().min(1),
   warehouse_id: uuidSchema,
   tenant_id: uuidSchema,
   customer_id: uuidSchema,
@@ -97,6 +98,8 @@ export const lotSchema = z.object({
   lodgement_date: z.string(),
   rental_mode: rentalModeSchema,
   location_ids: z.array(uuidSchema),
+  legacy_locations: z.string().nullable().optional(),
+  external_reference_id: z.string().nullable().optional(),
   driver_name: z.string().nullable().optional(),
   vehicle_number: z.string().nullable().optional(),
   status: lotStatusSchema,
@@ -116,6 +119,9 @@ export const deliverySchema = z.object({
   override_reason: z.string().nullable().optional(),
   override_at: z.string().datetime({ offset: true }).nullable().optional(),
   notes: z.string().nullable().optional(),
+  legacy_locations: z.string().nullable().optional(),
+  location_ids: z.array(uuidSchema).optional(),
+  external_reference_id: z.string().nullable().optional(),
   driver_name: z.string().nullable().optional(),
   vehicle_number: z.string().nullable().optional(),
   created_at: z.string().datetime({ offset: true }),
@@ -124,11 +130,13 @@ export const deliverySchema = z.object({
 
 export const transactionChargeSchema = z.object({
   id: uuidSchema,
-  delivery_id: uuidSchema,
+  delivery_id: uuidSchema.nullable().optional(),
   lot_id: uuidSchema,
-  charge_type_id: uuidSchema,
+  product_charge_type_id: uuidSchema,
   charge_amount: z.string(),
-  rate_per_unit: z.string().nullable().optional(),
+  charge_date: z.string(),
+  legacy_amount_paid: z.string().nullable().optional(),
+  num_bags: z.number().int().nonnegative().nullish(),
   is_paid: z.boolean(),
   paid_date: z.string().nullable().optional(),
   notes: z.string().nullable().optional(),

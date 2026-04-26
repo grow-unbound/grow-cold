@@ -34,7 +34,7 @@ export const CreateCustomerRequestSchema = z.object({
     .max(120)
     .regex(/^[A-Za-z0-9./\-]+$/, 'Use letters, digits, / . - only'),
   customer_name: z.string().min(1).max(500),
-  phone: z.string().min(5).max(32),
+  phone: z.string().min(5).max(32).nullish(),
   mobile: z.string().min(5).max(32).optional(),
   category: customerCategorySchema.optional().default('TRADER'),
   address: z.string().max(2000).optional(),
