@@ -4,40 +4,55 @@ import {
   type ClipboardEvent,
   type KeyboardEvent,
   useCallback,
+  useEffect,
   useRef,
   useState,
 } from 'react';
 
 type SixDigitOtpProps = {
   disabled?: boolean;
-  onComplete: (code: string) => void;
+  /** Current 6-digit code (may be partial). Fires on every change. */
+  onChange?: (code: string) => void;
+  /** When the 6th digit completes a valid code, fires once per distinct code until cleared. */
+  onComplete?: (code: string) => void;
+  /** When true, inputs show error styling (e.g. after failed verify). */
+  error?: boolean;
 };
 
-export function SixDigitOtp({ disabled, onComplete }: SixDigitOtpProps) {
+export function SixDigitOtp({ disabled, onChange, onComplete, error }: SixDigitOtpProps) {
   const [digits, setDigits] = useState<string[]>(() => Array.from({ length: 6 }, () => ''));
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+  const lastCompleteEmittedRef = useRef('');
 
   const focusAt = useCallback((i: number) => {
     const el = inputsRef.current[i];
     if (el) el.focus();
   }, []);
 
-  const emitIfComplete = useCallback(
-    (next: string[]) => {
-      const code = next.join('');
-      if (code.length === 6 && /^\d{6}$/.test(code)) {
-        onComplete(code);
-      }
-    },
-    [onComplete],
-  );
+  useEffect(() => {
+    onChangeRef.current?.(digits.join(''));
+  }, [digits]);
+
+  useEffect(() => {
+    const code = digits.join('');
+    if (code.length !== 6 || !/^\d{6}$/.test(code)) {
+      lastCompleteEmittedRef.current = '';
+      return;
+    }
+    if (lastCompleteEmittedRef.current === code) return;
+    lastCompleteEmittedRef.current = code;
+    onCompleteRef.current?.(code);
+  }, [digits]);
 
   const setAt = (index: number, val: string) => {
     const d = val.replace(/\D/g, '').slice(-1);
     setDigits((prev) => {
       const next = [...prev];
       next[index] = d;
-      emitIfComplete(next);
       return next;
     });
     if (d && index < 5) focusAt(index + 1);
@@ -76,12 +91,14 @@ export function SixDigitOtp({ disabled, onComplete }: SixDigitOtpProps) {
     if (text.length === 0) return;
     e.preventDefault();
     setDigits(() => {
-      const next = Array.from({ length: 6 }, (_, i) => text[i] ?? '');
-      emitIfComplete(next);
-      return next;
+      return Array.from({ length: 6 }, (_, i) => text[i] ?? '');
     });
     focusAt(Math.min(text.length, 5));
   };
+
+  const borderClass = error
+    ? 'border-danger-500 focus:border-danger-500 focus:ring-1'
+    : 'border-neutral-200 focus:border-primary-500 focus:ring-1';
 
   return (
     <div className="flex justify-center gap-1.5 sm:gap-2" role="group" aria-label="One-time code">
@@ -101,7 +118,7 @@ export function SixDigitOtp({ disabled, onComplete }: SixDigitOtpProps) {
           onChange={(e) => setAt(i, e.target.value)}
           onKeyDown={(e) => onKeyDown(i, e)}
           onPaste={i === 0 ? onPaste : undefined}
-          className="h-11 w-9 rounded-base border border-neutral-200 text-center text-base font-semibold outline-none ring-primary-500 focus:border-primary-500 focus:ring-1 sm:h-12 sm:w-10"
+          className={`h-touch w-9 rounded-lg border-2 text-center text-base font-semibold outline-none ring-primary-500 sm:w-10 ${borderClass}`}
           aria-label={`Digit ${i + 1}`}
         />
       ))}

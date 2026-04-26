@@ -111,8 +111,8 @@ VALUES
   (
     'a0000000-0000-4000-8000-000000000022'::uuid,
     'a0000000-0000-4000-8000-000000000001'::uuid,
-    'PLATFORM',
-    'Platform',
+    'PLATFORM_HAMALI',
+    'Platform Hamali',
     2
   ),
   (
@@ -128,6 +128,20 @@ VALUES
     'MAMULLE',
     'Mamulle',
     4
+  ),
+  (
+    'a0000000-0000-4000-8000-000000000025'::uuid,
+    'a0000000-0000-4000-8000-000000000001'::uuid,
+    'TRANSPORT',
+    'Transport',
+    5
+  ),
+  (
+    'a0000000-0000-4000-8000-000000000026'::uuid,
+    'a0000000-0000-4000-8000-000000000001'::uuid,
+    'INSURANCE',
+    'Insurance',
+    6
   );
 
 INSERT INTO public.locations (
@@ -148,7 +162,7 @@ INSERT INTO public.products (
   tenant_id,
   product_name,
   product_group_id,
-  bag_size,
+  chargeable_bag_size,
   monthly_rent_per_kg,
   yearly_rent_per_kg,
   stale_days_limit,

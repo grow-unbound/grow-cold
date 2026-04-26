@@ -9,7 +9,13 @@
     "db:start": "pnpm --filter @growcold/supabase db:start",
     "db:reset": "pnpm --filter @growcold/supabase db:reset",
     "db:types": "pnpm --filter @growcold/supabase db:types",
+    "import:sri-sai": "node scripts/import-sri-sai-padala.mjs",
+    "import:sri-sai:lots": "IMPORT_LOTS_ONLY=1 node scripts/import-sri-sai-padala.mjs",
     "linear:m0": "node scripts/linear-m0-closeout.mjs",
     "typecheck": "pnpm --filter @growcold/shared typecheck && pnpm --filter @growcold/web typecheck && pnpm --filter @growcold/mobile typecheck"
+  },
+  "devDependencies": {
+    "@supabase/supabase-js": "^2.57.4",
+    "csv-parse": "^5.5.6"
   }
 }

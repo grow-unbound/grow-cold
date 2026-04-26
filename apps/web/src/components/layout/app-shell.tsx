@@ -49,13 +49,14 @@ export function AppShell({ children }: { children: ReactNode }) {
   }, [pathname, hydrate]);
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-primary-50 lg:flex-row">
-      {/* Desktop: left sidebar */}
+    <div className="flex min-h-screen w-full flex-col bg-neutral-50 lg:flex-row">
+      {/* Desktop: left sidebar — brand accent strip (color only, no third-party mark) */}
       <aside
         className="hidden w-48 shrink-0 flex-col border-r border-neutral-200/80 bg-white lg:flex"
         aria-label="Main"
       >
-        <div className="flex min-h-[3.25rem] flex-col justify-center border-b border-neutral-200/80 px-3 py-2">
+        <div className="h-1 w-full shrink-0 bg-primary-500" aria-hidden />
+        <div className="flex min-h-touch flex-col justify-center border-b border-neutral-200/80 px-3 py-2">
           <span className="text-sm font-semibold tracking-tight text-neutral-900">{t('app_name')}</span>
           {warehouseName ? (
             <span className="mt-0.5 truncate text-caption text-neutral-500" title={warehouseName}>
@@ -84,30 +85,33 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {/* Main column: header (mobile/tablet) + content */}
       <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col">
-        <header className="flex w-full items-center justify-between border-b border-neutral-200/80 bg-white px-3 py-2 shadow-sm lg:hidden">
-          <div className="min-w-0 flex-1">
-            <h1 className="text-sm font-semibold tracking-tight text-neutral-900">{t('app_name')}</h1>
-            {warehouseName ? (
-              <p className="truncate text-caption text-neutral-500" title={warehouseName}>
-                {warehouseName}
-              </p>
-            ) : (
-              <p className="truncate text-caption text-neutral-400">{t('warehouse_placeholder')}</p>
-            )}
+        <header className="z-10 flex w-full flex-col border-b border-neutral-200/80 bg-white shadow-sm lg:hidden">
+          <div className="h-0.5 w-full bg-primary-500" aria-hidden />
+          <div className="flex min-h-touch items-center justify-between gap-2 px-3 py-0 pt-[max(0.5rem,env(safe-area-inset-top,0px))]">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-sm font-semibold tracking-tight text-neutral-900">{t('app_name')}</h1>
+              {warehouseName ? (
+                <p className="truncate text-caption text-neutral-500" title={warehouseName}>
+                  {warehouseName}
+                </p>
+              ) : (
+                <p className="truncate text-caption text-neutral-400">{t('warehouse_placeholder')}</p>
+              )}
+            </div>
+            <UserMenu />
           </div>
-          <UserMenu />
         </header>
 
-        <main className="page-container min-h-0 w-full max-w-none flex-1 self-stretch overflow-auto pb-14 pt-2 lg:pb-4 lg:pt-4">
+        <main className="page-container min-h-0 w-full max-w-none flex-1 self-stretch overflow-auto pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] pt-2 lg:pb-4 lg:pt-4">
           {children}
         </main>
 
-        {/* Mobile & tablet: bottom tab bar */}
+        {/* Mobile & tablet: bottom tab bar (super-app: green active, safe area) */}
         <nav
-          className="fixed bottom-0 left-0 right-0 z-40 border-t border-neutral-200/80 bg-white/95 shadow-[0_-4px_12px_rgba(0,0,0,0.06)] backdrop-blur-sm lg:hidden"
+          className="fixed bottom-0 left-0 right-0 z-40 border-t border-neutral-200/80 bg-white/95 pb-[max(0.25rem,env(safe-area-inset-bottom,0px))] shadow-[0_-4px_16px_rgba(0,0,0,0.05)] backdrop-blur-md lg:hidden"
           aria-label="Main"
         >
-          <ul className="flex w-full justify-between px-1 py-1">
+          <ul className="flex w-full justify-between px-1.5 py-1.5">
             {tabs.map((tab) => (
               <BottomTabLink
                 key={tab.href}
@@ -140,14 +144,25 @@ function BottomTabLink(props: {
       <Link
         href={props.href}
         className={cn(
-          'flex min-h-touch flex-col items-center justify-center gap-0.5 rounded-md px-0.5 py-0.5 text-center',
+          'flex min-h-touch flex-col items-center justify-center gap-1 rounded-full px-1.5 py-1 text-center transition-colors',
           active
-            ? 'bg-primary-50/90 text-primary-600'
-            : 'text-neutral-500 hover:bg-neutral-50/80 hover:text-neutral-800',
+            ? 'bg-primary-100 text-primary-700'
+            : 'text-neutral-500 hover:bg-neutral-100/80 hover:text-neutral-800',
         )}
       >
-        <Icon className={cn('h-4 w-4 shrink-0', active ? 'text-primary-600' : 'text-neutral-400')} aria-hidden />
-        <span className="text-caption font-medium leading-tight">{t(props.i18nKey)}</span>
+        <Icon
+          className={cn('h-5 w-5 shrink-0', active ? 'text-primary-600' : 'text-neutral-400')}
+          strokeWidth={active ? 2.25 : 1.75}
+          aria-hidden
+        />
+        <span
+          className={cn(
+            'text-caption font-semibold leading-tight',
+            active ? 'text-primary-800' : 'text-neutral-500',
+          )}
+        >
+          {t(props.i18nKey)}
+        </span>
       </Link>
     </li>
   );
@@ -167,13 +182,17 @@ function SidebarNavLink(props: {
     <Link
       href={props.href}
       className={cn(
-        'flex min-h-touch items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium transition-colors',
+        'flex min-h-touch items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-semibold transition-colors',
         active
-          ? 'bg-primary-50 text-primary-700 ring-1 ring-inset ring-primary-200'
+          ? 'bg-primary-50 text-primary-800 ring-1 ring-inset ring-primary-200/80'
           : 'text-neutral-600 hover:bg-neutral-50',
       )}
     >
-      <Icon className={cn('h-4 w-4 shrink-0', active ? 'text-primary-600' : 'text-neutral-400')} aria-hidden />
+      <Icon
+        className={cn('h-5 w-5 shrink-0', active ? 'text-primary-600' : 'text-neutral-400')}
+        strokeWidth={active ? 2.25 : 1.75}
+        aria-hidden
+      />
       <span className="truncate">{t(props.i18nKey)}</span>
     </Link>
   );

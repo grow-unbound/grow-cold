@@ -54,7 +54,7 @@ export const CreateLotRequestSchema = z.object({
   warehouse_id: z.string().uuid(),
   customer_id: z.string().uuid(),
   product_id: z.string().uuid(),
-  lot_number: z.string().regex(/^[A-Za-z0-9]+\/[A-Za-z0-9]+$/),
+  lot_number: z.string().min(1).max(200),
   original_bags: z.number().int().positive(),
   balance_bags: z.number().int().nonnegative().optional(),
   lodgement_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),

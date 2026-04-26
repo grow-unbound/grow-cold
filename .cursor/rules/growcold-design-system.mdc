@@ -1,5 +1,5 @@
 ---
-description: Enforce GrowCold design system for web UI and design-spec work (Tailwind tokens, component classes, accessibility).
+description: Enforce GrowCold design system for web UI and design-spec work (Tailwind tokens, component classes, standard platform sizing, semantic markup).
 globs:
   - apps/web/**
   - specs/DESIGN_SYSTEM*.md
@@ -12,7 +12,7 @@ alwaysApply: false
 ## Stack boundaries
 
 - **`apps/web`** (Next.js + React + Tailwind): Use this design system — tokens and component classes from `apps/web/tailwind.config.ts`.
-- **`apps/mobile`** (Expo + GlueStack): Do **not** apply Tailwind class names here; follow GlueStack theming and `specs/MOBILE_GLUESTACK_DESIGN_ALIGNMENT.md` when aligning colors/type/touch targets.
+- **`apps/mobile`** (Expo + GlueStack): Do **not** apply Tailwind class names here; follow GlueStack theming, `specs/MOBILE_GLUESTACK_DESIGN_ALIGNMENT.md`, and `apps/mobile/src/theme/gluestack.config.ts` when changing tokens.
 
 ## Before changing UI
 
@@ -25,15 +25,24 @@ Read (or skim for relevance):
 
 ## Tokens and classes (web)
 
-- Prefer **`primary`, `secondary`, `accent`, `success`, `warning`, `danger`, `neutral`** and **`status.*`** over ad hoc palette utilities such as `slate`, `zinc`, or `blue` for product chrome and text.
+- Prefer **`primary`**, **`secondary`**, **`accent`**, **`success`**, **`warning`**, **`danger`**, **`neutral`**, and **`status.*`** over ad hoc palette utilities such as `slate`, `zinc`, or `blue` for product chrome and text.
+- **Primary** is **Grab-inspired green** (`#00B14F` at `primary-500`). **Headings/body** use **Tuna** via `text-neutral-900` (`#363A45`). **Secondary buttons** are **neutral outline** (`.btn-secondary`); use **`Button` `variant="outline"`** for **green-outlined** secondary CTAs.
 - Prefer documented component utilities: **`btn-primary`**, **`btn-secondary`**, **`btn-danger`**, **`btn-ghost`**, **`input-base`**, **`form-field`**, **`card`**, **`skeleton`**, **`help-text`**, **`error-text`**, **`badge-*`**, **`page-container`**, **`lot-grid`**, heading helpers **`.h1` / `.h2` / `.h3`**, and semantic text sizes **`text-h1`**, **`text-body-sm`**, **`text-label`**, etc.
-- Use **`rounded-base`** (8px) for buttons and cards unless a spec calls for another token.
-- **`Button` component** (`apps/web/src/components/ui/button.tsx`): Use variants **`default`** (primary), **`secondary`**, **`outline`** (same as secondary outline), **`danger`**, **`ghost`** — align with COMPONENT_SPECS.
+- Use **`rounded-base`** (**12px**) for buttons and cards unless a spec calls for `rounded-lg` (16px) for large modules.
+- **`Button` component** (`apps/web/src/components/ui/button.tsx`): Use variants **`default`** (primary green), **`secondary`** (gray outline), **`outline`** (green border), **`danger`**, **`ghost`**.
 
-## Accessibility (non-negotiable)
+## Standard UI sizing (web — platform guidelines)
+
+- **Touch height:** **`min-h-touch` = 44px** (Apple HIG–style minimum; `min-h-11` in utilities). This is the product default, not a separate “accessibility mode.”
+- **Primary buttons & inputs:** **`py-2.5` `px-3.5`**, **min height 44px** via `.btn-base` / `.input-base` / `Button` variants.
+- **Form inputs:** **`text-base` (16px)** on `<input>`, `<select>`, `<textarea>` so iOS does not zoom on focus; do not use smaller type on real inputs.
+- **Between targets:** **≥8px** gap between adjacent tappable controls (industry / WCAG 2.2 spacing for pointer targets).
+- **Secondary copy:** **12px+** for important chrome (`text-caption` / `text-label` as documented); do not go below without layout justification.
+
+## Semantics & keyboard (non-negotiable)
 
 - Form controls: **`<label htmlFor>`** paired with **`id`**; **`aria-invalid`**, **`aria-describedby`** for errors; do not use placeholder as the only label.
-- Interactive controls: focus-visible affordance; minimum **13px** for secondary copy on small screens; **~34px** minimum tap targets for primary actions (`min-h-touch`, see COMPONENT_SPECS).
+- Interactive controls: **focus-visible** affordance (visible focus ring or equivalent).
 - Icon-only buttons: **`aria-label`**.
 
 ## What not to do

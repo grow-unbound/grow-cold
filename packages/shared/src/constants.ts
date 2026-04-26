@@ -14,9 +14,11 @@ export const RENTAL_MODE = ['YEARLY', 'MONTHLY', 'BROUGHT_FORWARD'] as const;
 /** Default `charge_types.code` values seeded per tenant (DB is source of truth). */
 export const DEFAULT_CHARGE_TYPE_CODES = [
   'HAMALI',
-  'PLATFORM',
+  'PLATFORM_HAMALI',
   'KATA_COOLIE',
   'MAMULLE',
+  'TRANSPORT',
+  'INSURANCE',
 ] as const;
 
 export const CUSTOMER_CATEGORY = ['TRADER', 'FARMER'] as const;

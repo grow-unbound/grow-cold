@@ -54,31 +54,31 @@ export function SignupForm() {
   const busy = form.formState.isSubmitting || redirecting;
 
   return (
-    <div className="mx-auto flex w-full max-w-sm flex-col gap-4 rounded-base border border-neutral-200 bg-white p-4 shadow-sm">
+    <div className="auth-panel">
       <div>
         <h1 className="text-lg font-semibold text-neutral-900">{t('title')}</h1>
         <p className="mt-1 text-caption text-neutral-600">{t('subtitle')}</p>
       </div>
       <form className="flex flex-col gap-3" onSubmit={onSubmit} noValidate>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="full_name" className="text-caption-sm font-medium text-neutral-800">
+        <div className="form-field">
+          <label htmlFor="full_name" className="text-label-lg font-semibold text-neutral-700">
             {t('full_name')}
           </label>
           <input
             id="full_name"
             autoComplete="name"
             disabled={busy}
-            className="rounded-base border border-neutral-200 px-3 py-2 text-sm outline-none ring-primary-500 focus:border-primary-500 focus:ring-1 disabled:bg-neutral-50"
+            className="input-base"
             {...form.register('full_name')}
           />
           {form.formState.errors.full_name?.message ? (
-            <p className="text-caption text-red-600" role="alert">
+            <p className="error-text" role="alert">
               {form.formState.errors.full_name.message}
             </p>
           ) : null}
         </div>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="phone" className="text-caption-sm font-medium text-neutral-800">
+        <div className="form-field">
+          <label htmlFor="phone" className="text-label-lg font-semibold text-neutral-700">
             {t('phone')}
           </label>
           <input
@@ -87,17 +87,17 @@ export function SignupForm() {
             autoComplete="tel"
             placeholder={t('phone_placeholder')}
             disabled={busy}
-            className="rounded-base border border-neutral-200 px-3 py-2 text-sm outline-none ring-primary-500 focus:border-primary-500 focus:ring-1 disabled:bg-neutral-50"
+            className="input-base"
             {...form.register('phone')}
           />
           {form.formState.errors.phone?.message ? (
-            <p className="text-caption text-red-600" role="alert">
+            <p className="error-text" role="alert">
               {form.formState.errors.phone.message}
             </p>
           ) : null}
         </div>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="email" className="text-caption-sm font-medium text-neutral-800">
+        <div className="form-field">
+          <label htmlFor="email" className="text-label-lg font-semibold text-neutral-700">
             {t('email')}
           </label>
           <input
@@ -106,36 +106,36 @@ export function SignupForm() {
             autoComplete="email"
             placeholder={t('email_placeholder')}
             disabled={busy}
-            className="rounded-base border border-neutral-200 px-3 py-2 text-sm outline-none ring-primary-500 focus:border-primary-500 focus:ring-1 disabled:bg-neutral-50"
+            className="input-base"
             {...form.register('email')}
           />
           {form.formState.errors.email?.message ? (
-            <p className="text-caption text-red-600" role="alert">
+            <p className="error-text" role="alert">
               {form.formState.errors.email.message}
             </p>
           ) : null}
         </div>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="company_name" className="text-caption-sm font-medium text-neutral-800">
+        <div className="form-field">
+          <label htmlFor="company_name" className="text-label-lg font-semibold text-neutral-700">
             {t('company')}
           </label>
           <input
             id="company_name"
             autoComplete="organization"
             disabled={busy}
-            className="rounded-base border border-neutral-200 px-3 py-2 text-sm outline-none ring-primary-500 focus:border-primary-500 focus:ring-1 disabled:bg-neutral-50"
+            className="input-base"
             {...form.register('company_name')}
           />
           {form.formState.errors.company_name?.message ? (
-            <p className="text-caption text-red-600" role="alert">
+            <p className="error-text" role="alert">
               {form.formState.errors.company_name.message}
             </p>
           ) : null}
         </div>
-        <label className="flex cursor-pointer items-start gap-2 text-caption text-neutral-700">
+        <label className="flex cursor-pointer items-start gap-3 py-1 text-sm text-neutral-700">
           <input
             type="checkbox"
-            className="mt-0.5 rounded border-neutral-300"
+            className="mt-0.5 size-5 shrink-0 rounded border-2 border-neutral-300"
             disabled={busy}
             {...form.register('agreed_to_terms')}
           />
@@ -151,7 +151,7 @@ export function SignupForm() {
           </span>
         </label>
         {form.formState.errors.agreed_to_terms?.message ? (
-          <p className="text-caption text-red-600" role="alert">
+          <p className="error-text" role="alert">
             {form.formState.errors.agreed_to_terms.message}
           </p>
         ) : null}
@@ -160,7 +160,7 @@ export function SignupForm() {
         </Button>
       </form>
       {error ? (
-        <p className="text-caption text-red-600" role="alert">
+        <p className="error-text" role="alert">
           {error}
         </p>
       ) : null}

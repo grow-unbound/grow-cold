@@ -95,7 +95,7 @@ export async function POST(request: Request) {
       warehouse_id: p.warehouse_id,
       customer_code: p.customer_code,
       customer_name: p.customer_name,
-      phone: p.phone,
+      phone: p.phone ?? null,
       mobile: p.mobile ?? null,
       category: p.category,
       address: p.address ?? null,

@@ -39,27 +39,31 @@ export default function HomePage() {
   const d = q.data;
   return (
     <div className="flex w-full flex-col gap-3">
-      <h1 className="h2">{t('home.title')}</h1>
+      <section className="rounded-2xl bg-gradient-to-b from-primary-50/80 via-white to-white p-3 ring-1 ring-primary-100/40 sm:p-4">
+        <h1 className="h2 tracking-tight text-neutral-900">{t('home.title')}</h1>
+        <p className="mt-1 text-body-sm text-neutral-600">{t('home.subtitle_hint')}</p>
+        <div className="mt-3 grid grid-cols-1 gap-2.5 sm:mt-4 sm:grid-cols-3 sm:gap-2">
+          <StatCard label={t('home.active_lots')} value={d.lot_counts.ACTIVE} emphasize />
+          <StatCard label={t('home.stale_lots')} value={d.lot_counts.STALE} />
+          <StatCard label={t('home.total_lots')} value={d.total_lots} />
+        </div>
+      </section>
 
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-        <StatCard label={t('home.active_lots')} value={d.lot_counts.ACTIVE} />
-        <StatCard label={t('home.stale_lots')} value={d.lot_counts.STALE} />
-        <StatCard label={t('home.total_lots')} value={d.total_lots} />
-      </div>
-
-      <div className="flex flex-wrap gap-2">
-        <Link href="/inventory" className="btn-secondary btn-base w-full min-w-[8rem] sm:w-auto">
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+        <Link href="/inventory" className="btn-primary w-full min-w-0 sm:min-w-[8rem] sm:flex-1 sm:w-auto">
           {t('home.open_inventory')}
         </Link>
-        <Link href="/parties" className="btn-secondary btn-base w-full min-w-[8rem] sm:w-auto">
-          {t('home.open_parties')}
-        </Link>
-        <Link href="/transactions" className="btn-secondary btn-base w-full min-w-[8rem] sm:w-auto">
-          {t('home.open_transactions')}
-        </Link>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:flex-1">
+          <Link href="/parties" className="btn-secondary w-full min-w-0 sm:w-auto">
+            {t('home.open_parties')}
+          </Link>
+          <Link href="/transactions" className="btn-secondary w-full min-w-0 sm:w-auto">
+            {t('home.open_transactions')}
+          </Link>
+        </div>
       </div>
 
-      <section className="card w-full">
+      <section className="card-elevated w-full">
         <h2 className="h3 mb-2">{t('home.recent_deliveries')}</h2>
         {d.recent_deliveries.length === 0 ? (
           <p className="text-body-sm text-neutral-500">{t('empty')}</p>
@@ -84,7 +88,7 @@ export default function HomePage() {
         )}
       </section>
 
-      <section className="card w-full">
+      <section className="card-elevated w-full">
         <h2 className="h3 mb-2">{t('home.recent_receipts')}</h2>
         {d.recent_receipts.length === 0 ? (
           <p className="text-body-sm text-neutral-500">{t('empty')}</p>
@@ -108,11 +112,16 @@ export default function HomePage() {
   );
 }
 
-function StatCard({ label, value }: { label: string; value: number }) {
+function StatCard({ label, value, emphasize }: { label: string; value: number; emphasize?: boolean }) {
   return (
-    <div className={cn('card flex flex-col gap-0.5 p-3')}>
-      <span className="text-caption font-medium text-neutral-500">{label}</span>
-      <span className="text-h2 font-bold text-neutral-900">{value}</span>
+    <div
+      className={cn(
+        'card-elevated flex flex-col gap-0.5 p-3 sm:p-3.5',
+        emphasize && 'ring-1 ring-primary-200/50',
+      )}
+    >
+      <span className="text-caption font-semibold uppercase tracking-wide text-neutral-500">{label}</span>
+      <span className="text-3xl font-bold tabular-nums tracking-tight text-neutral-900">{value}</span>
     </div>
   );
 }
