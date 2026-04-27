@@ -18,6 +18,7 @@
   "dependencies": {
     "@growcold/supabase": "workspace:*",
     "@supabase/supabase-js": "^2.57.4",
+    "date-fns": "^4.1.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {

@@ -1,6 +1,5 @@
-import { GetLotResponseSchema } from '@growcold/shared';
+import { GetLotDetailResponseSchema, fetchLotDetailPayload } from '@growcold/shared';
 import { NextResponse } from 'next/server';
-import { toListLotRow } from '@/lib/api-row-mappers';
 import { createSupabaseRouteHandlerClient } from '@/lib/supabase-route-handler';
 import { getRoleForWarehouse } from '@/lib/warehouse-role';
 
@@ -36,16 +35,12 @@ export async function GET(_request: Request, context: RouteContext) {
     return NextResponse.json({ error: 'Not found', code: 'NOT_FOUND' }, { status: 404 });
   }
 
-  const [{ data: cust }, { data: prod }] = await Promise.all([
-    supabase.from('customers').select('customer_name').eq('id', lot.customer_id).single(),
-    supabase.from('products').select('product_name').eq('id', lot.product_id).single(),
-  ]);
-
-  const row = toListLotRow(
-    lot,
-    cust?.customer_name ?? 'Unknown',
-    prod?.product_name ?? 'Unknown',
-  );
-  const out = GetLotResponseSchema.parse({ data: row });
-  return NextResponse.json(out);
+  try {
+    const data = await fetchLotDetailPayload(supabase, lot, lotId);
+    const out = GetLotDetailResponseSchema.parse({ data });
+    return NextResponse.json(out);
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json({ error: 'Query failed', code: 'DB_ERROR' }, { status: 500 });
+  }
 }

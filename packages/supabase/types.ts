@@ -255,6 +255,70 @@ export type Database = {
           },
         ]
       }
+      warehouse_cash_payments: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          payment_date: string
+          payment_method: Database["public"]["Enums"]["payment_method"] | null
+          recorded_by: string | null
+          recipient_name: string
+          tenant_id: string
+          total_amount: number
+          updated_at: string
+          warehouse_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          payment_date: string
+          payment_method?: Database["public"]["Enums"]["payment_method"] | null
+          recorded_by?: string | null
+          recipient_name: string
+          tenant_id?: string
+          total_amount: number
+          updated_at?: string
+          warehouse_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          payment_date?: string
+          payment_method?: Database["public"]["Enums"]["payment_method"] | null
+          recorded_by?: string | null
+          recipient_name?: string
+          tenant_id?: string
+          total_amount?: number
+          updated_at?: string
+          warehouse_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "warehouse_cash_payments_recorded_by_fkey"
+            columns: ["recorded_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "warehouse_cash_payments_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "warehouse_cash_payments_warehouse_id_fkey"
+            columns: ["warehouse_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           address: string | null
@@ -1152,6 +1216,86 @@ export type Database = {
     Functions: {
       accessible_warehouse_ids: { Args: never; Returns: string[] }
       current_tenant_id: { Args: never; Returns: string }
+      list_stock_movements: {
+        Args: {
+          p_warehouse_id: string
+          p_limit?: number
+          p_cursor_tx_date?: string
+          p_cursor_created_at?: string
+          p_cursor_kind?: string
+          p_cursor_event_id?: string
+        }
+        Returns: {
+          kind: string
+          event_id: string
+          lot_id: string
+          tx_date: string
+          created_at: string
+          lot_number: string
+          num_bags: number
+          customer_code: string
+          customer_name: string
+          product_name: string
+          product_group_name: string
+        }[]
+      }
+      list_money_movements: {
+        Args: {
+          p_warehouse_id: string
+          p_limit?: number
+          p_cursor_tx_date?: string
+          p_cursor_created_at?: string
+          p_cursor_kind?: string
+          p_cursor_event_id?: string
+        }
+        Returns: {
+          kind: string
+          event_id: string
+          tx_date: string
+          created_at: string
+          total_amount: number
+          payment_method: string | null
+          counterparty: string
+          notes: string | null
+        }[]
+      }
+      list_parties_tab: {
+        Args: {
+          p_warehouse_id: string
+          p_filter?: string
+          p_search?: string
+          p_limit?: number
+          p_offset?: number
+        }
+        Returns: {
+          customer_id: string
+          customer_code: string
+          customer_name: string
+          phone: string | null
+          mobile: string | null
+          address: string | null
+          outstanding: number
+          lot_count: number
+          bag_count: number
+          last_activity_date: string | null
+          has_stock: boolean
+          filter_total: number
+        }[]
+      }
+      parties_receivables_summary: {
+        Args: { p_warehouse_id: string }
+        Returns: {
+          total_receivable: number
+          customers_with_dues: number
+          rent_receivable: number
+          rent_lot_count: number
+          charges_receivable: number
+          charges_lot_count: number
+          others_receivable: number
+          others_customer_count: number
+          updated_at: string
+        }[]
+      }
     }
     Enums: {
       customer_category: "TRADER" | "FARMER"
