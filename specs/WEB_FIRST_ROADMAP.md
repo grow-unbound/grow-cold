@@ -232,7 +232,7 @@
 - [ ] Add tables:
   - `customer_receipts` (id, customerID, warehouseID, receiptDate, totalAmount, paymentMethod, referenceNumber, recordedBy, notes, createdAt)
   - `receipt_allocations` (id, receiptID, rentAccrualID OR chargeID, amount, allocatedManually, allocatedBy, createdAt)
-  - `warehouse_settings` (id, warehouseID, BLANKET_STALE_DAYS=180, FOLLOW_UP_OUTSTANDING_DAYS=30, YEARLY_RENT_CUTOFF_DATE, GRACE_PERIOD_MONTHS, createdAt, updatedAt)
+  - `warehouse_settings` (… `YEARLY_RENT_CUTOFF_MONTH`, `YEARLY_RENT_CUTOFF_DAY` recurring, `GRACE_PERIOD_MONTHS`, …)
   - `audit_log` (id, warehouseID, userID, entityType, entityID, action, oldValues, newValues, reason, ipAddress, createdAt)
 - [ ] Constraints: receipt total = allocations total, paidDate only if isPaid=true
 - [ ] Indexes: customer_receipts(customerID), receipt_allocations(receiptID), audit_log(warehouseID, createdAt DESC)
@@ -400,10 +400,10 @@
 
 ### Warehouse Settings Page
 - [ ] GET /api/warehouse-settings/:warehouseID:
-  - Return: BLANKET_STALE_DAYS, FOLLOW_UP_OUTSTANDING_DAYS, YEARLY_RENT_CUTOFF_DATE, GRACE_PERIOD_MONTHS
+  - Return: BLANKET_STALE_DAYS, FOLLOW_UP_OUTSTANDING_DAYS, YEARLY_RENT_CUTOFF_MONTH, YEARLY_RENT_CUTOFF_DAY, GRACE_PERIOD_MONTHS
   - Validate: user.role = 'OWNER' (403 if not, show "Unauthorized")
 - [ ] POST /api/warehouse-settings/:warehouseID (owner only):
-  - Input: BLANKET_STALE_DAYS, FOLLOW_UP_OUTSTANDING_DAYS, YEARLY_RENT_CUTOFF_DATE, GRACE_PERIOD_MONTHS
+  - Input: BLANKET_STALE_DAYS, FOLLOW_UP_OUTSTANDING_DAYS, YEARLY_RENT_CUTOFF_MONTH, YEARLY_RENT_CUTOFF_DAY, GRACE_PERIOD_MONTHS
   - Validate: All > 0
   - Update: warehouse_settings record
   - Log: audit_log action='SETTINGS_UPDATED', oldValues, newValues
@@ -413,7 +413,7 @@
   - Form inputs:
     - BLANKET_STALE_DAYS (number, ≥1)
     - FOLLOW_UP_OUTSTANDING_DAYS (number, ≥1)
-    - YEARLY_RENT_CUTOFF_DATE (date picker)
+    - YEARLY_RENT_CUTOFF_MONTH / DAY (e.g. May 31)
     - GRACE_PERIOD_MONTHS (number, ≥1)
   - Defaults displayed
   - Save button (disabled until change)

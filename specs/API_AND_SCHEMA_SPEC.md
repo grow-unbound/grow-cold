@@ -517,9 +517,9 @@ CREATE TABLE warehouse_settings (
   FOLLOW_UP_OUTSTANDING_DAYS INT DEFAULT 30,
     -- Trigger follow-up when daysOutstanding > this
 
-  -- Rental Cutoff
-  YEARLY_RENT_CUTOFF_DATE DATE DEFAULT '2026-01-01',
-    -- When yearly rent resets (typically Jan 1)
+  -- Rental Cutoff (recurring calendar month/day every year — no stored year)
+  YEARLY_RENT_CUTOFF_MONTH SMALLINT NOT NULL DEFAULT 1,  -- 1–12 (e.g. 5 = May)
+  YEARLY_RENT_CUTOFF_DAY SMALLINT NOT NULL DEFAULT 1,    -- 1–31, clamped to last day of month when needed
 
   GRACE_PERIOD_MONTHS INT DEFAULT 1,
     -- Grace period before cutoff (e.g., 1 month = can pay Jan 1-31)
@@ -1117,7 +1117,8 @@ Manually re-allocate receipt to different charges.
     "warehouseID": "wh_1",
     "BLANKET_STALE_DAYS": 180,
     "FOLLOW_UP_OUTSTANDING_DAYS": 30,
-    "YEARLY_RENT_CUTOFF_DATE": "2026-01-01",
+    "YEARLY_RENT_CUTOFF_MONTH": 5,
+    "YEARLY_RENT_CUTOFF_DAY": 31,
     "GRACE_PERIOD_MONTHS": 1,
     "updatedAt": "2026-01-01T00:00:00Z"
   }
@@ -1135,7 +1136,8 @@ Manually re-allocate receipt to different charges.
 {
   "BLANKET_STALE_DAYS": 180,
   "FOLLOW_UP_OUTSTANDING_DAYS": 30,
-  "YEARLY_RENT_CUTOFF_DATE": "2026-01-01",
+  "YEARLY_RENT_CUTOFF_MONTH": 5,
+  "YEARLY_RENT_CUTOFF_DAY": 31,
   "GRACE_PERIOD_MONTHS": 1
 }
 ```

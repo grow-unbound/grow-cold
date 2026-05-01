@@ -9,7 +9,7 @@
 
 ## EXECUTIVE SUMMARY
 
-This is a 3PL cold storage management system for unorganized Indian warehouses. Core insight: **stock is leverage for collections**. Business model accrues rent daily, blocks final deliveries if customers owe, and tracks spoilage by commodity.
+This is a 3PL cold storage management system for unorganized Indian warehouses. Core insight: **stock is leverage for collections**. Business model accrues rent monthly, blocks final deliveries if customers owe, and tracks spoilage by commodity.
 
 **Key Guardrails**:
 - Rent accrues from lodgement date, stops when stock is delivered
@@ -141,21 +141,37 @@ Requirement:
 
 #### Yearly Rent
 - Starts accruing: `lodgementDate`
-- First accrual: `lodgementDate + 1 month`
-- Then: Annual on same date, applies grace period (e.g., 1 month = 30 days buffer)
+- First accrual: `Monthend of lodgementDate`
+- No more accurals for the remaining part of the year (of lodgement)
+- Next accrual based on Brought Forward logic below
+- Eligible lots: lot.lodgement_date <= **yearly rent cutoff** for that calendar year (see `warehouse_settings.yearly_rent_cutoff_month` / `yearly_rent_cutoff_day`, recurring every year — e.g. May 31 → if lot was lodged Jan 1–May 31 **inclusive** → yearly rent for that lodgement year)
 
 #### Monthly Rent
 - Starts: `lodgementDate`
-- First accrual: `lodgementDate + 1 day`
-- Recurring: Monthly thereafter
+- First accrual: `Monthend of lodgementDate`
+- Recurring: Monthly thereafter (on monthends)
+- Eligible lots: lot.lodgement_date **>** same cutoff for that calendar year (e.g. for cutoff May 31 — lots lodged **after** May 31 through Dec 31 → **monthly** rent for that lodgement year)
 
 #### Brought Forward (Carryover)
-- Manual accrual by owner
+- Carried over on 1st Jan of the following year
+- Add monthly rents for the graceperiod #months - use `WarehouseSettings.GRACE_PERIOD_MONTHS`
 - Adds to previous month's rent (no interest multiplier)
 
+#### Rent Accrual Logic (Runs monthly - monthend date)
+- For any lot, initial yearly vs monthly for lodgement calendar year: `lodgement_date <= cutoff(lodgement_year)` → yearly (see `yearly_rent_cutoff_month` / `yearly_rent_cutoff_day`); else monthly
+- max_bags_in_month (peak bags in warehouse during the month) = opening balance at month start + bags delivered in month (equivalently: `original_bags` minus deliveries before month start, when there are no inward increases on the same lot)
+- if rental_mode = YEARLY, rent_accrued = original_bags * yearly_rent_per_bag for product (accrued only once in the month of lodgement for the year; no further rent accruals during the year)
+- if rental_mode = MONTHLY, rent_accrued = max_bags_in_month * monthly_rent_per_bag for product (accrued end of every month) until the end of the lodgement calendar year, while the lot still has stock in that month
+- Accruals **stop** when the lot has **no bags** in storage for that month (e.g. after full delivery: `DELIVERED` / `CLEARED`) and for `WRITTEN_OFF` / `DISPUTED`
+- On Jan 1st, all lots with balance_bags > 0 are brought forward
+- For brought_forward lots (lodgement_date year < current calendar year), rent_accrual is MONTHLY using above logic for `WarehouseSettings.GRACE_PERIOD_MONTHS` counting from January (months 1 … N); **after** the grace window, **one YEARLY** accrual in calendar month **N+1** on **remaining bags** (opening balance for that month × `yearly_rent_per_bag`) so the yearly charge is not deferred to December (lots may be delivered/cleared earlier). If `grace_period_months >= 12`, there is no separate in-year yearly row after grace (all months fall under BF monthly). Implemented in Postgres: `generate_rent_accruals_for_month` (monthly job uses narrowed lot scope by default), `backfill_rent_accruals` (passes full scope).
+- Lots can get brought forward across years if there are balance_bags on the lot on Jan 1st. In such case, repeat above BroughtForward logic for the new year as well.
+
+
 **Cutoff Logic**
-- Yearly rent recalculated on `WarehouseSettings.YEARLY_RENT_CUTOFF_DATE`
-- Grace period: `WarehouseSettings.GRACE_PERIOD_MONTHS` (e.g., 1 month = 30 days before cutoff)
+- Yearly rent considered for lots where lot.lodgement_date <= cutoff for **that** lodgement calendar year (from `yearly_rent_cutoff_month` / `yearly_rent_cutoff_day`)
+- Monthly rents considered for lots where lot.lodgement_date **>** that cutoff
+- Grace period for Brought Forward lots: `WarehouseSettings.GRACE_PERIOD_MONTHS` (e.g., 1 month = 30 days before cutoff)
 
 ---
 
@@ -300,7 +316,8 @@ When payment allocated to `WRITTEN_OFF` lot:
     id (PK), warehouseID (FK, unique),
     BLANKET_STALE_DAYS (INT, default: 180),
     FOLLOW_UP_OUTSTANDING_DAYS (INT, default: 30),
-    YEARLY_RENT_CUTOFF_DATE (DATE, e.g., Jan 1),
+    YEARLY_RENT_CUTOFF_MONTH (INT 1–12, e.g., 5 = May),
+    YEARLY_RENT_CUTOFF_DAY (INT 1–31, recurring annually, e.g., 31 → May 31),
     GRACE_PERIOD_MONTHS (INT, default: 1),
     createdAt, updatedAt,
     createdBy, updatedBy
@@ -451,7 +468,8 @@ Role: OWNER only
 Response: {
   BLANKET_STALE_DAYS,
   FOLLOW_UP_OUTSTANDING_DAYS,
-  YEARLY_RENT_CUTOFF_DATE,
+  YEARLY_RENT_CUTOFF_MONTH,
+  YEARLY_RENT_CUTOFF_DAY,
   GRACE_PERIOD_MONTHS
 }
 ```
@@ -625,7 +643,7 @@ Bottom tabs: **Home**, **Inventory**, **Parties**, **Transactions**,
    Form:
      - BLANKET_STALE_DAYS
      - FOLLOW_UP_OUTSTANDING_DAYS
-     - YEARLY_RENT_CUTOFF_DATE
+     - YEARLY_RENT_CUTOFF_MONTH / YEARLY_RENT_CUTOFF_DAY (recurring, e.g. May 31)
      - GRACE_PERIOD_MONTHS
    Save → API call with 403 check
    ```
@@ -785,7 +803,7 @@ Bottom tabs: **Home**, **Inventory**, **Parties**, **Transactions**,
 ```
 BLANKET_STALE_DAYS = 180 days
 FOLLOW_UP_OUTSTANDING_DAYS = 30 days
-YEARLY_RENT_CUTOFF_DATE = Jan 1
+YEARLY_RENT_CUTOFF_MONTH / YEARLY_RENT_CUTOFF_DAY = Jan 1 (month 1, day 1) unless configured otherwise (e.g. 5 / 31 = May 31)
 GRACE_PERIOD_MONTHS = 1 month
 ```
 
