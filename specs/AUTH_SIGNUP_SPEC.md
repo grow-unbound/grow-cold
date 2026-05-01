@@ -525,15 +525,15 @@ VALUES (
   now()
 );
 
--- Setup defaults for warehouse settings
--- Change yearly_rent_cutoff_date field to capture month & day wihtout year (since this applies to every year) e.g. May 31st. (applies to every year)
+-- Setup defaults for warehouse settings (recurring yearly rent cutoff: month + day only)
 INSERT INTO warehouse_settings (
     id,
     warehouse_id,
     tenant_id,
     blanket_stale_days,
     follow_up_outstanding_days,
-    yearly_rent_cutoff_date,
+    yearly_rent_cutoff_month,
+    yearly_rent_cutoff_day,
     grace_period_months,
     created_at,
     updated_at
@@ -544,11 +544,12 @@ VALUES (
     tenant.id,
     180,
     15,
-    May-31,
+    5,
+    31,
     3,
     now(),
     now()
-)
+);
 
 -- Link user to warehouse
 INSERT INTO user_warehouse_assignments (
