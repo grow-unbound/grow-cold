@@ -1,6 +1,6 @@
 # Postgres-only import: staging + `apply_lots_from_raw`
 
-This path loads `lots-and-deliveries.csv` into `import_staging.raw_lots_and_deliveries`, then applies rows into `public.lots`, `public.deliveries`, and `public.transaction_charges` inside Postgres.
+This path loads `lots-and-deliveries.csv` into `import_staging.raw_lots_and_deliveries`, then applies rows into `public.lots`, `public.deliveries`, and `public.transaction_charges` inside Postgres. **TRANSPORT** is not created here; use **Phase B** in [`IMPORT_OPERATIONAL_PAYMENTS_STAGING.md`](IMPORT_OPERATIONAL_PAYMENTS_STAGING.md) (`raw_lots_charges_paid` + `apply_transport_charges_from_raw`) after a successful apply.
 
 It does **not** replace or modify `scripts/import-sri-sai-padala.mjs`. Compare results on a branch / copy of the database before relying on it in production.
 
@@ -124,6 +124,7 @@ Return value is a `jsonb` summary, e.g.:
 |------|---------|
 | `supabase/migrations/20260426120000_import_staging_lots_raw.sql` | Schema `import_staging`, table `raw_lots_and_deliveries`, grants |
 | `supabase/migrations/20260426120100_import_staging_apply_lots_from_raw.sql` | Helpers + `import_staging.apply_lots_from_raw` |
+| `supabase/migrations/20260430120000_import_staging_transport_charges_overlay.sql` | `raw_lots_charges_paid` + `apply_transport_charges_from_raw` (TRANSPORT overlay) |
 
 ## Optional: invoke from app
 
@@ -136,3 +137,5 @@ const { data, error } = await adminClient.rpc('apply_lots_from_raw', {
 ```
 
 Expose a thin Postgres wrapper in `public` if you need a stable RPC name without schema prefix (not included by default).
+
+**See also:** [`IMPORT_OPERATIONAL_PAYMENTS_STAGING.md`](IMPORT_OPERATIONAL_PAYMENTS_STAGING.md) for bulk loading `operational-payments.csv` into `public.operational_payments`.

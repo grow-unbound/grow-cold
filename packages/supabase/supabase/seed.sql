@@ -36,7 +36,8 @@ INSERT INTO public.warehouse_settings (
   tenant_id,
   blanket_stale_days,
   follow_up_outstanding_days,
-  yearly_rent_cutoff_date,
+  yearly_rent_cutoff_month,
+  yearly_rent_cutoff_day,
   grace_period_months
 )
 VALUES (
@@ -45,7 +46,8 @@ VALUES (
     'a0000000-0000-4000-8000-000000000001'::uuid,
     180,
     30,
-    '2026-01-01',
+    1,
+    1,
     1
   );
 

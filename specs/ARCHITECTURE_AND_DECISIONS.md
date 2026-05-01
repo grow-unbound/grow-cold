@@ -270,7 +270,7 @@ Customer sends payment:
 
 ### Decision 4: Accrual Stops on DELIVERED (Not ACTIVE → CLEARED)
 
-**Decision**: Accrual stops when `status = DELIVERED`, not when fully cleared
+**Decision**: Accrual stops when `status = DELIVERED` (balance zero — no stock in warehouse), not when fully cleared financially; `CLEARED` is the settled closed state and also has no accruals.
 
 **Rationale**:
 - ✅ Logical: No bags in warehouse → no rent accrues

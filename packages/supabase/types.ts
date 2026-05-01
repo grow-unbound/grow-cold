@@ -1048,7 +1048,8 @@ export type Database = {
           tenant_id: string
           updated_at: string
           warehouse_id: string
-          yearly_rent_cutoff_date: string
+          yearly_rent_cutoff_day: number
+          yearly_rent_cutoff_month: number
         }
         Insert: {
           blanket_stale_days?: number
@@ -1059,7 +1060,8 @@ export type Database = {
           tenant_id?: string
           updated_at?: string
           warehouse_id: string
-          yearly_rent_cutoff_date?: string
+          yearly_rent_cutoff_day?: number
+          yearly_rent_cutoff_month?: number
         }
         Update: {
           blanket_stale_days?: number
@@ -1070,7 +1072,8 @@ export type Database = {
           tenant_id?: string
           updated_at?: string
           warehouse_id?: string
-          yearly_rent_cutoff_date?: string
+          yearly_rent_cutoff_day?: number
+          yearly_rent_cutoff_month?: number
         }
         Relationships: [
           {
@@ -1151,7 +1154,31 @@ export type Database = {
     }
     Functions: {
       accessible_warehouse_ids: { Args: never; Returns: string[] }
+      backfill_rent_accruals: {
+        Args: {
+          p_from_month?: string
+          p_through_month?: string
+          p_warehouse_id?: string
+        }
+        Returns: Json
+      }
       current_tenant_id: { Args: never; Returns: string }
+      generate_rent_accruals_for_month: {
+        Args: {
+          p_month: string
+          p_narrow_lot_scope?: boolean
+          p_warehouse_id: string | null
+        }
+        Returns: Json
+      }
+      rent_yearly_cutoff_in_year: {
+        Args: {
+          p_cut_day: number
+          p_cut_month: number
+          p_year: number
+        }
+        Returns: string
+      }
     }
     Enums: {
       customer_category: "TRADER" | "FARMER"

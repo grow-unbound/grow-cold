@@ -461,7 +461,8 @@ async function main() {
       tenant_id: tenantId,
       blanket_stale_days: 180,
       follow_up_outstanding_days: 30,
-      yearly_rent_cutoff_date: '2026-01-01',
+      yearly_rent_cutoff_month: 5,
+      yearly_rent_cutoff_day: 31,
       grace_period_months: 1,
     });
     if (wsErr) throw wsErr;
