@@ -23,10 +23,16 @@ export function SixDigitOtp({ disabled, onChange, onComplete, error }: SixDigitO
   const [digits, setDigits] = useState<string[]>(() => Array.from({ length: 6 }, () => ''));
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
   const onChangeRef = useRef(onChange);
-  onChangeRef.current = onChange;
   const onCompleteRef = useRef(onComplete);
-  onCompleteRef.current = onComplete;
   const lastCompleteEmittedRef = useRef('');
+
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
   const focusAt = useCallback((i: number) => {
     const el = inputsRef.current[i];

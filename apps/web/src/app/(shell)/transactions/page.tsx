@@ -1,6 +1,7 @@
 'use client';
 
 import { PAYMENT_METHOD, formatINR } from '@growcold/shared';
+import Link from 'next/link';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -46,15 +47,23 @@ export default function TransactionsPage() {
 
   return (
     <div className="flex w-full flex-col gap-3">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
         <h1 className="h2">{t('transactions.title')}</h1>
-        <button type="button" className="btn-primary w-full sm:w-auto" onClick={() => setDialogOpen(true)}>
-          {t('transactions.record_receipt')}
-        </button>
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:justify-end">
+          <Link
+            href="/transactions/payments/new"
+            className="btn-secondary inline-flex min-h-touch w-full items-center justify-center sm:w-auto"
+          >
+            {t('operational_payment.new_fab')}
+          </Link>
+          <button type="button" className="btn-primary w-full sm:w-auto" onClick={() => setDialogOpen(true)}>
+            {t('transactions.record_receipt')}
+          </button>
+        </div>
       </div>
 
       <p className="text-caption text-neutral-500">
-        {t('transactions.receipt_badge')} — {t('transactions.payment_badge')} (coming soon) will appear together here.
+        {t('transactions.receipt_badge')} — {t('transactions.payment_badge')} ({t('operational_payment.new_fab')}).
       </p>
 
       {listQ.isPending && <p className="text-body-sm text-neutral-600">{t('loading')}</p>}
