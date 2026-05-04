@@ -24,3 +24,7 @@ out
 *.njsproj
 *.sln
 *.sw?
+
+#DS_Store
+.DS_Store
+CLAUDE\ OUTPUTS/.DS_Store

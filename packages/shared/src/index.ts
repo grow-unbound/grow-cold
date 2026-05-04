@@ -6,3 +6,5 @@ export * from './schemas/common';
 export * from './schemas/tenant';
 export * from './schemas/domain';
 export * from './i18n/resources';
+export * from './utils/rental-mode';
+export * from './utils/fifo-allocation';
