@@ -53,3 +53,20 @@ export const CreateCustomerResponseSchema = z.object({
 });
 
 export type CreateCustomerResponse = z.infer<typeof CreateCustomerResponseSchema>;
+
+export const customerOutstandingHttpPath = (customerId: string) =>
+  `/api/customers/${customerId}/outstanding` as const;
+
+export const CustomerOutstandingQuerySchema = z.object({
+  warehouseId: z.string().uuid(),
+});
+
+export const CustomerOutstandingResponseSchema = z.object({
+  data: z.object({
+    rent: z.number(),
+    charges: z.number(),
+    total: z.number(),
+  }),
+});
+
+export type CustomerOutstandingResponse = z.infer<typeof CustomerOutstandingResponseSchema>;

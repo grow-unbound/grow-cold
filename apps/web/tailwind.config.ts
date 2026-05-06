@@ -116,6 +116,17 @@ const config: Config = {
           writtenOff: '#9AA0AD',
           disputed: '#EF4444',
         },
+
+        // HOME_TAB command center (paired with mobile GlueStack dashboard tokens)
+        dashboard: {
+          lodged: '#00B14F',
+          delivered: '#0891B2',
+          accent: '#7C3AED',
+          money: '#00B14F',
+          danger: '#DC2626',
+          muted: '#6B7280',
+          surface: '#F9FAFB',
+        },
       },
 
       fontSize: {
@@ -162,15 +173,14 @@ const config: Config = {
         loose: '2',
       },
 
-      // Grab-style: softer modules (12px default, 16px large, 20px hero)
       borderRadius: {
         none: '0',
         sm: '4px',
         base: '12px',
-        md: '14px',
-        lg: '16px',
-        xl: '18px',
-        '2xl': '20px',
+        md: '10px',
+        lg: '8px',
+        xl: '12px',
+        '2xl': '16px',
         '3xl': '24px',
         full: '9999px',
       },
@@ -247,7 +257,19 @@ const config: Config = {
     function ({ addComponents }: PluginAPI) {
       addComponents({
         '.btn-base': {
-          '@apply min-h-touch px-4 py-3 text-base rounded-base font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center': {},
+          '@apply h-11 px-6 text-base rounded-lg font-semibold transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center': {},
+        },
+
+        '.chip': {
+          '@apply shrink-0 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors': {},
+        },
+
+        '.chip-active': {
+          '@apply chip bg-[#00B14F] border-[#00B14F] text-white font-semibold': {},
+        },
+
+        '.chip-inactive': {
+          '@apply chip bg-white border-gray-200 text-gray-600': {},
         },
 
         '.btn-primary': {

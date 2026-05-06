@@ -1,4 +1,4 @@
-import type { ListLotRow, TransactionReceiptRow } from '@growcold/shared';
+import type { ListLotRow, LotDetailRow, TransactionReceiptRow } from '@growcold/shared';
 import type { Database } from '@growcold/shared';
 
 type LotRow = Database['public']['Tables']['lots']['Row'];
@@ -36,6 +36,17 @@ export function toListLotRow(lot: LotRow, customer_name: string, product_name: s
     customer_name,
     product_name,
   };
+}
+
+export function toLotDetailRow(
+  lot: LotRow,
+  customer_name: string,
+  product_name: string,
+  customer_code: string,
+  has_deliveries: boolean,
+): LotDetailRow {
+  const base = toListLotRow(lot, customer_name, product_name);
+  return { ...base, customer_code, has_deliveries };
 }
 
 export function toCustomerApi(row: CustomerRow) {
@@ -93,6 +104,7 @@ export function toTransactionReceiptRow(
     reference_number: r.reference_number ?? undefined,
     notes: r.notes ?? undefined,
     recorded_by: r.recorded_by ?? undefined,
+    allocation_confirmed_at: r.allocation_confirmed_at ?? undefined,
     created_at: r.created_at,
     updated_at: r.updated_at,
     kind: 'receipt',

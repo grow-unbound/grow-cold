@@ -18,6 +18,15 @@ const brandColors = {
   textLight900: '#363A45',
   textLight800: '#3D424D',
   backgroundLight50: '#F7F7F8',
+  /** HOME_TAB dashboard — lodged / chips active */
+  dashboardLodged: '#00B14F',
+  /** HOME_TAB dashboard — delivered */
+  dashboardDelivered: '#0891B2',
+  dashboardAccentPurple: '#7C3AED',
+  dashboardMoney: '#00B14F',
+  dashboardDanger: '#DC2626',
+  dashboardMuted: '#6B7280',
+  dashboardSurface: '#F9FAFB',
 } as const;
 
 export const config = {

@@ -3,6 +3,7 @@ import {
   CUSTOMER_CATEGORY,
   DELIVERY_STATUS,
   LOT_STATUS,
+  OP_PAYMENT_STATUS,
   PAYMENT_METHOD,
   RENTAL_MODE,
   USER_ROLE,
@@ -21,6 +22,8 @@ export const customerCategorySchema = z.enum(CUSTOMER_CATEGORY);
 export const deliveryStatusSchema = z.enum(DELIVERY_STATUS);
 
 export const paymentMethodSchema = z.enum(PAYMENT_METHOD);
+
+export const opPaymentStatusSchema = z.enum(OP_PAYMENT_STATUS);
 
 export const timestampsSchema = z.object({
   created_at: z.string().datetime({ offset: true }),

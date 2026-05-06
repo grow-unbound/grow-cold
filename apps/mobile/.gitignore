@@ -39,3 +39,7 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+#DS_Store
+.DS_Store
+CLAUDE\ OUTPUTS/.DS_Store

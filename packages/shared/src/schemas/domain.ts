@@ -170,6 +170,7 @@ export const customerReceiptSchema = z.object({
   reference_number: z.string().nullable().optional(),
   notes: z.string().nullable().optional(),
   recorded_by: uuidSchema.nullable().optional(),
+  allocation_confirmed_at: z.string().datetime({ offset: true }).nullable().optional(),
   created_at: z.string().datetime({ offset: true }),
   updated_at: z.string().datetime({ offset: true }),
 });

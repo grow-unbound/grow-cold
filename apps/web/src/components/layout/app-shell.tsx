@@ -31,6 +31,18 @@ function isTabActive(pathname: string, href: string, end?: boolean) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
+/** Lot drill-down uses its own sticky header on small screens. */
+function isInventoryLotDetailPath(pathname: string): boolean {
+  return /^\/inventory\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(pathname);
+}
+
+/** Money transaction drill-down: same as lot — no double app header on mobile. */
+function isTransactionDetailPath(pathname: string): boolean {
+  return /^\/transaction\/(receipt|payment)\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+    pathname,
+  );
+}
+
 export function AppShell({ children }: { children: ReactNode }) {
   const { t } = useTranslation('common');
   const pathname = usePathname();
@@ -52,7 +64,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen w-full flex-col bg-neutral-50 lg:flex-row">
       {/* Desktop: left sidebar — brand accent strip (color only, no third-party mark) */}
       <aside
-        className="hidden w-48 shrink-0 flex-col border-r border-neutral-200/80 bg-white lg:flex"
+        className="hidden w-40 shrink-0 flex-col border-r border-neutral-200/80 bg-white lg:flex"
         aria-label="Main"
       >
         <div className="h-1 w-full shrink-0 bg-primary-500" aria-hidden />
@@ -85,7 +97,12 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {/* Main column: header (mobile/tablet) + content */}
       <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col">
-        <header className="z-10 flex w-full flex-col border-b border-neutral-200/80 bg-white shadow-sm lg:hidden">
+        <header
+          className={cn(
+            'z-10 flex w-full flex-col border-b border-neutral-200/80 bg-white shadow-sm lg:hidden',
+            (isInventoryLotDetailPath(pathname) || isTransactionDetailPath(pathname)) && 'hidden',
+          )}
+        >
           <div className="h-0.5 w-full bg-primary-500" aria-hidden />
           <div className="flex min-h-touch items-center justify-between gap-2 px-3 py-0 pt-[max(0.5rem,env(safe-area-inset-top,0px))]">
             <div className="min-w-0 flex-1">
@@ -182,14 +199,14 @@ function SidebarNavLink(props: {
     <Link
       href={props.href}
       className={cn(
-        'flex min-h-touch items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-semibold transition-colors',
+        'flex h-9 items-center gap-2.5 rounded-lg px-3 text-sm transition-colors',
         active
-          ? 'bg-primary-50 text-primary-800 ring-1 ring-inset ring-primary-200/80'
-          : 'text-neutral-600 hover:bg-neutral-50',
+          ? 'bg-[#E8F8EF] text-[#00B14F] font-semibold'
+          : 'font-medium text-neutral-600 hover:bg-neutral-50',
       )}
     >
       <Icon
-        className={cn('h-5 w-5 shrink-0', active ? 'text-primary-600' : 'text-neutral-400')}
+        className={cn('h-4 w-4 shrink-0', active ? 'text-[#00B14F]' : 'text-neutral-400')}
         strokeWidth={active ? 2.25 : 1.75}
         aria-hidden
       />

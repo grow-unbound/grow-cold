@@ -146,3 +146,7 @@ vite.config.ts.timestamp-*
 
 # Data
 data/
+
+#DS_Store
+.DS_Store
+CLAUDE\ OUTPUTS/.DS_Store
