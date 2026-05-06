@@ -13,8 +13,8 @@ export function BusinessSnapshot({ data, isLoading }: Props) {
   if (isLoading || !data) {
     return (
       <HStack space="sm" mt="$2">
-        <Box flex={1} h={120} borderRadius={12} bg="$backgroundLight200" />
-        <Box flex={1} h={120} borderRadius={12} bg="$backgroundLight200" />
+        <Box flex={1} h={120} borderRadius={12} bg="$bgInset" />
+        <Box flex={1} h={120} borderRadius={12} bg="$bgInset" />
       </HStack>
     );
   }
@@ -25,7 +25,7 @@ export function BusinessSnapshot({ data, isLoading }: Props) {
         flex={1}
         p="$4"
         borderRadius={12}
-        bg="$backgroundLight0"
+        bg="$bgSurface"
         style={{
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 1 },
@@ -37,16 +37,16 @@ export function BusinessSnapshot({ data, isLoading }: Props) {
       >
         <VStack space="xs">
           <Text fontSize={24}>💰</Text>
-          <Text fontSize={24} fontWeight="$bold" color="$textLight900">
+          <Text fontSize={24} fontWeight="$bold" color="$textPrimary">
             {formatINR(data.cashBalance)}
           </Text>
-          <Text size="sm" color="$textLight500">
+          <Text size="sm" color="$textTertiary">
             {t('cash_balance')}
           </Text>
-          <Text size="sm" color="$textLight500">
+          <Text size="sm" color="$textTertiary">
             {t('received_today')}: {formatINR(data.receivedToday)}
           </Text>
-          <Text size="sm" color="$textLight500">
+          <Text size="sm" color="$textTertiary">
             {t('paid_today')}: {formatINR(data.paidToday)}
           </Text>
         </VStack>
@@ -55,7 +55,7 @@ export function BusinessSnapshot({ data, isLoading }: Props) {
         flex={1}
         p="$4"
         borderRadius={12}
-        bg="$backgroundLight0"
+        bg="$bgSurface"
         style={{
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 1 },
@@ -67,16 +67,16 @@ export function BusinessSnapshot({ data, isLoading }: Props) {
       >
         <VStack space="xs">
           <Text fontSize={24}>📦</Text>
-          <Text fontSize={24} fontWeight="$bold" color="$textLight900">
+          <Text fontSize={24} fontWeight="$bold" color="$textPrimary">
             {formatIndianNumber(data.totalBags)}
           </Text>
-          <Text size="sm" color="$textLight500">
+          <Text size="sm" color="$textTertiary">
             {t('total_bags')}
           </Text>
-          <Text size="sm" color="$textLight500">
+          <Text size="sm" color="$textTertiary">
             {t('total_lots')}: {data.totalLots}
           </Text>
-          <Text size="sm" color="$dashboardDanger">
+          <Text size="sm" color="$outward">
             {t('stale_lots')}: {data.staleLots}
           </Text>
         </VStack>

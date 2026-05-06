@@ -1,8 +1,9 @@
 # GrowCold Component Specifications v1.0
 
 > Building blocks for the design system. Every component must follow these specs.
+> Canonical design reference: `specs/GROWCOLD_BRAND_v3.md`.
 
-**Sizing:** Controls follow **standard platform UI** metrics — **44px** minimum height for primary buttons and inputs (`min-h-11` / `min-h-touch`), **16px** text on real form fields, **≥8px** between adjacent tap targets. This is the **product default**, not a separate “accessibility sizing” mode.
+**Sizing:** Controls use a two-number system: **36px visual height** (what users see), **48px tap zone** (actual touch area via hitSlop or padding). **16px** text on all form fields. **≥8px** between adjacent tap targets. This is the **product default**, not a separate “accessibility mode”.
 
 ---
 
@@ -23,15 +24,14 @@
 ```
 
 **Specs:**
-- Background: `bg-primary-500` (#00B14F)
-- Hover: `hover:bg-primary-600` (#009948)
-- Active: `active:bg-primary-700` (#007A3A)
+- Background: `brand-ui` (`#C8712A`)
+- Hover: `brand-ui-hover` (`#AD5E1F`)
+- Active: `brand-ui-press` (`#9A5418`)
 - Disabled: Opacity 0.5, cursor not-allowed
-- Padding: `px-3.5 py-2.5` (~44px height with 16px label)
+- Visual height: 36px; tap zone: 48px (hitSlop or padding compensation)
 - Border radius: `rounded-base` (12px)
 - Font: `text-base font-semibold` (16px, 600 weight)
 - Transition: `transition-all duration-200`
-- Touch target: Minimum **44px** height (`min-h-11` / `min-h-touch`); no default `min-width` on text buttons (use full width in forms as needed)
 - Width: Full width on mobile, auto on desktop
 
 #### Secondary Button (neutral outline)
@@ -52,8 +52,8 @@
 - Hover: `hover:bg-neutral-50`
 - Active: `active:bg-neutral-100`
 
-#### Outline Button (green border — strong secondary CTA)
-Use `Button` `variant="outline"`: `border-primary-500`, `text-primary-700`, `hover:bg-primary-50`. Document in the same feature where a “Record” / “Continue” is secondary to a dismiss action.
+#### Outline Button (brand border — strong secondary CTA)
+Use `Button` `variant=”outline”`: `border-brand-ui`, `text-brand-text`, `hover:bg-brand-subtle`. Use where a “Record” / “Continue” is secondary to a dismiss action.
 
 #### Danger Button (Delete/Write-off)
 ```tsx
@@ -75,7 +75,7 @@ Use `Button` `variant="outline"`: `border-primary-500`, `text-primary-700`, `hov
 
 **Specs:**
 - Background: Transparent
-- Text: `text-primary-600`
+- Text: `text-brand-text`
 - Hover: `hover:underline` (underline appears)
 - No border
 - Minimal visual weight
@@ -111,7 +111,7 @@ export function DeliveryActions() {
   );
 }
 
-// Minimum tap target: ~44px primary chrome (`min-h-touch` / `min-h-11`); leave ≥8px between adjacent targets (WCAG 2.2 spacing)
+// Touch target: 36px visual height, 48px tap zone; leave ≥8px between adjacent targets (WCAG 2.2 spacing)
 // Never use tiny icon-only targets without padding + aria-label
 ```
 
@@ -140,11 +140,11 @@ export function DeliveryActions() {
 ```
 
 **Specs:**
-- Height: **44px** minimum (`min-h-11` with `py-2.5 px-3.5` via `.input-base`); font **16px** (`text-base`) always on inputs
+- Visual height: 36px, tap zone 48px; font **16px** (`text-base`) always on inputs — never smaller
 - Padding: `px-3.5 py-2.5`
 - Border: `border-2 border-neutral-200`
 - Font size: `text-base` (16px) — NEVER smaller on mobile (prevents iOS zoom)
-- Focus: `focus:border-primary-500 focus:shadow-focus`
+- Focus: `focus:border-brand-ui focus:ring-3` (3px `rgba(200,113,42,0.12)` ring)
 - Placeholder: `placeholder-neutral-400` (light gray)
 - Disabled: `disabled:bg-neutral-100 disabled:opacity-50`
 
@@ -188,7 +188,7 @@ export function DeliveryActions() {
         type="radio"
         name="rental-mode"
         value="monthly"
-        className="w-4 h-4 text-primary-500"
+        className="w-4 h-4 accent-brand-ui"
         defaultChecked
       />
       <span className="text-base">Monthly</span>
@@ -198,7 +198,7 @@ export function DeliveryActions() {
         type="radio"
         name="rental-mode"
         value="yearly"
-        className="w-4 h-4 text-primary-500"
+        className="w-4 h-4 accent-brand-ui"
       />
       <span className="text-base">Yearly</span>
     </label>
@@ -269,7 +269,7 @@ export function LotCard({ lot }: { lot: Lot }) {
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
-          <h3 className="h3 text-neutral-900 truncate">{lot.customerName}</h3>
+          <h3 className="h3 text-primary truncate">{lot.customerName}</h3>
           <p className="text-body-sm text-neutral-600">{lot.productName}</p>
         </div>
         <span className={`badge-${lot.status.toLowerCase()}`}>
@@ -348,7 +348,7 @@ export function EmptyLotsCard() {
       </div>
 
       {/* Message */}
-      <h3 className="h3 text-neutral-900 mb-2">No lots added yet</h3>
+      <h3 className="h3 text-primary mb-2">No lots added yet</h3>
       <p className="text-body-sm text-neutral-600 mb-6 max-w-xs mx-auto">
         Start by recording your first lot. Tap the button below.
       </p>
@@ -655,9 +655,9 @@ export function OfflineQueueBadge() {
 
 ## Design Checklist (Before Component Shipping)
 
-- [ ] Color contrast meets WCAG AA (4.5:1 for text)
-- [ ] Touch targets ≥44px primary chrome (buttons, inputs); ≥8px spacing between adjacent controls
-- [ ] Font size ≥16px on inputs/buttons; ≥14px for secondary copy; ≥12px for errors only
+- [ ] Color contrast meets WCAG AA (4.5:1 for text); brand amber text uses `brand-text (#8C4A12)` not `brand-ui (#C8712A)`
+- [ ] Touch targets: 36px visual / 48px tap zone; ≥8px spacing between adjacent controls
+- [ ] Font size 16px on inputs/buttons; 13px+ for secondary copy
 - [ ] Line height ≥1.5 on body scale
 - [ ] All interactive elements focusable (tab order logical)
 - [ ] Focus indicators visible (2px outline, offset 4px)

@@ -6,8 +6,9 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { PartiesListRowDto } from '@growcold/shared';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { TextInput } from 'react-native';
+import { StyleSheet, Text as RNText, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { colors as c } from '@growcold/tokens';
 import { useAuthReady } from '../../features/home/useAuthReady';
 import { useDebouncedValue } from '../../features/home/useDebouncedValue';
 import { usePartiesListQuery, usePartiesReceivablesQuery } from '../../features/parties/usePartiesQueries';
@@ -72,11 +73,11 @@ export function PartiesScreen() {
 
   if (!configured) {
     return (
-      <Box flex={1} p="$4" bg="#F9FAFB" style={{ paddingTop: Math.max(insets.top, 16) }}>
-        <Text fontSize={20} fontWeight="$semibold" color="$textLight900">
+      <Box flex={1} p="$4" bg="$bgSurface" style={{ paddingTop: Math.max(insets.top, 16) }}>
+        <Text fontSize={20} fontWeight="$semibold" color="$textPrimary">
           {tNav('parties')}
         </Text>
-        <Text mt="$3" color="$textLight600">
+        <Text mt="$3" color="$textSecondary">
           {t('select_warehouse')}
         </Text>
       </Box>
@@ -84,39 +85,31 @@ export function PartiesScreen() {
   }
 
   return (
-    <Box flex={1} bg="#F9FAFB">
+    <Box flex={1} bg="$bgSurface">
       {offline ? (
-        <Box bg="$backgroundLight200" px="$4" py="$2">
-          <Text size="sm" color="$textLight500">
+        <Box bg="$bgInset" px="$4" py="$2">
+          <Text size="sm" color="$textTertiary">
             {tHome('offline_banner')}
           </Text>
         </Box>
       ) : null}
 
       <HStack px="$4" pb="$2" alignItems="center" style={{ paddingTop: Math.max(insets.top, 8) }}>
-        <Text fontSize={20} fontWeight="$semibold" color="$textLight900">
+        <Text fontSize={20} fontWeight="$semibold" color="$textPrimary">
           {tNav('parties')}
         </Text>
       </HStack>
 
-      <VStack px="$3" pt="$2" pb="$2" space="sm" bg="#F9FAFB">
+      <VStack px="$3" pt="$2" pb="$2" space="sm" bg="$bgSurface" borderBottomWidth={1} borderColor="$borderLight200">
         <Box position="relative">
           <TextInput
             value={search}
             onChangeText={setSearch}
             placeholder={t('parties.search_placeholder')}
-            placeholderTextColor="#9CA3AF"
-            style={{
-              height: 48,
-              borderRadius: 12,
-              paddingHorizontal: 16,
-              paddingLeft: 40,
-              backgroundColor: '#F3F4F6',
-              fontSize: 16,
-              color: '#111827',
-            }}
+            placeholderTextColor={c.textTertiary}
+            style={styles.searchInput}
           />
-          <Text position="absolute" left={12} top={14} fontSize={16} color="#9CA3AF">
+          <Text position="absolute" left={12} top={14} fontSize={16} color="$textTertiary">
             🔍
           </Text>
         </Box>
@@ -130,20 +123,20 @@ export function PartiesScreen() {
 
         <FilterChips value={filter} onChange={setFilter} />
 
-        <Text fontSize={12} fontWeight="$semibold" color="#6B7280" letterSpacing={0.5}>
+        <RNText style={sectionLabelStyle}>
           {t('parties.customers_section', { count: filterTotal, scope: t(`parties.${scopeKey}`) })}
-        </Text>
+        </RNText>
       </VStack>
 
       {searching ? (
-        <Text px="$3" mb="$2" size="sm" color="$textLight600">
+        <Text px="$3" mb="$2" size="sm" color="$textSecondary">
           {filterTotal > 0
             ? t('parties.showing_customers', { count: filterTotal, query: debouncedSearch })
             : t('parties.no_results', { query: debouncedSearch })}
         </Text>
       ) : null}
       {searching && filterTotal === 0 && !listQ.isPending ? (
-        <Text px="$3" mb="$2" size="xs" color="$textLight500">
+        <Text px="$3" mb="$2" size="xs" color="$textTertiary">
           {t('parties.no_results_hint')}
         </Text>
       ) : null}
@@ -156,10 +149,10 @@ export function PartiesScreen() {
 
       {!listQ.isPending && !searching && flat.length === 0 ? (
         <Box px="$4" py="$8" alignItems="center">
-          <Text textAlign="center" color="$textLight700">
+          <Text textAlign="center" color="$textSecondary">
             {t('parties.empty_customers')}
           </Text>
-          <Text textAlign="center" mt="$1" size="sm" color="$textLight500">
+          <Text textAlign="center" mt="$1" size="sm" color="$textTertiary">
             {t('parties.empty_customers_hint')}
           </Text>
         </Box>
@@ -169,7 +162,6 @@ export function PartiesScreen() {
         <FlashList
           data={flat}
           keyExtractor={(item) => item.customerId}
-          estimatedItemSize={120}
           contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 24 }}
           onEndReached={() => {
             if (listQ.hasNextPage && !listQ.isFetchingNextPage) void listQ.fetchNextPage();
@@ -177,7 +169,7 @@ export function PartiesScreen() {
           onEndReachedThreshold={0.3}
           ListFooterComponent={
             listQ.isFetchingNextPage ? (
-              <Text textAlign="center" py="$4" size="sm" color="$textLight500">
+              <Text textAlign="center" py="$4" size="sm" color="$textTertiary">
                 {t('parties.load_more')}
               </Text>
             ) : (
@@ -201,3 +193,29 @@ export function PartiesScreen() {
     </Box>
   );
 }
+
+// ── Styles ────────────────────────────────────────────────────────────────────
+
+const styles = StyleSheet.create({
+  searchInput: {
+    height: 48,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingLeft: 40,
+    backgroundColor: c.bgSubtle,
+    fontSize: 16,
+    color: c.textPrimary,
+    fontFamily: 'NotoSans_400Regular',
+  },
+});
+
+const sectionLabelStyle = {
+  fontFamily: 'NotoSansMono_400Regular',
+  fontSize: 11,
+  fontWeight: '500' as const,
+  color: c.textTertiary,
+  textTransform: 'uppercase' as const,
+  letterSpacing: 1.1,
+  marginTop: 4,
+  marginBottom: 2,
+};

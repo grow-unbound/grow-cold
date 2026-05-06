@@ -25,7 +25,7 @@ export function MoneyPerformance() {
         <Text fontSize={16} fontWeight="$semibold" mb="$2">
           {t('money')}
         </Text>
-        <Box h={280} borderRadius={12} bg="$backgroundLight200" />
+        <Box h={280} borderRadius={12} bg="$bgInset" />
       </Box>
     );
   }
@@ -45,7 +45,7 @@ export function MoneyPerformance() {
         mt="$2"
         p="$3"
         borderRadius={12}
-        bg="$backgroundLight0"
+        bg="$bgSurface"
         style={{
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 1 },
@@ -56,8 +56,8 @@ export function MoneyPerformance() {
       >
         <PerformanceGraph
           series={data.series}
-          lodgedColor="#16A34A"
-          deliveredColor="#00B14F"
+          lodgedColor="#0B7B6E"
+          deliveredColor="#C8712A"
           lodgedLegend={t('kpi_collected')}
           deliveredLegend={t('kpi_paid_out')}
           valueFormatter={(n) => formatINR(n)}

@@ -13,7 +13,7 @@ type ChargesData = ChargesBootstrapResponse['data'];
 type ChargeRow = ChargesData['charge_rows'][number];
 
 function rowArrowColor(diff: number): string {
-  return diff >= 0 ? 'text-success-600' : 'text-danger-600';
+  return diff >= 0 ? 'text-inward' : 'text-outward';
 }
 
 interface MovementChargesEditorProps {
@@ -88,7 +88,7 @@ export function MovementChargesEditor({ bagsMax, data, draft, setRow }: Movement
     if (dr.recvManual && !row.is_transport) {
       return (
         <div className="flex flex-col gap-2">
-          <span className="text-caption text-neutral-600">{t('manual_receive')}</span>
+          <span className="text-caption text-text-secondary">{t('manual_receive')}</span>
           <input
             type="number"
             inputMode="decimal"
@@ -107,7 +107,7 @@ export function MovementChargesEditor({ bagsMax, data, draft, setRow }: Movement
           />
           <button
             type="button"
-            className="text-left text-caption text-primary-700 underline"
+            className="text-left text-caption text-brand-text underline"
             onClick={() => toggleRecvManual(row.product_charge_type_id, row)}
           >
             {t('revert_calc')}
@@ -136,11 +136,11 @@ export function MovementChargesEditor({ bagsMax, data, draft, setRow }: Movement
     return (
       <button
         type="button"
-        className="input-base inline-flex cursor-pointer items-center justify-between gap-2 bg-neutral-50"
+        className="input-base inline-flex cursor-pointer items-center justify-between gap-2 bg-surface-subtle"
         onClick={() => toggleRecvManual(row.product_charge_type_id, row)}
       >
         <span>{formatINR(dr.recv)}</span>
-        <Lock className="h-4 w-4 shrink-0 text-neutral-500" aria-hidden />
+        <Lock className="h-4 w-4 shrink-0 text-text-tertiary" aria-hidden />
       </button>
     );
   }
@@ -165,7 +165,7 @@ export function MovementChargesEditor({ bagsMax, data, draft, setRow }: Movement
         <label className={cn('form-field gap-1', dr.paid <= 0 && 'opacity-40')}>
           <span className="text-label">{t('method_label')}</span>
           <select
-            className={cn('input-base', dr.methodError && 'border-danger-500')}
+            className={cn('input-base', dr.methodError && 'border-outward-border')}
             disabled={dr.paid <= 0}
             value={dr.method}
             onChange={(e) =>
@@ -200,8 +200,8 @@ export function MovementChargesEditor({ bagsMax, data, draft, setRow }: Movement
           return (
             <div key={row.product_charge_type_id} className="card flex flex-col gap-3">
               <div className="flex items-start justify-between gap-2">
-                <span className="font-semibold text-neutral-900">{row.display_name}</span>
-                <span className="text-caption text-neutral-500">
+                <span className="font-semibold text-text-primary">{row.display_name}</span>
+                <span className="text-caption text-text-tertiary">
                   {row.is_transport
                     ? t('transport_dash')
                     : row.rate_per_bag != null
@@ -215,7 +215,7 @@ export function MovementChargesEditor({ bagsMax, data, draft, setRow }: Movement
                   <input
                     type="number"
                     inputMode="numeric"
-                    className={cn('input-base', dr.bagsError && 'border-danger-500')}
+                    className={cn('input-base', dr.bagsError && 'border-outward-border')}
                     value={dr.bags}
                     onChange={(e) => onBagsChange(row.product_charge_type_id, row, e.target.value)}
                     onBlur={() => setRow(row.product_charge_type_id, { bagsError: undefined })}
@@ -238,8 +238,8 @@ export function MovementChargesEditor({ bagsMax, data, draft, setRow }: Movement
 
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full min-w-[640px] border-collapse text-body-sm">
-          <thead className="border-b border-neutral-200 bg-neutral-50 text-left">
-            <tr className="text-caption font-medium uppercase text-neutral-600">
+          <thead className="border-b border-border bg-surface-subtle text-left">
+            <tr className="text-caption font-medium uppercase text-text-secondary">
               <th className="px-2 py-2">{t('charge_col')}</th>
               <th className="px-2 py-2">{t('bags_col')}</th>
               <th className="px-2 py-2">{t('rate_col')}</th>
@@ -255,7 +255,7 @@ export function MovementChargesEditor({ bagsMax, data, draft, setRow }: Movement
               if (!dr) return null;
               const d = diffFor(dr, row.has_labor);
               return (
-                <tr key={row.product_charge_type_id} className="border-b border-neutral-100 align-top">
+                <tr key={row.product_charge_type_id} className="border-b border-border align-top">
                   <td className="px-2 py-2 font-medium">{row.display_name}</td>
                   <td className="px-2 py-2">
                     {!row.is_transport ? (
@@ -263,7 +263,7 @@ export function MovementChargesEditor({ bagsMax, data, draft, setRow }: Movement
                         <input
                           type="number"
                           inputMode="numeric"
-                          className={cn('input-base max-w-[5rem]', dr.bagsError && 'border-danger-500')}
+                          className={cn('input-base max-w-[5rem]', dr.bagsError && 'border-outward-border')}
                           value={dr.bags}
                           onChange={(e) => onBagsChange(row.product_charge_type_id, row, e.target.value)}
                           onBlur={() => setRow(row.product_charge_type_id, { bagsError: undefined })}
@@ -271,7 +271,7 @@ export function MovementChargesEditor({ bagsMax, data, draft, setRow }: Movement
                         {dr.bagsError ? <p className="error-text">{dr.bagsError}</p> : null}
                       </>
                     ) : (
-                      <span className="text-neutral-400">—</span>
+                      <span className="text-text-tertiary">—</span>
                     )}
                   </td>
                   <td className="px-2 py-2">
@@ -301,7 +301,7 @@ export function MovementChargesEditor({ bagsMax, data, draft, setRow }: Movement
                       '—'
                     ) : (
                       <select
-                        className={cn('input-base max-w-[7rem]', dr.methodError && 'border-danger-500')}
+                        className={cn('input-base max-w-[7rem]', dr.methodError && 'border-outward-border')}
                         disabled={dr.paid <= 0}
                         value={dr.method}
                         onChange={(e) =>
@@ -325,14 +325,14 @@ export function MovementChargesEditor({ bagsMax, data, draft, setRow }: Movement
                 </tr>
               );
             })}
-            <tr className="bg-neutral-50 font-semibold">
+            <tr className="bg-surface-subtle font-semibold">
               <td className="px-2 py-2" colSpan={3}>
                 {t('total_row')}
               </td>
               <td className="px-2 py-2">{formatINR(totals.recv)}</td>
               <td className="px-2 py-2">{formatINR(totals.paid)}</td>
               <td className="px-2 py-2" />
-              <td className={cn('px-2 py-2', net >= 0 ? 'text-success-600' : 'text-danger-600')}>
+              <td className={cn('px-2 py-2', net >= 0 ? 'text-inward' : 'text-outward')}>
                 {formatINR(Math.abs(net))} {net >= 0 ? '↑' : '↓'}
               </td>
             </tr>
@@ -341,18 +341,18 @@ export function MovementChargesEditor({ bagsMax, data, draft, setRow }: Movement
       </div>
 
       <div className="card flex flex-col gap-2 md:hidden">
-        <div className="flex justify-between border-b border-neutral-100 pb-2">
+        <div className="flex justify-between border-b border-border pb-2">
           <span>{t('total_receivable')}</span>
           <span>{formatINR(totals.recv)}</span>
         </div>
-        <div className="flex justify-between border-b border-neutral-100 pb-2">
+        <div className="flex justify-between border-b border-border pb-2">
           <span>{t('total_paid')}</span>
           <span>{formatINR(totals.paid)}</span>
         </div>
         <div
           className={cn(
             'flex justify-between font-semibold',
-            net >= 0 ? 'text-success-600' : 'text-danger-600',
+            net >= 0 ? 'text-inward' : 'text-outward',
           )}
         >
           <span>{t('net_label')}</span>

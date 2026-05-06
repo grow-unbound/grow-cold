@@ -40,7 +40,7 @@ export default function TransactionsPage() {
   if (!warehouseId) {
     return (
       <div className="card w-full">
-        <p className="text-body-sm text-neutral-600">{t('select_warehouse')}</p>
+        <p className="text-body-sm text-text-secondary">{t('select_warehouse')}</p>
       </div>
     );
   }
@@ -62,16 +62,16 @@ export default function TransactionsPage() {
         </div>
       </div>
 
-      <p className="text-caption text-neutral-500">
+      <p className="text-caption text-text-tertiary">
         {t('transactions.receipt_badge')} — {t('transactions.payment_badge')} ({t('operational_payment.new_fab')}).
       </p>
 
-      {listQ.isPending && <p className="text-body-sm text-neutral-600">{t('loading')}</p>}
-      {listQ.isError && <p className="text-danger-600 text-body-sm">{t('error_load')}</p>}
+      {listQ.isPending && <p className="text-body-sm text-text-secondary">{t('loading')}</p>}
+      {listQ.isError && <p className="text-outward text-body-sm">{t('error_load')}</p>}
 
       {listQ.data && listQ.data.data.length === 0 && (
         <div className="card w-full">
-          <p className="text-body-sm text-neutral-500">{t('empty')}</p>
+          <p className="text-body-sm text-text-tertiary">{t('empty')}</p>
         </div>
       )}
 
@@ -82,7 +82,7 @@ export default function TransactionsPage() {
               key={row.id}
               className={cn(
                 'card-elevated flex flex-col gap-1 border-0 border-l-4 border-solid sm:flex-row sm:items-center sm:justify-between',
-                row.kind === 'receipt' ? 'border-l-accent-500' : 'border-l-primary-500',
+                row.kind === 'receipt' ? 'border-l-inward' : 'border-l-brand-ui',
               )}
             >
               <div className="min-w-0 flex-1">
@@ -92,22 +92,22 @@ export default function TransactionsPage() {
                       'rounded-full px-2 py-0.5 text-caption font-semibold',
                       row.kind === 'receipt'
                         ? 'bg-accent-100 text-accent-800'
-                        : 'bg-primary-100 text-primary-800',
+                        : 'bg-brand-subtle text-brand-text',
                     )}
                   >
                     {row.kind === 'receipt' ? t('transactions.receipt_badge') : t('transactions.payment_badge')}
                   </span>
-                  <span className="text-sm font-semibold text-neutral-900">{row.customer_name}</span>
+                  <span className="text-sm font-semibold text-text-primary">{row.customer_name}</span>
                 </div>
-                <p className="text-caption text-neutral-500">
+                <p className="text-caption text-text-tertiary">
                   {t('transactions.date')}: {row.receipt_date}
                   {row.payment_method ? ` · ${t('transactions.method')}: ${row.payment_method}` : null}
                 </p>
                 {row.reference_number ? (
-                  <p className="text-caption text-neutral-500">Ref: {row.reference_number}</p>
+                  <p className="text-caption text-text-tertiary">Ref: {row.reference_number}</p>
                 ) : null}
               </div>
-              <p className="text-sm font-bold text-neutral-900">{formatINR(Number(row.total_amount))}</p>
+              <p className="text-sm font-bold text-text-primary">{formatINR(Number(row.total_amount))}</p>
             </li>
           ))}
         </ul>
@@ -157,7 +157,7 @@ export default function TransactionsPage() {
               })}
             >
               <div className="form-field">
-                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="rcustomer">
+                <label className="text-label-lg font-semibold text-text-secondary" htmlFor="rcustomer">
                   {t('transactions.customer')} *
                 </label>
                 <select id="rcustomer" className="input-base" {...form.register('customer_id', { required: true })}>
@@ -170,19 +170,19 @@ export default function TransactionsPage() {
                 </select>
               </div>
               <div className="form-field">
-                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="rdate">
+                <label className="text-label-lg font-semibold text-text-secondary" htmlFor="rdate">
                   {t('transactions.date')} *
                 </label>
                 <input id="rdate" type="date" className="input-base" {...form.register('receipt_date')} />
               </div>
               <div className="form-field">
-                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="ramount">
+                <label className="text-label-lg font-semibold text-text-secondary" htmlFor="ramount">
                   {t('transactions.amount')} *
                 </label>
                 <input id="ramount" inputMode="decimal" className="input-base" {...form.register('total_amount')} />
               </div>
               <div className="form-field">
-                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="pmethod">
+                <label className="text-label-lg font-semibold text-text-secondary" htmlFor="pmethod">
                   {t('transactions.method')}
                 </label>
                 <select id="pmethod" className="input-base" {...form.register('payment_method')}>
@@ -195,13 +195,13 @@ export default function TransactionsPage() {
                 </select>
               </div>
               <div className="form-field">
-                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="ref">
+                <label className="text-label-lg font-semibold text-text-secondary" htmlFor="ref">
                   Reference
                 </label>
                 <input id="ref" className="input-base" {...form.register('reference_number')} />
               </div>
               <div className="form-field">
-                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="rnotes">
+                <label className="text-label-lg font-semibold text-text-secondary" htmlFor="rnotes">
                   Notes
                 </label>
                 <textarea id="rnotes" className="input-base min-h-[3rem]" {...form.register('notes')} />

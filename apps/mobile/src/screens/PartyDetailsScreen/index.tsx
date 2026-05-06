@@ -48,7 +48,7 @@ export function PartyDetailsScreen({ navigation, route }: Props) {
       alignItems="center"
       justifyContent="space-between"
       borderBottomWidth={1}
-      borderBottomColor="#E2E4E8"
+      borderBottomColor="#E5DED2"
       bg="$white"
       px="$2"
       style={{ paddingTop: Math.max(insets.top, 8) }}
@@ -64,11 +64,11 @@ export function PartyDetailsScreen({ navigation, route }: Props) {
         justifyContent="center"
         alignItems="center"
       >
-        <Text fontSize="$lg" color="#0891B2" fontWeight="$medium">
+        <Text fontSize="$lg" color="#A83422" fontWeight="$medium">
           ←
         </Text>
       </Pressable>
-      <Text flex={1} textAlign="center" fontSize={18} fontWeight="$semibold" color="$textLight900" numberOfLines={1}>
+      <Text flex={1} textAlign="center" fontSize={18} fontWeight="$semibold" color="$textPrimary" numberOfLines={1}>
         {data?.customerCode ?? '…'}
       </Text>
       <Pressable
@@ -83,7 +83,7 @@ export function PartyDetailsScreen({ navigation, route }: Props) {
         alignItems="center"
         opacity={0.35}
       >
-        <Text fontSize="$xl" color="$dashboardMuted">
+        <Text fontSize="$xl" color="$textTertiary">
           ⋮
         </Text>
       </Pressable>
@@ -91,7 +91,7 @@ export function PartyDetailsScreen({ navigation, route }: Props) {
   );
 
   const tabBar = (
-    <Box flexDirection="row" borderBottomWidth={1} borderBottomColor="#E2E4E8" bg="$white">
+    <Box flexDirection="row" borderBottomWidth={1} borderBottomColor="#E5DED2" bg="$white">
       {tabs.map((item) => {
         const active = tab === item.id;
         return (
@@ -103,9 +103,9 @@ export function PartyDetailsScreen({ navigation, route }: Props) {
             justifyContent="center"
             alignItems="center"
             borderBottomWidth={3}
-            borderBottomColor={active ? '#00B14F' : 'transparent'}
+            borderBottomColor={active ? '#C8712A' : 'transparent'}
           >
-            <Text fontSize="$sm" fontWeight="$medium" color={active ? '#00B14F' : '$dashboardMuted'}>
+            <Text fontSize="$sm" fontWeight="$medium" color={active ? '#C8712A' : '$textTertiary'}>
               {item.label}
             </Text>
           </Pressable>
@@ -116,8 +116,8 @@ export function PartyDetailsScreen({ navigation, route }: Props) {
 
   if (!warehouseId) {
     return (
-      <Box flex={1} p="$4" bg="#F9FAFB" justifyContent="center">
-        <Text color="$textLight600" textAlign="center">
+      <Box flex={1} p="$4" bg="#FFFFFF" justifyContent="center">
+        <Text color="$textSecondary" textAlign="center">
           {t('select_warehouse')}
         </Text>
       </Box>
@@ -126,9 +126,9 @@ export function PartyDetailsScreen({ navigation, route }: Props) {
 
   if (q.isPending) {
     return (
-      <Box flex={1} justifyContent="center" alignItems="center" bg="#F9FAFB">
-        <ActivityIndicator size="large" color="#00B14F" />
-        <Text mt="$3" color="$dashboardMuted">
+      <Box flex={1} justifyContent="center" alignItems="center" bg="#FFFFFF">
+        <ActivityIndicator size="large" color="#C8712A" />
+        <Text mt="$3" color="$textTertiary">
           {t('loading')}
         </Text>
       </Box>
@@ -137,13 +137,13 @@ export function PartyDetailsScreen({ navigation, route }: Props) {
 
   if (q.isError || !data) {
     return (
-      <Box flex={1} p="$4" bg="#F9FAFB" justifyContent="center" style={{ paddingTop: insets.top + 8 }}>
+      <Box flex={1} p="$4" bg="#FFFFFF" justifyContent="center" style={{ paddingTop: insets.top + 8 }}>
         <Pressable onPress={() => navigation.goBack()} mb="$4">
-          <Text color="#0891B2" size="md">
+          <Text color="#A83422" size="md">
             ← {t('back')}
           </Text>
         </Pressable>
-        <Text color="$textLight600" textAlign="center">
+        <Text color="$textSecondary" textAlign="center">
           {t('error_load')}
         </Text>
       </Box>
@@ -154,7 +154,7 @@ export function PartyDetailsScreen({ navigation, route }: Props) {
     <Box flex={1} bg="$white">
       <ScrollView flex={1} stickyHeaderIndices={[0, 2]} showsVerticalScrollIndicator={false}>
         {header}
-        <Box px="$3" pt="$3" bg="#F9FAFB">
+        <Box px="$3" pt="$3" bg="#FFFFFF">
           <CustomerSummary
             data={data}
             onPhonePress={() => {

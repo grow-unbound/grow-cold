@@ -26,7 +26,7 @@ export default function InventoryPage() {
   if (!warehouseId) {
     return (
       <div className="card w-full">
-        <p className="text-body-sm text-neutral-600">{t('select_warehouse')}</p>
+        <p className="text-body-sm text-text-secondary">{t('select_warehouse')}</p>
       </div>
     );
   }
@@ -50,8 +50,8 @@ export default function InventoryPage() {
             className={cn(
               'min-h-10 rounded-full border-2 px-3 py-1.5 text-label font-semibold transition-colors',
               statusFilter === s
-                ? 'border-primary-500 bg-primary-50 text-primary-800 shadow-sm'
-                : 'border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50',
+                ? 'border-brand-ui bg-brand-subtle text-brand-text shadow-sm'
+                : 'border-border bg-white text-text-secondary hover:bg-surface-subtle',
             )}
             onClick={() => setStatusFilter(s)}
           >
@@ -60,12 +60,12 @@ export default function InventoryPage() {
         ))}
       </div>
 
-      {lotsQ.isPending && <p className="text-body-sm text-neutral-600">{t('loading')}</p>}
-      {lotsQ.isError && <p className="text-danger-600 text-body-sm">{t('error_load')}</p>}
+      {lotsQ.isPending && <p className="text-body-sm text-text-secondary">{t('loading')}</p>}
+      {lotsQ.isError && <p className="text-outward text-body-sm">{t('error_load')}</p>}
 
       {lotsQ.data && lotsQ.data.data.length === 0 && (
         <div className="card w-full">
-          <p className="text-body-sm text-neutral-500">{t('empty')}</p>
+          <p className="text-body-sm text-text-tertiary">{t('empty')}</p>
         </div>
       )}
 
@@ -78,15 +78,15 @@ export default function InventoryPage() {
             >
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <Link href={`/inventory/${lot.id}`} className="text-sm font-semibold text-primary-600 hover:underline">
+                  <Link href={`/inventory/${lot.id}`} className="text-sm font-semibold text-brand-text hover:underline">
                     {lot.lot_number}
                   </Link>
                   <LotStatusBadge status={lot.status} />
                 </div>
-                <p className="mt-0.5 truncate text-caption text-neutral-600">
+                <p className="mt-0.5 truncate text-caption text-text-secondary">
                   {lot.customer_name} · {lot.product_name}
                 </p>
-                <p className="text-caption text-neutral-500">
+                <p className="text-caption text-text-tertiary">
                   {t('inventory.bags')}: {lot.balance_bags}/{lot.original_bags} · {t('inventory.lodgement')}:{' '}
                   {lot.lodgement_date}
                 </p>

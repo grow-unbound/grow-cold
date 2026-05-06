@@ -7,30 +7,10 @@ export type Json =
   | Json[]
 
 export type Database = {
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -258,63 +238,93 @@ export type Database = {
           },
         ]
       }
-      warehouse_cash_payments: {
+      customer_summary: {
         Row: {
-          created_at: string
-          id: string
-          notes: string | null
-          payment_date: string
-          payment_method: Database["public"]["Enums"]["payment_method"] | null
-          recorded_by: string | null
-          recipient_name: string
+          active_bag_count: number
+          active_lot_count: number
+          aging_bag_count: number
+          aging_lot_count: number
+          customer_id: string
+          first_transaction_date: string | null
+          fresh_bag_count: number
+          fresh_lot_count: number
+          has_pending_dues: boolean | null
+          is_active: boolean
+          last_activity_date: string | null
+          last_updated_at: string
+          outstanding_charges: number
+          outstanding_others: number
+          outstanding_rents: number
+          outstanding_total: number
+          stale_bag_count: number
+          stale_lot_count: number
           tenant_id: string
-          total_amount: number
-          updated_at: string
+          total_paid: number
           warehouse_id: string
         }
         Insert: {
-          created_at?: string
-          id?: string
-          notes?: string | null
-          payment_date: string
-          payment_method?: Database["public"]["Enums"]["payment_method"] | null
-          recorded_by?: string | null
-          recipient_name: string
+          active_bag_count?: number
+          active_lot_count?: number
+          aging_bag_count?: number
+          aging_lot_count?: number
+          customer_id: string
+          first_transaction_date?: string | null
+          fresh_bag_count?: number
+          fresh_lot_count?: number
+          has_pending_dues?: boolean | null
+          is_active?: boolean
+          last_activity_date?: string | null
+          last_updated_at?: string
+          outstanding_charges?: number
+          outstanding_others?: number
+          outstanding_rents?: number
+          outstanding_total?: number
+          stale_bag_count?: number
+          stale_lot_count?: number
           tenant_id?: string
-          total_amount: number
-          updated_at?: string
+          total_paid?: number
           warehouse_id: string
         }
         Update: {
-          created_at?: string
-          id?: string
-          notes?: string | null
-          payment_date?: string
-          payment_method?: Database["public"]["Enums"]["payment_method"] | null
-          recorded_by?: string | null
-          recipient_name?: string
+          active_bag_count?: number
+          active_lot_count?: number
+          aging_bag_count?: number
+          aging_lot_count?: number
+          customer_id?: string
+          first_transaction_date?: string | null
+          fresh_bag_count?: number
+          fresh_lot_count?: number
+          has_pending_dues?: boolean | null
+          is_active?: boolean
+          last_activity_date?: string | null
+          last_updated_at?: string
+          outstanding_charges?: number
+          outstanding_others?: number
+          outstanding_rents?: number
+          outstanding_total?: number
+          stale_bag_count?: number
+          stale_lot_count?: number
           tenant_id?: string
-          total_amount?: number
-          updated_at?: string
+          total_paid?: number
           warehouse_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "warehouse_cash_payments_recorded_by_fkey"
-            columns: ["recorded_by"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
+            foreignKeyName: "customer_summary_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: true
+            referencedRelation: "customers"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "warehouse_cash_payments_tenant_id_fkey"
+            foreignKeyName: "customer_summary_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "warehouse_cash_payments_warehouse_id_fkey"
+            foreignKeyName: "customer_summary_warehouse_id_fkey"
             columns: ["warehouse_id"]
             isOneToOne: false
             referencedRelation: "warehouses"
@@ -342,7 +352,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
-          category?: Database["public"]["Enums"]["customer_category"]
+          category: Database["public"]["Enums"]["customer_category"]
           created_at?: string
           credit_limit?: number
           customer_code: string
@@ -394,42 +404,42 @@ export type Database = {
       daily_money_summary: {
         Row: {
           id: string
-          warehouse_id: string
-          tenant_id: string
-          summary_date: string
-          receipts_amount: number
-          receipts_count: number
-          receipt_parties: number
+          last_updated_at: string
+          net_amount: number | null
           payments_amount: number
           payments_count: number
-          net_amount: number | null
-          last_updated_at: string
+          receipt_parties: number
+          receipts_amount: number
+          receipts_count: number
+          summary_date: string
+          tenant_id: string
+          warehouse_id: string
         }
         Insert: {
           id?: string
-          warehouse_id: string
-          tenant_id?: string
-          summary_date: string
-          receipts_amount?: number
-          receipts_count?: number
-          receipt_parties?: number
+          last_updated_at?: string
+          net_amount?: number | null
           payments_amount?: number
           payments_count?: number
-          net_amount?: number | null
-          last_updated_at?: string
+          receipt_parties?: number
+          receipts_amount?: number
+          receipts_count?: number
+          summary_date: string
+          tenant_id?: string
+          warehouse_id: string
         }
         Update: {
           id?: string
-          warehouse_id?: string
-          tenant_id?: string
-          summary_date?: string
-          receipts_amount?: number
-          receipts_count?: number
-          receipt_parties?: number
+          last_updated_at?: string
+          net_amount?: number | null
           payments_amount?: number
           payments_count?: number
-          net_amount?: number | null
-          last_updated_at?: string
+          receipt_parties?: number
+          receipts_amount?: number
+          receipts_count?: number
+          summary_date?: string
+          tenant_id?: string
+          warehouse_id?: string
         }
         Relationships: [
           {
@@ -441,6 +451,81 @@ export type Database = {
           },
           {
             foreignKeyName: "daily_money_summary_warehouse_id_fkey"
+            columns: ["warehouse_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      daily_stock_summary: {
+        Row: {
+          active_lots_eod: number
+          aging_bags_eod: number
+          aging_lots_eod: number
+          delivered_bags: number
+          delivered_lots: number
+          fresh_bags_eod: number
+          fresh_lots_eod: number
+          id: string
+          last_updated_at: string
+          lodged_bags: number
+          lodged_lots: number
+          stale_bags_eod: number
+          stale_lots_eod: number
+          summary_date: string
+          tenant_id: string
+          total_bags_eod: number
+          warehouse_id: string
+        }
+        Insert: {
+          active_lots_eod?: number
+          aging_bags_eod?: number
+          aging_lots_eod?: number
+          delivered_bags?: number
+          delivered_lots?: number
+          fresh_bags_eod?: number
+          fresh_lots_eod?: number
+          id?: string
+          last_updated_at?: string
+          lodged_bags?: number
+          lodged_lots?: number
+          stale_bags_eod?: number
+          stale_lots_eod?: number
+          summary_date: string
+          tenant_id?: string
+          total_bags_eod?: number
+          warehouse_id: string
+        }
+        Update: {
+          active_lots_eod?: number
+          aging_bags_eod?: number
+          aging_lots_eod?: number
+          delivered_bags?: number
+          delivered_lots?: number
+          fresh_bags_eod?: number
+          fresh_lots_eod?: number
+          id?: string
+          last_updated_at?: string
+          lodged_bags?: number
+          lodged_lots?: number
+          stale_bags_eod?: number
+          stale_lots_eod?: number
+          summary_date?: string
+          tenant_id?: string
+          total_bags_eod?: number
+          warehouse_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_stock_summary_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "daily_stock_summary_warehouse_id_fkey"
             columns: ["warehouse_id"]
             isOneToOne: false
             referencedRelation: "warehouses"
@@ -610,6 +695,7 @@ export type Database = {
       lots: {
         Row: {
           balance_bags: number
+          charges_pending: number
           created_at: string
           customer_id: string
           driver_name: string | null
@@ -621,7 +707,9 @@ export type Database = {
           lot_number: string
           notes: string | null
           original_bags: number
+          outstanding_total: number | null
           product_id: string
+          rent_pending: number
           rental_mode: Database["public"]["Enums"]["rental_mode"]
           status: Database["public"]["Enums"]["lot_status"]
           tenant_id: string
@@ -631,6 +719,7 @@ export type Database = {
         }
         Insert: {
           balance_bags: number
+          charges_pending?: number
           created_at?: string
           customer_id: string
           driver_name?: string | null
@@ -642,7 +731,9 @@ export type Database = {
           lot_number: string
           notes?: string | null
           original_bags: number
+          outstanding_total?: number | null
           product_id: string
+          rent_pending?: number
           rental_mode: Database["public"]["Enums"]["rental_mode"]
           status?: Database["public"]["Enums"]["lot_status"]
           tenant_id?: string
@@ -652,6 +743,7 @@ export type Database = {
         }
         Update: {
           balance_bags?: number
+          charges_pending?: number
           created_at?: string
           customer_id?: string
           driver_name?: string | null
@@ -663,7 +755,9 @@ export type Database = {
           lot_number?: string
           notes?: string | null
           original_bags?: number
+          outstanding_total?: number | null
           product_id?: string
+          rent_pending?: number
           rental_mode?: Database["public"]["Enums"]["rental_mode"]
           status?: Database["public"]["Enums"]["lot_status"]
           tenant_id?: string
@@ -704,79 +798,72 @@ export type Database = {
       }
       operational_payments: {
         Row: {
-          id: string
-          warehouse_id: string
-          tenant_id: string
-          payment_type_id: string | null
-          expenditure_head: string | null
-          status: Database["public"]["Enums"]["op_payment_status"]
-          due_date: string | null
-          payment_date: string | null
           amount: number
-          payment_method: Database["public"]["Enums"]["payment_method"] | null
+          created_at: string
           delivery_id: string | null
+          due_date: string | null
+          expenditure_head: string | null
+          external_reference_id: string | null
+          id: string
           lot_id: string | null
-          product_charge_type_id: string | null
+          notes: string | null
           party_name: string | null
           party_phone: string | null
-          notes: string | null
+          payment_date: string | null
+          payment_method: Database["public"]["Enums"]["payment_method"] | null
+          payment_type_id: string | null
+          product_charge_type_id: string | null
           recorded_by: string | null
-          created_at: string
+          status: Database["public"]["Enums"]["op_payment_status"]
+          tenant_id: string
           updated_at: string
-          external_reference_id: string | null
+          warehouse_id: string
         }
         Insert: {
-          id?: string
-          warehouse_id: string
-          tenant_id?: string
-          payment_type_id?: string | null
-          expenditure_head?: string | null
-          status?: Database["public"]["Enums"]["op_payment_status"]
-          due_date?: string | null
-          payment_date?: string | null
           amount: number
-          payment_method?: Database["public"]["Enums"]["payment_method"] | null
+          created_at?: string
           delivery_id?: string | null
+          due_date?: string | null
+          expenditure_head?: string | null
+          external_reference_id?: string | null
+          id?: string
           lot_id?: string | null
-          product_charge_type_id?: string | null
+          notes?: string | null
           party_name?: string | null
           party_phone?: string | null
-          notes?: string | null
+          payment_date?: string | null
+          payment_method?: Database["public"]["Enums"]["payment_method"] | null
+          payment_type_id?: string | null
+          product_charge_type_id?: string | null
           recorded_by?: string | null
-          created_at?: string
+          status?: Database["public"]["Enums"]["op_payment_status"]
+          tenant_id?: string
           updated_at?: string
-          external_reference_id?: string | null
+          warehouse_id: string
         }
         Update: {
-          id?: string
-          warehouse_id?: string
-          tenant_id?: string
-          payment_type_id?: string | null
-          expenditure_head?: string | null
-          status?: Database["public"]["Enums"]["op_payment_status"]
-          due_date?: string | null
-          payment_date?: string | null
           amount?: number
-          payment_method?: Database["public"]["Enums"]["payment_method"] | null
+          created_at?: string
           delivery_id?: string | null
+          due_date?: string | null
+          expenditure_head?: string | null
+          external_reference_id?: string | null
+          id?: string
           lot_id?: string | null
-          product_charge_type_id?: string | null
+          notes?: string | null
           party_name?: string | null
           party_phone?: string | null
-          notes?: string | null
+          payment_date?: string | null
+          payment_method?: Database["public"]["Enums"]["payment_method"] | null
+          payment_type_id?: string | null
+          product_charge_type_id?: string | null
           recorded_by?: string | null
-          created_at?: string
+          status?: Database["public"]["Enums"]["op_payment_status"]
+          tenant_id?: string
           updated_at?: string
-          external_reference_id?: string | null
+          warehouse_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "operational_payments_product_charge_type_id_fkey",
-            columns: ["product_charge_type_id"],
-            isOneToOne: false,
-            referencedRelation: "product_charges",
-            referencedColumns: ["product_charge_type_id"],
-          },
           {
             foreignKeyName: "operational_payments_delivery_id_fkey"
             columns: ["delivery_id"]
@@ -823,77 +910,35 @@ export type Database = {
       }
       payment_types: {
         Row: {
-          id: string
-          tenant_id: string
-          name: string
           category: string
-          is_active: boolean
           created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          tenant_id: string
           updated_at: string
         }
         Insert: {
-          id?: string
-          tenant_id: string
-          name: string
           category: string
-          is_active?: boolean
           created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          tenant_id?: string
           updated_at?: string
         }
         Update: {
-          id?: string
-          tenant_id?: string
-          name?: string
           category?: string
-          is_active?: boolean
           created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          tenant_id?: string
           updated_at?: string
         }
         Relationships: [
           {
             foreignKeyName: "payment_types_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      product_groups: {
-        Row: {
-          created_at: string
-          id: string
-          name: string
-          parent_product_group_id: string | null
-          tenant_id: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          name: string
-          parent_product_group_id?: string | null
-          tenant_id?: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          name?: string
-          parent_product_group_id?: string | null
-          tenant_id?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "product_groups_parent_product_group_id_fkey"
-            columns: ["parent_product_group_id"]
-            isOneToOne: false
-            referencedRelation: "product_groups"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "product_groups_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
@@ -943,8 +988,51 @@ export type Database = {
           },
         ]
       }
+      product_groups: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          parent_product_group_id: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          parent_product_group_id?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          parent_product_group_id?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_groups_parent_product_group_id_fkey"
+            columns: ["parent_product_group_id"]
+            isOneToOne: false
+            referencedRelation: "product_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_groups_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
+          bag_size: number | null
           chargeable_bag_size: number | null
           created_at: string
           description: string | null
@@ -962,11 +1050,13 @@ export type Database = {
           yearly_rent_per_kg: number | null
         }
         Insert: {
+          bag_size?: number | null
           chargeable_bag_size?: number | null
           created_at?: string
           description?: string | null
           id?: string
           is_active?: boolean
+          monthly_rent_per_bag?: number | null
           monthly_rent_per_kg?: number | null
           product_group_id: string
           product_name: string
@@ -974,14 +1064,17 @@ export type Database = {
           storage_temperature?: string | null
           tenant_id?: string
           updated_at?: string
+          yearly_rent_per_bag?: number | null
           yearly_rent_per_kg?: number | null
         }
         Update: {
+          bag_size?: number | null
           chargeable_bag_size?: number | null
           created_at?: string
           description?: string | null
           id?: string
           is_active?: boolean
+          monthly_rent_per_bag?: number | null
           monthly_rent_per_kg?: number | null
           product_group_id?: string
           product_name?: string
@@ -989,6 +1082,7 @@ export type Database = {
           storage_temperature?: string | null
           tenant_id?: string
           updated_at?: string
+          yearly_rent_per_bag?: number | null
           yearly_rent_per_kg?: number | null
         }
         Relationships: [
@@ -1148,6 +1242,7 @@ export type Database = {
         Row: {
           charge_amount: number
           charge_date: string
+          charge_type_id: string | null
           created_at: string
           delivery_id: string | null
           id: string
@@ -1157,12 +1252,13 @@ export type Database = {
           notes: string | null
           num_bags: number | null
           paid_date: string | null
-          product_charge_type_id: string
+          product_charge_type_id: string | null
           updated_at: string
         }
         Insert: {
           charge_amount: number
           charge_date: string
+          charge_type_id?: string | null
           created_at?: string
           delivery_id?: string | null
           id?: string
@@ -1172,12 +1268,13 @@ export type Database = {
           notes?: string | null
           num_bags?: number | null
           paid_date?: string | null
-          product_charge_type_id: string
+          product_charge_type_id?: string | null
           updated_at?: string
         }
         Update: {
           charge_amount?: number
           charge_date?: string
+          charge_type_id?: string | null
           created_at?: string
           delivery_id?: string | null
           id?: string
@@ -1187,10 +1284,17 @@ export type Database = {
           notes?: string | null
           num_bags?: number | null
           paid_date?: string | null
-          product_charge_type_id?: string
+          product_charge_type_id?: string | null
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "transaction_charges_charge_type_id_fkey"
+            columns: ["charge_type_id"]
+            isOneToOne: false
+            referencedRelation: "charge_types"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "transaction_charges_delivery_id_fkey"
             columns: ["delivery_id"]
@@ -1319,6 +1423,70 @@ export type Database = {
           },
         ]
       }
+      warehouse_cash_payments: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          payment_date: string
+          payment_method: Database["public"]["Enums"]["payment_method"] | null
+          recipient_name: string
+          recorded_by: string | null
+          tenant_id: string
+          total_amount: number
+          updated_at: string
+          warehouse_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          payment_date: string
+          payment_method?: Database["public"]["Enums"]["payment_method"] | null
+          recipient_name: string
+          recorded_by?: string | null
+          tenant_id?: string
+          total_amount: number
+          updated_at?: string
+          warehouse_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          payment_date?: string
+          payment_method?: Database["public"]["Enums"]["payment_method"] | null
+          recipient_name?: string
+          recorded_by?: string | null
+          tenant_id?: string
+          total_amount?: number
+          updated_at?: string
+          warehouse_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "warehouse_cash_payments_recorded_by_fkey"
+            columns: ["recorded_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "warehouse_cash_payments_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "warehouse_cash_payments_warehouse_id_fkey"
+            columns: ["warehouse_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       warehouse_settings: {
         Row: {
           blanket_stale_days: number
@@ -1375,103 +1543,103 @@ export type Database = {
       }
       warehouse_snapshot: {
         Row: {
-          warehouse_id: string
-          tenant_id: string
-          total_bags: number
-          total_lots: number
           active_lots: number
-          stale_lots: number
-          fresh_bags: number
-          fresh_lots: number
           aging_bags: number
           aging_lots: number
+          cash_balance: number
+          charges_lots: number
+          fresh_bags: number
+          fresh_lots: number
+          last_updated_at: string
+          lots_aged_365_plus: number
+          overdue_customers: number
+          pending_payables: number
+          receivable_charges: number
+          receivable_customers: number
+          receivable_others: number
+          receivable_rents: number
+          rent_lots: number
           stale_bags: number
-          today_lodged_bags: number
-          today_lodged_lots: number
+          stale_lots: number
+          tenant_id: string
+          today_date: string
           today_delivered_bags: number
           today_delivered_lots: number
-          cash_balance: number
-          today_receipts: number
+          today_lodged_bags: number
+          today_lodged_lots: number
           today_payments: number
-          pending_payables: number
           today_receipt_parties: number
+          today_receipts: number
+          total_bags: number
+          total_lots: number
           total_receivable: number
-          receivable_customers: number
-          receivable_rents: number
-          receivable_charges: number
-          receivable_others: number
-          rent_lots: number
-          charges_lots: number
-          overdue_customers: number
-          lots_aged_365_plus: number
-          last_updated_at: string
-          today_date: string
+          warehouse_id: string
         }
         Insert: {
-          warehouse_id: string
-          tenant_id?: string
-          total_bags?: number
-          total_lots?: number
           active_lots?: number
-          stale_lots?: number
-          fresh_bags?: number
-          fresh_lots?: number
           aging_bags?: number
           aging_lots?: number
+          cash_balance?: number
+          charges_lots?: number
+          fresh_bags?: number
+          fresh_lots?: number
+          last_updated_at?: string
+          lots_aged_365_plus?: number
+          overdue_customers?: number
+          pending_payables?: number
+          receivable_charges?: number
+          receivable_customers?: number
+          receivable_others?: number
+          receivable_rents?: number
+          rent_lots?: number
           stale_bags?: number
-          today_lodged_bags?: number
-          today_lodged_lots?: number
+          stale_lots?: number
+          tenant_id?: string
+          today_date?: string
           today_delivered_bags?: number
           today_delivered_lots?: number
-          cash_balance?: number
-          today_receipts?: number
+          today_lodged_bags?: number
+          today_lodged_lots?: number
           today_payments?: number
-          pending_payables?: number
           today_receipt_parties?: number
+          today_receipts?: number
+          total_bags?: number
+          total_lots?: number
           total_receivable?: number
-          receivable_customers?: number
-          receivable_rents?: number
-          receivable_charges?: number
-          receivable_others?: number
-          rent_lots?: number
-          charges_lots?: number
-          overdue_customers?: number
-          lots_aged_365_plus?: number
-          last_updated_at?: string
-          today_date?: string
+          warehouse_id: string
         }
         Update: {
-          warehouse_id?: string
-          tenant_id?: string
-          total_bags?: number
-          total_lots?: number
           active_lots?: number
-          stale_lots?: number
-          fresh_bags?: number
-          fresh_lots?: number
           aging_bags?: number
           aging_lots?: number
+          cash_balance?: number
+          charges_lots?: number
+          fresh_bags?: number
+          fresh_lots?: number
+          last_updated_at?: string
+          lots_aged_365_plus?: number
+          overdue_customers?: number
+          pending_payables?: number
+          receivable_charges?: number
+          receivable_customers?: number
+          receivable_others?: number
+          receivable_rents?: number
+          rent_lots?: number
           stale_bags?: number
-          today_lodged_bags?: number
-          today_lodged_lots?: number
+          stale_lots?: number
+          tenant_id?: string
+          today_date?: string
           today_delivered_bags?: number
           today_delivered_lots?: number
-          cash_balance?: number
-          today_receipts?: number
+          today_lodged_bags?: number
+          today_lodged_lots?: number
           today_payments?: number
-          pending_payables?: number
           today_receipt_parties?: number
+          today_receipts?: number
+          total_bags?: number
+          total_lots?: number
           total_receivable?: number
-          receivable_customers?: number
-          receivable_rents?: number
-          receivable_charges?: number
-          receivable_others?: number
-          rent_lots?: number
-          charges_lots?: number
-          overdue_customers?: number
-          lots_aged_365_plus?: number
-          last_updated_at?: string
-          today_date?: string
+          warehouse_id?: string
         }
         Relationships: [
           {
@@ -1548,19 +1716,73 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      money_events: {
+        Row: {
+          amount: number | null
+          customer_id: string | null
+          event_date: string | null
+          event_type: string | null
+          expenditure_head: string | null
+          id: string | null
+          party_name: string | null
+          payment_method: string | null
+          payment_type_category: string | null
+          payment_type_id: string | null
+          payment_type_name: string | null
+          status: string | null
+          warehouse_id: string | null
+        }
+        Relationships: []
+      }
+      stock_events: {
+        Row: {
+          balance_bags: number | null
+          customer_id: string | null
+          delivery_id: string | null
+          event_date: string | null
+          event_type: string | null
+          id: string | null
+          num_bags: number | null
+          status: string | null
+          warehouse_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      accessible_warehouse_ids: { Args: never; Returns: string[] }
-      confirm_receipt_allocations: {
-        Args: { p_lines: Json; p_receipt_id: string }
+      _generate_rent_accruals_for_month_warehouse: {
+        Args: {
+          p_month: string
+          p_narrow_lot_scope?: boolean
+          p_warehouse_id: string
+        }
         Returns: Json
       }
+      accessible_warehouse_ids: { Args: never; Returns: string[] }
+      backfill_rent_accruals: {
+        Args: {
+          p_from_month?: string
+          p_through_month?: string
+          p_warehouse_id?: string
+        }
+        Returns: Json
+      }
+      confirm_receipt_allocations: {
+        Args: {
+          p_lines: Json
+          p_receipt_id: string
+        }
+        Returns: Json
+      }
+      current_tenant_id: { Args: never; Returns: string }
       customer_outstanding_allocatable: {
-        Args: { p_customer_id: string; p_warehouse_id: string }
+        Args: {
+          p_customer_id: string
+          p_warehouse_id: string
+        }
         Returns: {
           charge_type_code: string | null
-          display_period: string
+          display_period: string | null
           due_amount: number
           line_id: string
           line_kind: string
@@ -1572,109 +1794,159 @@ export type Database = {
           sort_date: string
         }[]
       }
-      backfill_rent_accruals: {
-        Args: {
-          p_from_month?: string
-          p_through_month?: string
-          p_warehouse_id?: string
-        }
-        Returns: Json
-      }
-      current_tenant_id: { Args: never; Returns: string }
       generate_rent_accruals_for_month: {
         Args: {
           p_month: string
           p_narrow_lot_scope?: boolean
-          p_warehouse_id: string | null
+          p_warehouse_id: string
         }
         Returns: Json
       }
-      list_money_movements: {
+      get_customers_paged: {
         Args: {
-          p_warehouse_id: string
+          p_filter?: string
+          p_last_id?: string
+          p_last_sort_val?: string
           p_limit?: number
-          p_cursor_tx_date?: string
-          p_cursor_created_at?: string
-          p_cursor_kind?: string
-          p_cursor_event_id?: string
+          p_warehouse_id: string
         }
         Returns: {
-          kind: string
-          event_id: string
-          tx_date: string
-          created_at: string
-          total_amount: number
-          payment_method: string | null
+          address: string
+          bag_count: number
+          customer_code: string
+          customer_id: string
+          customer_name: string
+          has_stock: boolean
+          last_activity_date: string
+          lot_count: number
+          mobile: string
+          outstanding: number
+          phone: string
+        }[]
+      }
+      get_money_events: {
+        Args: {
+          p_event_type?: string
+          p_last_date?: string
+          p_last_id?: string
+          p_limit?: number
+          p_warehouse_id: string
+        }
+        Returns: {
           counterparty: string
-          notes: string | null
+          created_at: string
+          event_id: string
+          kind: string
+          notes: string
+          payment_method: string
+          total_amount: number
+          tx_date: string
+        }[]
+      }
+      get_stock_events: {
+        Args: {
+          p_event_type?: string
+          p_last_date?: string
+          p_last_id?: string
+          p_limit?: number
+          p_warehouse_id: string
+        }
+        Returns: {
+          created_at: string
+          customer_code: string
+          customer_name: string
+          event_id: string
+          kind: string
+          lot_id: string
+          lot_number: string
+          num_bags: number
+          product_group_name: string
+          product_name: string
+          tx_date: string
+        }[]
+      }
+      list_money_movements: {
+        Args: {
+          p_cursor_created_at?: string
+          p_cursor_event_id?: string
+          p_cursor_kind?: string
+          p_cursor_tx_date?: string
+          p_limit?: number
+          p_warehouse_id: string
+        }
+        Returns: {
+          counterparty: string
+          created_at: string
+          event_id: string
+          kind: string
+          notes: string
+          payment_method: string
+          total_amount: number
+          tx_date: string
         }[]
       }
       list_parties_tab: {
         Args: {
-          p_warehouse_id: string
           p_filter?: string
-          p_search?: string
           p_limit?: number
           p_offset?: number
+          p_search?: string
+          p_warehouse_id: string
         }
         Returns: {
-          customer_id: string
-          customer_code: string
-          customer_name: string
-          phone: string | null
-          mobile: string | null
-          address: string | null
-          outstanding: number
-          lot_count: number
+          address: string
           bag_count: number
-          last_activity_date: string | null
-          has_stock: boolean
+          customer_code: string
+          customer_id: string
+          customer_name: string
           filter_total: number
+          has_stock: boolean
+          last_activity_date: string
+          lot_count: number
+          mobile: string
+          outstanding: number
+          phone: string
         }[]
       }
       list_stock_movements: {
         Args: {
-          p_warehouse_id: string
-          p_limit?: number
-          p_cursor_tx_date?: string
           p_cursor_created_at?: string
-          p_cursor_kind?: string
           p_cursor_event_id?: string
+          p_cursor_kind?: string
+          p_cursor_tx_date?: string
+          p_limit?: number
+          p_warehouse_id: string
         }
         Returns: {
-          kind: string
-          event_id: string
-          lot_id: string
-          tx_date: string
           created_at: string
-          lot_number: string
-          num_bags: number
           customer_code: string
           customer_name: string
-          product_name: string
+          event_id: string
+          kind: string
+          lot_id: string
+          lot_number: string
+          num_bags: number
           product_group_name: string
+          product_name: string
+          tx_date: string
         }[]
       }
       parties_receivables_summary: {
         Args: { p_warehouse_id: string }
         Returns: {
-          total_receivable: number
-          customers_with_dues: number
-          rent_receivable: number
-          rent_lot_count: number
-          charges_receivable: number
           charges_lot_count: number
-          others_receivable: number
+          charges_receivable: number
+          customers_with_dues: number
           others_customer_count: number
+          others_receivable: number
+          rent_lot_count: number
+          rent_receivable: number
+          total_receivable: number
           updated_at: string
         }[]
       }
       rent_yearly_cutoff_in_year: {
-        Args: {
-          p_cut_day: number
-          p_cut_month: number
-          p_year: number
-        }
+        Args: { p_cut_day: number; p_cut_month: number; p_year: number }
         Returns: string
       }
     }
@@ -1817,9 +2089,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       customer_category: ["TRADER", "FARMER"],
@@ -1832,10 +2101,10 @@ export const Constants = {
         "WRITTEN_OFF",
         "DISPUTED",
       ],
+      op_payment_status: ["PENDING", "PAID"],
       payment_method: ["CASH", "BANK_TRANSFER", "CHEQUE", "UPI", "OTHER"],
       rental_mode: ["YEARLY", "MONTHLY", "BROUGHT_FORWARD"],
       user_role: ["OWNER", "MANAGER", "STAFF"],
     },
   },
 } as const
-

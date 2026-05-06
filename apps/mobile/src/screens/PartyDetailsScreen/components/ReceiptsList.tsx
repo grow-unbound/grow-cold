@@ -23,11 +23,11 @@ export function ReceiptsList({
 
   if (receipts.length === 0) {
     return (
-      <Box borderRadius={12} borderWidth={1} borderColor="#E5E7EB" bg="$white" px="$4" py="$8" alignItems="center">
-        <Text fontSize={16} fontWeight="$semibold" color="$textLight900" textAlign="center">
+      <Box borderRadius={12} borderWidth={1} borderColor="#E5DED2" bg="$white" px="$4" py="$8" alignItems="center">
+        <Text fontSize={16} fontWeight="$semibold" color="$textPrimary" textAlign="center">
           {t('parties.party_detail.empty_receipts_title')}
         </Text>
-        <Text mt="$2" fontSize={14} color="$textLight600" textAlign="center">
+        <Text mt="$2" fontSize={14} color="$textSecondary" textAlign="center">
           {t('parties.party_detail.empty_receipts_body')}
         </Text>
       </Box>
@@ -49,17 +49,17 @@ export function ReceiptsList({
             minHeight={48}
             borderRadius={12}
             borderWidth={1}
-            borderColor="#E5E7EB"
+            borderColor="#E5DED2"
             bg="$white"
             p="$3"
           >
-            <Text fontSize={16} fontWeight="$semibold" color="$textLight900">
+            <Text fontSize={16} fontWeight="$semibold" color="$textPrimary">
               {formatYmdLong(r.receipt_date, i18n.language)} • {formatINR(r.amount)}
             </Text>
-            <Text mt="$1" fontSize={14} color="$textLight600">
+            <Text mt="$1" fontSize={14} color="$textSecondary">
               {lotLine}
             </Text>
-            <Text mt="$1" fontSize={14} color="$textLight600">
+            <Text mt="$1" fontSize={14} color="$textSecondary">
               {paymentMethodLabel(r.payment_method, t)}
             </Text>
           </Pressable>
@@ -72,13 +72,13 @@ export function ReceiptsList({
           minHeight={48}
           borderRadius={12}
           borderWidth={1}
-          borderColor="#D1D5DB"
+          borderColor="#C9BFB0"
           bg="$white"
           p="$3"
           alignItems="center"
           opacity={isFetchingMore ? 0.6 : 1}
         >
-          <Text fontSize={16} fontWeight="$medium" color="#0891B2">
+          <Text fontSize={16} fontWeight="$medium" color="#A83422">
             {isFetchingMore ? t('parties.load_more') : t('parties.party_detail.load_more')}
           </Text>
         </Pressable>

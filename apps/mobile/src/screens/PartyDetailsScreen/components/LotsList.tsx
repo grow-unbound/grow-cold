@@ -27,11 +27,11 @@ export function LotsList({ lots, onOpenLot }: Props) {
 
   if (lots.length === 0) {
     return (
-      <Box borderRadius={12} borderWidth={1} borderColor="#E5E7EB" bg="$white" px="$4" py="$8" alignItems="center">
-        <Text fontSize={16} fontWeight="$semibold" color="$textLight900" textAlign="center">
+      <Box borderRadius={12} borderWidth={1} borderColor="#E5DED2" bg="$white" px="$4" py="$8" alignItems="center">
+        <Text fontSize={16} fontWeight="$semibold" color="$textPrimary" textAlign="center">
           {t('parties.party_detail.empty_lots_title')}
         </Text>
-        <Text mt="$2" fontSize={14} color="$textLight600" textAlign="center">
+        <Text mt="$2" fontSize={14} color="$textSecondary" textAlign="center">
           {t('parties.party_detail.empty_lots_body')}
         </Text>
       </Box>
@@ -40,7 +40,7 @@ export function LotsList({ lots, onOpenLot }: Props) {
 
   return (
     <Box gap="$3">
-      <Text fontSize={12} fontWeight="$medium" color="$textLight500" textTransform="uppercase">
+      <Text fontSize={12} fontWeight="$medium" color="$textTertiary" textTransform="uppercase">
         {t('parties.party_detail.lots_heading', { count: lots.length })}
       </Text>
       <Box gap="$3">
@@ -65,14 +65,14 @@ export function LotsList({ lots, onOpenLot }: Props) {
               minHeight={48}
               borderRadius={12}
               borderWidth={1}
-              borderColor="#E5E7EB"
+              borderColor="#E5DED2"
               bg="$white"
               p="$3"
             >
-              <Text fontSize={16} fontWeight="$semibold" color="$textLight900">
+              <Text fontSize={16} fontWeight="$semibold" color="$textPrimary">
                 {t('lot_detail.lot_header_label', { number: lot.lot_number })} • {lot.product_name}
               </Text>
-              <Text mt="$1" fontSize={14} color="$textLight600">
+              <Text mt="$1" fontSize={14} color="$textSecondary">
                 {t('parties.party_detail.lot_lodged_delivered', {
                   lodged: lot.original_bags.toLocaleString('en-IN'),
                   delivered: lot.delivered_bags.toLocaleString('en-IN'),
@@ -81,7 +81,7 @@ export function LotsList({ lots, onOpenLot }: Props) {
               <Text
                 mt="$1"
                 fontSize={14}
-                color={isCompleted ? '#16A34A' : '$textLight600'}
+                color={isCompleted ? '#0B7B6E' : '$textSecondary'}
                 fontWeight={isCompleted ? '$medium' : '$normal'}
               >
                 {line3}

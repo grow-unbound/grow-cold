@@ -7,7 +7,7 @@ import { chargesTe } from '@/locales/charges-te';
 void i18n.use(initReactI18next).init({
   lng: 'en',
   fallbackLng: 'te',
-  ns: ['nav', 'menu', 'common', 'login', 'signup', 'authVerify', 'onboarding', 'pages', 'home', 'charges'],
+  ns: ['nav', 'menu', 'common', 'login', 'signup', 'authVerify', 'onboarding', 'pages', 'home', 'charges', 'search'],
   defaultNS: 'nav',
   react: {
     useSuspense: false,
@@ -24,6 +24,7 @@ void i18n.use(initReactI18next).init({
       pages: resources.te.pages,
       home: resources.te.home,
       charges: chargesTe,
+      search: resources.te.search,
     },
     en: {
       nav: resources.en.nav,
@@ -36,6 +37,7 @@ void i18n.use(initReactI18next).init({
       pages: resources.en.pages,
       home: resources.en.home,
       charges: chargesEn,
+      search: resources.en.search,
     },
   },
   interpolation: { escapeValue: false },

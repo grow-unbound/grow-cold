@@ -25,8 +25,8 @@ import { Modal, ScrollView as RNScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { supabase } from '../../../lib/supabase';
 
-const GREEN = '#16A34A';
-const PURPLE = '#7C3AED';
+const GREEN = '#0B7B6E';
+const PURPLE = '#7B5200';
 
 interface Props {
   open: boolean;
@@ -121,7 +121,7 @@ export function RecordTransactionSheet({ open, onClose, warehouseId }: Props) {
   return (
     <Modal visible={open} animationType="slide" transparent onRequestClose={onClose}>
       <Box flex={1} justifyContent="flex-end" bg="rgba(0,0,0,0.4)">
-        <Box bg="$backgroundLight0" borderTopLeftRadius={20} borderTopRightRadius={20} pb={insets.bottom + 16} maxHeight="92%">
+        <Box bg="$bgSurface" borderTopLeftRadius={20} borderTopRightRadius={20} pb={insets.bottom + 16} maxHeight="92%">
           <VStack p="$4" space="md">
             <Text fontSize={18} fontWeight="$bold">
               {t('money.record_title')}
@@ -132,9 +132,9 @@ export function RecordTransactionSheet({ open, onClose, warehouseId }: Props) {
                 flex={1}
                 p="$2"
                 borderRadius={10}
-                style={{ backgroundColor: mode === 'receipt' ? GREEN : '#D1D5DB' }}
+                style={{ backgroundColor: mode === 'receipt' ? GREEN : '#C9BFB0' }}
               >
-                <Text textAlign="center" color={mode === 'receipt' ? '$white' : '$textLight700'} fontWeight="$semibold">
+                <Text textAlign="center" color={mode === 'receipt' ? '$white' : '$textSecondary'} fontWeight="$semibold">
                   {t('money.mode_receipt')}
                 </Text>
               </Pressable>
@@ -143,9 +143,9 @@ export function RecordTransactionSheet({ open, onClose, warehouseId }: Props) {
                 flex={1}
                 p="$2"
                 borderRadius={10}
-                style={{ backgroundColor: mode === 'payment' ? PURPLE : '#D1D5DB' }}
+                style={{ backgroundColor: mode === 'payment' ? PURPLE : '#C9BFB0' }}
               >
-                <Text textAlign="center" color={mode === 'payment' ? '$white' : '$textLight700'} fontWeight="$semibold">
+                <Text textAlign="center" color={mode === 'payment' ? '$white' : '$textSecondary'} fontWeight="$semibold">
                   {t('money.mode_payment')}
                 </Text>
               </Pressable>
@@ -164,7 +164,7 @@ export function RecordTransactionSheet({ open, onClose, warehouseId }: Props) {
                           <Pressable
                             key={c.id}
                             p="$2"
-                            bg={rCustomer === c.id ? '$primary100' : 'transparent'}
+                            bg={rCustomer === c.id ? '$brandSubtle' : 'transparent'}
                             onPress={() => setRCustomer(c.id)}
                           >
                             <Text>{c.customer_name}</Text>
@@ -202,12 +202,12 @@ export function RecordTransactionSheet({ open, onClose, warehouseId }: Props) {
                           borderRadius="$full"
                           borderWidth={2}
                           style={{
-                            backgroundColor: rMethod === m ? '#111827' : 'transparent',
-                            borderColor: rMethod === m ? '#111827' : '#E5E7EB',
+                            backgroundColor: rMethod === m ? '#1C1A16' : 'transparent',
+                            borderColor: rMethod === m ? '#1C1A16' : '#E5DED2',
                           }}
                           onPress={() => setRMethod(m)}
                         >
-                          <Text color={rMethod === m ? '$white' : '$textLight800'} fontSize={13}>
+                          <Text color={rMethod === m ? '$white' : '$textPrimary'} fontSize={13}>
                             {m}
                           </Text>
                         </Pressable>
@@ -274,12 +274,12 @@ export function RecordTransactionSheet({ open, onClose, warehouseId }: Props) {
                           borderRadius="$full"
                           borderWidth={2}
                           style={{
-                            backgroundColor: pMethod === m ? '#111827' : 'transparent',
-                            borderColor: pMethod === m ? '#111827' : '#E5E7EB',
+                            backgroundColor: pMethod === m ? '#1C1A16' : 'transparent',
+                            borderColor: pMethod === m ? '#1C1A16' : '#E5DED2',
                           }}
                           onPress={() => setPMethod(m)}
                         >
-                          <Text color={pMethod === m ? '$white' : '$textLight800'} fontSize={13}>
+                          <Text color={pMethod === m ? '$white' : '$textPrimary'} fontSize={13}>
                             {m}
                           </Text>
                         </Pressable>

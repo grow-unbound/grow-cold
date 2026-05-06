@@ -161,11 +161,11 @@ function RecordDeliveryFormLoaded({
     <>
       <div className="mx-auto mb-28 flex max-w-[560px] flex-col gap-4 pb-4">
         <div>
-          <Link href={`/inventory/${lotId}`} className="text-caption font-medium text-primary-600 hover:underline">
+          <Link href={`/inventory/${lotId}`} className="text-caption font-medium text-brand-text hover:underline">
             ← {t('back_lot')}
           </Link>
-          <h1 className="mt-2 h2 text-neutral-900">{tp('inventory.record_delivery_title')}</h1>
-          <p className="mt-1 text-body-sm text-neutral-600">{tp('inventory.record_delivery_sub')}</p>
+          <h1 className="mt-2 h2 text-text-primary">{tp('inventory.record_delivery_title')}</h1>
+          <p className="mt-1 text-body-sm text-text-secondary">{tp('inventory.record_delivery_sub')}</p>
         </div>
 
         {dues ? (
@@ -189,16 +189,16 @@ function RecordDeliveryFormLoaded({
         ) : null}
 
         <div className="card grid gap-3 text-body-sm">
-          <p className="text-caption font-medium text-neutral-500">{tp('inventory.record_delivery_zone1')}</p>
+          <p className="text-caption font-medium text-text-tertiary">{tp('inventory.record_delivery_zone1')}</p>
           <div className="flex flex-wrap gap-2">
-            <span className="text-caption font-medium text-neutral-500">{t('party_locked')}</span>
-            <span className="inline-flex rounded-full bg-neutral-100 px-3 py-1 text-sm font-medium text-neutral-900">
+            <span className="text-caption font-medium text-text-tertiary">{t('party_locked')}</span>
+            <span className="inline-flex rounded-full bg-surface-subtle px-3 py-1 text-sm font-medium text-text-primary">
               {data.party.customer_code} — {data.party.customer_name}
             </span>
           </div>
           <div className="flex flex-wrap gap-2">
-            <span className="text-caption font-medium text-neutral-500">{t('lot_locked')}</span>
-            <span className="inline-flex rounded-full bg-neutral-100 px-3 py-1 text-sm font-medium text-neutral-900">
+            <span className="text-caption font-medium text-text-tertiary">{t('lot_locked')}</span>
+            <span className="inline-flex rounded-full bg-surface-subtle px-3 py-1 text-sm font-medium text-text-primary">
               {data.lot.lot_number} · {lot.balance_bags}/{lot.original_bags} {tp('inventory.bags_suffix')}
             </span>
           </div>
@@ -235,7 +235,7 @@ function RecordDeliveryFormLoaded({
               value={laborPaymentDate}
               onChange={(e) => setLaborPaymentDate(e.target.value)}
             />
-            <span className="text-caption text-neutral-500">{tp('inventory.record_delivery_labor_date_hint')}</span>
+            <span className="text-caption text-text-tertiary">{tp('inventory.record_delivery_labor_date_hint')}</span>
           </label>
           <div className="form-field gap-2">
             <span className="text-label">{tp('inventory.record_delivery_locations')}</span>
@@ -245,7 +245,7 @@ function RecordDeliveryFormLoaded({
                   key={c.id}
                   className={cn(
                     'inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1 text-sm',
-                    selectedLocs.has(c.id) ? 'border-primary-500 bg-primary-50' : 'border-neutral-200 bg-white',
+                    selectedLocs.has(c.id) ? 'border-brand-ui bg-brand-subtle' : 'border-border bg-white',
                   )}
                 >
                   <input
@@ -266,15 +266,15 @@ function RecordDeliveryFormLoaded({
         </div>
 
         <div>
-          <h2 className="mb-2 text-body-sm font-semibold text-neutral-800">{tp('inventory.record_delivery_zone2')}</h2>
+          <h2 className="mb-2 text-body-sm font-semibold text-text-primary">{tp('inventory.record_delivery_zone2')}</h2>
           <MovementChargesEditor bagsMax={Math.max(bagsMax, 1)} data={data} draft={draft} setRow={setRow} />
           {!hasAnyCharge ? (
-            <p className="mt-2 text-caption text-neutral-500">{tp('inventory.record_delivery_charges_optional')}</p>
+            <p className="mt-2 text-caption text-text-tertiary">{tp('inventory.record_delivery_charges_optional')}</p>
           ) : null}
         </div>
       </div>
 
-      <footer className="fixed bottom-0 left-0 right-0 z-30 border-t border-neutral-200 bg-white px-4 py-3 lg:left-48">
+      <footer className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-white px-4 py-3 lg:left-48">
         <div className="mx-auto flex max-w-[560px] justify-between gap-3">
           <button type="button" className="btn-secondary min-h-touch" onClick={() => router.back()}>
             {t('cancel')}
@@ -321,7 +321,7 @@ export function RecordDeliveryForm({ lotId }: { lotId: string }) {
     return (
       <div className="flex max-w-[560px] flex-col gap-3">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="card skeleton h-28 w-full animate-pulse bg-neutral-100" />
+          <div key={i} className="card skeleton h-28 w-full animate-pulse bg-surface-subtle" />
         ))}
       </div>
     );
@@ -341,11 +341,11 @@ export function RecordDeliveryForm({ lotId }: { lotId: string }) {
   if (lot.balance_bags <= 0) {
     return (
       <div className="mx-auto mb-28 max-w-[560px]">
-        <Link href={`/inventory/${lotId}`} className="text-caption font-medium text-primary-600 hover:underline">
+        <Link href={`/inventory/${lotId}`} className="text-caption font-medium text-brand-text hover:underline">
           ← {t('back_lot')}
         </Link>
         <h1 className="mt-2 h2">{tp('inventory.record_delivery_title')}</h1>
-        <p className="mt-4 text-body-sm text-neutral-600">{tp('inventory.record_delivery_no_balance')}</p>
+        <p className="mt-4 text-body-sm text-text-secondary">{tp('inventory.record_delivery_no_balance')}</p>
       </div>
     );
   }
@@ -353,11 +353,11 @@ export function RecordDeliveryForm({ lotId }: { lotId: string }) {
   if (!(lot.location_ids?.length ?? 0)) {
     return (
       <div className="mx-auto mb-28 max-w-[560px]">
-        <Link href={`/inventory/${lotId}`} className="text-caption font-medium text-primary-600 hover:underline">
+        <Link href={`/inventory/${lotId}`} className="text-caption font-medium text-brand-text hover:underline">
           ← {t('back_lot')}
         </Link>
         <h1 className="mt-2 h2">{tp('inventory.record_delivery_title')}</h1>
-        <p className="mt-4 text-body-sm text-danger-600">{tp('inventory.record_delivery_no_locations')}</p>
+        <p className="mt-4 text-body-sm text-outward">{tp('inventory.record_delivery_no_locations')}</p>
       </div>
     );
   }

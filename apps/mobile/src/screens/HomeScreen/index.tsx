@@ -1,7 +1,10 @@
 import { Box, HStack, Pressable, ScrollView, Text, VStack } from '@gluestack-ui/themed';
 import NetInfo from '@react-native-community/netinfo';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Search } from 'lucide-react-native';
+import { colors as tc } from '@growcold/tokens';
 import { useEffect, useState } from 'react';
-import { Modal, Pressable as RNPressable, Text as RNText, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { ProfileMenu } from '../../components/ProfileMenu';
@@ -12,6 +15,7 @@ import {
   useBusinessSnapshotQuery,
   useTodaysActivityQuery,
 } from '../../features/home/useHomeQueries';
+import type { RootStackParamList } from '../../navigation/types';
 import { useWarehouseStore } from '../../stores/warehouse-store';
 import { AlertsSection } from './components/AlertsSection';
 import { BusinessSnapshot } from './components/BusinessSnapshot';
@@ -22,11 +26,12 @@ import { TodaysActivity } from './components/TodaysActivity';
 
 export function HomeScreen() {
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation();
   const { t } = useTranslation('home');
   const { t: tNav } = useTranslation('nav');
   const { t: tPages } = useTranslation('pages');
+  const { t: tSearch } = useTranslation('search');
   const warehouseId = useWarehouseStore((s) => s.warehouseId);
-  const [searchOpen, setSearchOpen] = useState(false);
   const authReady = useAuthReady();
   const configured = !!supabase && authReady && warehouseId.length > 0;
   const [offline, setOffline] = useState(false);
@@ -44,11 +49,16 @@ export function HomeScreen() {
 
   const updatedLabel = t('updated', { time: new Date().toLocaleTimeString() });
 
+  const openSearch = () => {
+    const root = navigation.getParent<NativeStackNavigationProp<RootStackParamList>>();
+    root?.navigate('Search');
+  };
+
   return (
-    <Box flex={1} bg="$dashboardSurface">
+    <Box flex={1} bg="$bgSurface">
       {offline ? (
-        <Box bg="$backgroundLight200" px="$4" py="$2">
-          <Text size="sm" color="$textLight500">
+        <Box bg="$bgInset" px="$4" py="$2">
+          <Text size="sm" color="$textTertiary">
             {t('offline_banner')}
           </Text>
         </Box>
@@ -61,31 +71,42 @@ export function HomeScreen() {
             pt={Math.max(insets.top, 8)}
             pb="$2"
           >
-            <Text fontSize={20} fontWeight="$semibold" color="$textLight900" flex={1} mr="$2">
+            <Text
+              flex={1}
+              mr="$2"
+              fontFamily="NotoSerif_500Medium"
+              fontSize={24}
+              lineHeight={30}
+              color="$textPrimary"
+            >
               {tNav('home')}
             </Text>
-            <HStack space="md" alignItems="center">
+            <HStack space="sm" alignItems="center">
               <Pressable
-                onPress={() => setSearchOpen(true)}
+                onPress={openSearch}
                 accessibilityRole="button"
-                accessibilityLabel="Search"
-                p="$2"
-                style={{ minWidth: 48, minHeight: 48, justifyContent: 'center', alignItems: 'center' }}
+                accessibilityLabel={tSearch('open_aria')}
+                style={{
+                  width: 44,
+                  height: 44,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
               >
-                <Text fontSize="$xl">🔍</Text>
+                <Search size={22} color={tc.textSecondary} strokeWidth={1.75} />
               </Pressable>
               <ProfileMenu />
             </HStack>
           </HStack>
 
           {!configured ? (
-            <Text fontSize={16} color="$textLight500">
+            <Text fontSize={16} color="$textTertiary">
               {t('configure_env')}
             </Text>
           ) : null}
 
           {configured && snapshot.isError ? (
-            <Text color="$dashboardDanger">{tPages('error_load')}</Text>
+            <Text color="$outward">{tPages('error_load')}</Text>
           ) : null}
 
           <BusinessSnapshot
@@ -100,38 +121,19 @@ export function HomeScreen() {
 
           {configured ? (
             <>
-              <Text fontSize={16} fontWeight="$bold" color="$textLight900" mt="$4">
+              <Text fontSize={16} fontWeight="$bold" color="$textPrimary" mt="$4">
                 {t('summary')}
               </Text>
               <StockPerformance />
               <MoneyPerformance />
               <PartiesPerformance />
-              <Text size="xs" color="$textLight500" mt="$2">
+              <Text size="xs" color="$textTertiary" mt="$2">
                 {updatedLabel}
               </Text>
             </>
           ) : null}
         </VStack>
       </ScrollView>
-
-      <Modal visible={searchOpen} transparent animationType="fade" onRequestClose={() => setSearchOpen(false)}>
-        <RNPressable
-          onPress={() => setSearchOpen(false)}
-          style={{
-            flex: 1,
-            backgroundColor: 'rgba(0,0,0,0.4)',
-            justifyContent: 'center',
-            padding: 24,
-          }}
-        >
-          <View style={{ backgroundColor: 'white', borderRadius: 12, padding: 24 }}>
-            <RNText style={{ fontSize: 16, marginBottom: 16, color: '#363A45' }}>{t('search_coming')}</RNText>
-            <RNPressable onPress={() => setSearchOpen(false)} accessibilityRole="button">
-              <RNText style={{ color: '#00B14F', fontWeight: '600' }}>OK</RNText>
-            </RNPressable>
-          </View>
-        </RNPressable>
-      </Modal>
     </Box>
   );
 }

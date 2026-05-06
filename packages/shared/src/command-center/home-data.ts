@@ -1,79 +1,17 @@
 import { eachDayOfInterval, startOfDay } from 'date-fns';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import {
+  CommandCenterActivityResponseSchema,
+  CommandCenterAlertsResponseSchema,
+  CommandCenterHomeResponseSchema,
+  CommandCenterSnapshotResponseSchema,
+  type CommandCenterHomeResponse,
+} from '../api/endpoints/command-center';
 import type { Database } from '../api/types';
 import { toISODate } from './date-ranges';
 import type { PeriodBounds } from './types';
 
 type SB = SupabaseClient<Database>;
-
-const LOT_STATUSES_SNAPSHOT = ['ACTIVE', 'STALE', 'DELIVERED'] as const;
-
-/** Keep PostgREST `.in()` URLs under ~16KB (undici / Supabase limits). */
-const IN_CHUNK = 100;
-
-function chunkIds(ids: string[]): string[][] {
-  const out: string[][] = [];
-  for (let i = 0; i < ids.length; i += IN_CHUNK) out.push(ids.slice(i, i + IN_CHUNK));
-  return out;
-}
-
-async function lotIdsForWarehouse(client: SB, warehouseId: string): Promise<string[]> {
-  const { data, error } = await client.from('lots').select('id').eq('warehouse_id', warehouseId);
-  if (error) throw error;
-  return (data ?? []).map((r) => r.id);
-}
-
-async function fetchDeliveriesInRange(
-  client: SB,
-  lotIds: string[],
-  from: string,
-  to: string,
-): Promise<{ id: string; lot_id: string; delivery_date: string; num_bags_out: number }[]> {
-  if (lotIds.length === 0) return [];
-  const rows: { id: string; lot_id: string; delivery_date: string; num_bags_out: number }[] = [];
-  for (const part of chunkIds(lotIds)) {
-    const { data, error } = await client
-      .from('deliveries')
-      .select('id, lot_id, delivery_date, num_bags_out')
-      .in('lot_id', part)
-      .gte('delivery_date', from)
-      .lte('delivery_date', to);
-    if (error) throw error;
-    rows.push(...(data ?? []));
-  }
-  return rows;
-}
-
-async function fetchChargesForLots(
-  client: SB,
-  lotIds: string[],
-  filter: { is_paid?: boolean; paid_date_eq?: string; paid_from?: string; paid_to?: string },
-): Promise<{ charge_amount: number; is_paid: boolean; paid_date: string | null; lot_id: string }[]> {
-  if (lotIds.length === 0) return [];
-  const rows: { charge_amount: number; is_paid: boolean; paid_date: string | null; lot_id: string }[] =
-    [];
-  for (const part of chunkIds(lotIds)) {
-    let q = client
-      .from('transaction_charges')
-      .select('charge_amount, is_paid, paid_date, lot_id')
-      .in('lot_id', part);
-    if (filter.is_paid !== undefined) q = q.eq('is_paid', filter.is_paid);
-    if (filter.paid_date_eq) q = q.eq('paid_date', filter.paid_date_eq);
-    if (filter.paid_from) q = q.gte('paid_date', filter.paid_from);
-    if (filter.paid_to) q = q.lte('paid_date', filter.paid_to);
-    const { data, error } = await q;
-    if (error) throw error;
-    for (const r of data ?? []) {
-      rows.push({
-        charge_amount: Number(r.charge_amount),
-        is_paid: r.is_paid,
-        paid_date: r.paid_date,
-        lot_id: r.lot_id,
-      });
-    }
-  }
-  return rows;
-}
 
 export interface BusinessSnapshot {
   cashBalance: number;
@@ -149,60 +87,59 @@ function calendarDaysInBounds(b: PeriodBounds): number {
   return Math.max(1, days.length);
 }
 
+async function activeLotsNearEndOfPeriod(
+  client: SB,
+  warehouseId: string,
+  periodEnd: Date,
+): Promise<number> {
+  const d = toISODate(periodEnd);
+  const { data: dayRow } = await client
+    .from('daily_stock_summary')
+    .select('active_lots_eod')
+    .eq('warehouse_id', warehouseId)
+    .eq('summary_date', d)
+    .maybeSingle();
+  if (dayRow?.active_lots_eod !== undefined && dayRow.active_lots_eod !== null) {
+    return dayRow.active_lots_eod;
+  }
+  const { data: snap } = await client
+    .from('warehouse_snapshot')
+    .select('active_lots')
+    .eq('warehouse_id', warehouseId)
+    .maybeSingle();
+  return snap?.active_lots ?? 0;
+}
+
 export async function fetchBusinessSnapshot(
   client: SB,
   warehouseId: string,
-  today: Date,
+  _today: Date,
 ): Promise<BusinessSnapshot> {
-  const todayStr = toISODate(today);
-  const lotIds = await lotIdsForWarehouse(client, warehouseId);
-
-  const [receiptsRes, lotsRes, staleRes, allPaidCharges, receiptsTodayRes, paidTodayCharges] =
-    await Promise.all([
-      client.from('customer_receipts').select('total_amount').eq('warehouse_id', warehouseId),
-      client
-        .from('lots')
-        .select('id, balance_bags, status')
-        .eq('warehouse_id', warehouseId)
-        .in('status', [...LOT_STATUSES_SNAPSHOT]),
-      client
-        .from('lots')
-        .select('id', { count: 'exact', head: true })
-        .eq('warehouse_id', warehouseId)
-        .eq('status', 'STALE'),
-      fetchChargesForLots(client, lotIds, { is_paid: true }),
-      client
-        .from('customer_receipts')
-        .select('total_amount')
-        .eq('warehouse_id', warehouseId)
-        .eq('receipt_date', todayStr),
-      fetchChargesForLots(client, lotIds, { is_paid: true, paid_date_eq: todayStr }),
-    ]);
-
-  if (receiptsRes.error) throw receiptsRes.error;
-  if (lotsRes.error) throw lotsRes.error;
-  if (staleRes.error) throw staleRes.error;
-  if (receiptsTodayRes.error) throw receiptsTodayRes.error;
-
-  const receiptsSum = (receiptsRes.data ?? []).reduce((s, r) => s + Number(r.total_amount), 0);
-  const paidChargesSum = allPaidCharges.reduce((s, r) => s + r.charge_amount, 0);
-  const totalBags = (lotsRes.data ?? []).reduce((s, l) => s + l.balance_bags, 0);
-  const totalLots = lotsRes.data?.length ?? 0;
-  const staleLots = staleRes.count ?? 0;
-
-  const receivedToday = (receiptsTodayRes.data ?? []).reduce(
-    (s, r) => s + Number(r.total_amount),
-    0,
-  );
-  const paidToday = paidTodayCharges.reduce((s, r) => s + r.charge_amount, 0);
-
+  const { data, error } = await client
+    .from('warehouse_snapshot')
+    .select(
+      'cash_balance, today_receipts, today_payments, total_bags, total_lots, stale_lots',
+    )
+    .eq('warehouse_id', warehouseId)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) {
+    return {
+      cashBalance: 0,
+      receivedToday: 0,
+      paidToday: 0,
+      totalBags: 0,
+      totalLots: 0,
+      staleLots: 0,
+    };
+  }
   return {
-    cashBalance: receiptsSum - paidChargesSum,
-    receivedToday,
-    paidToday,
-    totalBags,
-    totalLots,
-    staleLots,
+    cashBalance: Number(data.cash_balance),
+    receivedToday: Number(data.today_receipts),
+    paidToday: Number(data.today_payments),
+    totalBags: data.total_bags,
+    totalLots: data.total_lots,
+    staleLots: data.stale_lots,
   };
 }
 
@@ -211,32 +148,45 @@ export async function fetchTodaysActivity(
   warehouseId: string,
   today: Date,
 ): Promise<TodaysActivity> {
-  const todayStr = toISODate(today);
-  const lotIds = await lotIdsForWarehouse(client, warehouseId);
-
-  const [lotsToday, deliveriesToday, recRes] = await Promise.all([
+  const day = toISODate(today);
+  const [stockRes, moneyRes] = await Promise.all([
     client
-      .from('lots')
-      .select('id, original_bags')
+      .from('stock_events')
+      .select('event_type, num_bags')
       .eq('warehouse_id', warehouseId)
-      .eq('lodgement_date', todayStr),
-    fetchDeliveriesInRange(client, lotIds, todayStr, todayStr),
+      .eq('event_date', day),
     client
-      .from('customer_receipts')
-      .select('total_amount, customer_id')
+      .from('money_events')
+      .select('event_type, amount, customer_id')
       .eq('warehouse_id', warehouseId)
-      .eq('receipt_date', todayStr),
+      .eq('event_date', day),
   ]);
+  if (stockRes.error) throw stockRes.error;
+  if (moneyRes.error) throw moneyRes.error;
 
-  if (lotsToday.error) throw lotsToday.error;
-  if (recRes.error) throw recRes.error;
+  let lodgementsCount = 0;
+  let lodgementsBags = 0;
+  let deliveriesCount = 0;
+  let deliveriesBags = 0;
+  for (const r of stockRes.data ?? []) {
+    const n = r.num_bags ?? 0;
+    if (r.event_type === 'LODGEMENT') {
+      lodgementsCount += 1;
+      lodgementsBags += n;
+    } else if (r.event_type === 'DELIVERY') {
+      deliveriesCount += 1;
+      deliveriesBags += n;
+    }
+  }
 
-  const lodgementsCount = lotsToday.data?.length ?? 0;
-  const lodgementsBags = (lotsToday.data ?? []).reduce((s, l) => s + l.original_bags, 0);
-  const deliveriesCount = deliveriesToday.length;
-  const deliveriesBags = deliveriesToday.reduce((s, d) => s + d.num_bags_out, 0);
-  const collectedAmount = (recRes.data ?? []).reduce((s, r) => s + Number(r.total_amount), 0);
-  const collectedCustomerCount = new Set((recRes.data ?? []).map((r) => r.customer_id)).size;
+  let collectedAmount = 0;
+  const receiptCustomers = new Set<string>();
+  for (const r of moneyRes.data ?? []) {
+    if (r.event_type === 'RECEIPT' && r.amount != null) {
+      collectedAmount += Number(r.amount);
+      if (r.customer_id) receiptCustomers.add(r.customer_id);
+    }
+  }
 
   return {
     lodgementsCount,
@@ -244,88 +194,57 @@ export async function fetchTodaysActivity(
     deliveriesCount,
     deliveriesBags,
     collectedAmount,
-    collectedCustomerCount,
+    collectedCustomerCount: receiptCustomers.size,
   };
 }
 
-export async function fetchAlerts(client: SB, warehouseId: string, today: Date): Promise<HomeAlert[]> {
-  const cutoff = new Date(today);
-  cutoff.setDate(cutoff.getDate() - 30);
-  const cutoffStr = toISODate(cutoff);
-  const yearAgo = new Date(today);
-  yearAgo.setDate(yearAgo.getDate() - 365);
-  const yearAgoStr = toISODate(yearAgo);
-  const lotIds = await lotIdsForWarehouse(client, warehouseId);
-
-  const [oldLots, pendingCharges, overdueRentRes] = await Promise.all([
-    client
-      .from('lots')
-      .select('id', { count: 'exact', head: true })
-      .eq('warehouse_id', warehouseId)
-      .in('status', ['ACTIVE', 'STALE'])
-      .lt('lodgement_date', yearAgoStr),
-    fetchChargesForLots(client, lotIds, { is_paid: false }),
-    client
-      .from('rent_accruals')
-      .select('id, rental_amount, accrual_date, lot_id, lots!inner(warehouse_id)')
-      .eq('is_paid', false)
-      .lt('accrual_date', cutoffStr)
-      .eq('lots.warehouse_id', warehouseId)
-      .limit(200),
-  ]);
-
-  if (overdueRentRes.error) throw overdueRentRes.error;
-  const overdueRent = { data: overdueRentRes.data ?? [] };
-  if (oldLots.error) throw oldLots.error;
+export async function fetchAlerts(client: SB, warehouseId: string, _today: Date): Promise<HomeAlert[]> {
+  const { data: ws, error: wsErr } = await client
+    .from('warehouse_snapshot')
+    .select('lots_aged_365_plus, pending_payables')
+    .eq('warehouse_id', warehouseId)
+    .maybeSingle();
+  if (wsErr) throw wsErr;
 
   const alerts: HomeAlert[] = [];
-  const lotCustomer = new Map<string, string>();
-  const overdueLotIds = [...new Set((overdueRent.data ?? []).map((r) => r.lot_id))];
-  if (overdueLotIds.length > 0) {
-    const { data: lotRows, error: le } = await client
-      .from('lots')
-      .select('id, customer_id')
-      .in('id', overdueLotIds)
-      .eq('warehouse_id', warehouseId);
-    if (le) throw le;
-    for (const l of lotRows ?? []) lotCustomer.set(l.id, l.customer_id);
+
+  const { data: rentRows, error: rentErr } = await client
+    .from('customer_summary')
+    .select('customer_id, outstanding_rents, customers(customer_name)')
+    .eq('warehouse_id', warehouseId)
+    .gt('outstanding_rents', 0)
+    .order('outstanding_rents', { ascending: false })
+    .limit(3);
+  if (rentErr) throw rentErr;
+
+  type RentRow = {
+    customer_id: string;
+    outstanding_rents: number;
+    customers: { customer_name: string } | null;
+  };
+  for (const row of (rentRows ?? []) as RentRow[]) {
+    const name = row.customers?.customer_name ?? 'Customer';
+    alerts.push({
+      id: `rent-${row.customer_id}`,
+      message: `${name}: rent overdue · ${Number(row.outstanding_rents).toFixed(0)}`,
+      nav: { kind: 'party', customerId: row.customer_id },
+    });
   }
 
-  const byCustomer = new Map<string, number>();
-  for (const row of overdueRent.data ?? []) {
-    const cid = lotCustomer.get(row.lot_id);
-    if (!cid) continue;
-    byCustomer.set(cid, (byCustomer.get(cid) ?? 0) + Number(row.rental_amount));
-  }
-  const topCustomers = [...byCustomer.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3);
-
-  if (topCustomers.length > 0) {
-    const ids = topCustomers.map(([id]) => id);
-    const { data: names } = await client.from('customers').select('id, customer_name').in('id', ids);
-    const nameBy = new Map((names ?? []).map((c) => [c.id, c.customer_name]));
-    for (const [customerId, amt] of topCustomers) {
-      alerts.push({
-        id: `rent-${customerId}`,
-        message: `${nameBy.get(customerId) ?? 'Customer'}: rent overdue · ${amt.toFixed(0)}`,
-        nav: { kind: 'party', customerId },
-      });
-    }
-  }
-
-  const agedCount = oldLots.count ?? 0;
-  if (agedCount > 0) {
+  const aged = ws?.lots_aged_365_plus ?? 0;
+  if (aged > 0) {
     alerts.push({
       id: 'stale-aged',
-      message: `${agedCount} lots aged over 1 year`,
+      message: `${aged} lots aged over 1 year`,
       nav: { kind: 'stock_stale' },
     });
   }
 
-  const pendingSum = pendingCharges.reduce((s, r) => s + r.charge_amount, 0);
-  if (pendingSum > 0) {
+  const pending = Number(ws?.pending_payables ?? 0);
+  if (pending > 0) {
     alerts.push({
-      id: 'pending-charges',
-      message: `₹${pendingSum.toFixed(0)} staff / hamali charges pending`,
+      id: 'pending-payables',
+      message: `₹${pending.toFixed(0)} operational payables pending`,
       nav: { kind: 'money_pending' },
     });
   }
@@ -333,11 +252,18 @@ export async function fetchAlerts(client: SB, warehouseId: string, today: Date):
   return alerts.slice(0, 5);
 }
 
-async function fetchStockPeriod(
+type DailyStockRow = {
+  summary_date: string;
+  lodged_bags: number;
+  lodged_lots: number;
+  delivered_bags: number;
+  delivered_lots: number;
+};
+
+async function aggregateDailyStock(
   client: SB,
   warehouseId: string,
   bounds: PeriodBounds,
-  lotIds: string[],
 ): Promise<{
   lodgedBags: number;
   lodgedLots: number;
@@ -345,53 +271,32 @@ async function fetchStockPeriod(
   deliveredLots: number;
   lodgedByDay: Map<string, number>;
   deliveredByDay: Map<string, number>;
-  activeLotIds: Set<string>;
 }> {
   const from = toISODate(bounds.start);
   const to = toISODate(bounds.end);
-
-  const { data: lotsRows, error: lotsErr } = await client
-    .from('lots')
-    .select('id, original_bags, lodgement_date')
+  const { data, error } = await client
+    .from('daily_stock_summary')
+    .select('summary_date, lodged_bags, lodged_lots, delivered_bags, delivered_lots')
     .eq('warehouse_id', warehouseId)
-    .gte('lodgement_date', from)
-    .lte('lodgement_date', to);
-  if (lotsErr) throw lotsErr;
-
-  const deliveries = await fetchDeliveriesInRange(client, lotIds, from, to);
-
-  const lodgedByDay = new Map<string, number>();
+    .gte('summary_date', from)
+    .lte('summary_date', to);
+  if (error) throw error;
+  const rows = (data ?? []) as DailyStockRow[];
   let lodgedBags = 0;
-  const activeLotIds = new Set<string>();
-  for (const l of lotsRows ?? []) {
-    lodgedBags += l.original_bags;
-    const d = l.lodgement_date;
-    lodgedByDay.set(d, (lodgedByDay.get(d) ?? 0) + l.original_bags);
-    activeLotIds.add(l.id);
-  }
-  const lodgedLots = lotsRows?.length ?? 0;
-
-  const deliveredByDay = new Map<string, number>();
+  let lodgedLots = 0;
   let deliveredBags = 0;
-  const deliveredLotIds = new Set<string>();
-  for (const d of deliveries) {
-    deliveredBags += d.num_bags_out;
-    deliveredLotIds.add(d.lot_id);
-    activeLotIds.add(d.lot_id);
-    const day = d.delivery_date;
-    deliveredByDay.set(day, (deliveredByDay.get(day) ?? 0) + d.num_bags_out);
+  let deliveredLots = 0;
+  const lodgedByDay = new Map<string, number>();
+  const deliveredByDay = new Map<string, number>();
+  for (const row of rows) {
+    lodgedBags += row.lodged_bags;
+    lodgedLots += row.lodged_lots;
+    deliveredBags += row.delivered_bags;
+    deliveredLots += row.delivered_lots;
+    lodgedByDay.set(row.summary_date, (lodgedByDay.get(row.summary_date) ?? 0) + row.lodged_bags);
+    deliveredByDay.set(row.summary_date, (deliveredByDay.get(row.summary_date) ?? 0) + row.delivered_bags);
   }
-  const deliveredLots = deliveredLotIds.size;
-
-  return {
-    lodgedBags,
-    lodgedLots,
-    deliveredBags,
-    deliveredLots,
-    lodgedByDay,
-    deliveredByDay,
-    activeLotIds,
-  };
+  return { lodgedBags, lodgedLots, deliveredBags, deliveredLots, lodgedByDay, deliveredByDay };
 }
 
 export async function fetchStockPerformance(
@@ -400,111 +305,82 @@ export async function fetchStockPerformance(
   current: PeriodBounds,
   previous: PeriodBounds,
 ): Promise<StockPerformanceData> {
-  const lotIds = await lotIdsForWarehouse(client, warehouseId);
-  const [cur, prev] = await Promise.all([
-    fetchStockPeriod(client, warehouseId, current, lotIds),
-    fetchStockPeriod(client, warehouseId, previous, lotIds),
+  const [curAgg, prevAgg, curAct, prevAct] = await Promise.all([
+    aggregateDailyStock(client, warehouseId, current),
+    aggregateDailyStock(client, warehouseId, previous),
+    activeLotsNearEndOfPeriod(client, warehouseId, current.end),
+    activeLotsNearEndOfPeriod(client, warehouseId, previous.end),
   ]);
 
   const daysCur = calendarDaysInBounds(current);
   const daysPrev = calendarDaysInBounds(previous);
-  const avgBagsPerDay = (cur.lodgedBags + cur.deliveredBags) / daysCur;
-  const prevAvgBagsPerDay = (prev.lodgedBags + prev.deliveredBags) / daysPrev;
+  const avgBagsPerDay = (curAgg.lodgedBags + curAgg.deliveredBags) / daysCur;
+  const prevAvgBagsPerDay = (prevAgg.lodgedBags + prevAgg.deliveredBags) / daysPrev;
 
-  const days = eachDayOfInterval({ start: startOfDay(current.start), end: startOfDay(current.end) });
+  const days = eachDayOfInterval({
+    start: startOfDay(current.start),
+    end: startOfDay(current.end),
+  });
   const series = days.map((day) => {
     const key = toISODate(day);
     return {
       label: key.slice(5),
-      lodged: cur.lodgedByDay.get(key) ?? 0,
-      delivered: cur.deliveredByDay.get(key) ?? 0,
+      lodged: curAgg.lodgedByDay.get(key) ?? 0,
+      delivered: curAgg.deliveredByDay.get(key) ?? 0,
     };
   });
 
   return {
-    lodgedBags: cur.lodgedBags,
-    lodgedLots: cur.lodgedLots,
-    deliveredBags: cur.deliveredBags,
-    deliveredLots: cur.deliveredLots,
+    lodgedBags: curAgg.lodgedBags,
+    lodgedLots: curAgg.lodgedLots,
+    deliveredBags: curAgg.deliveredBags,
+    deliveredLots: curAgg.deliveredLots,
     avgBagsPerDay,
-    activeLotsCount: cur.activeLotIds.size,
-    prevLodgedBags: prev.lodgedBags,
-    prevDeliveredBags: prev.deliveredBags,
-    prevLodgedLots: prev.lodgedLots,
-    prevDeliveredLots: prev.deliveredLots,
+    activeLotsCount: curAct,
+    prevLodgedBags: prevAgg.lodgedBags,
+    prevDeliveredBags: prevAgg.deliveredBags,
+    prevLodgedLots: prevAgg.lodgedLots,
+    prevDeliveredLots: prevAgg.deliveredLots,
     prevAvgBagsPerDay,
-    prevActiveLots: prev.activeLotIds.size,
+    prevActiveLots: prevAct,
     series,
   };
 }
 
-async function fetchMoneyPeriod(
+type DailyMoneyRow = {
+  summary_date: string;
+  receipts_amount: number;
+  payments_amount: number;
+  net_amount: number | null;
+};
+
+async function aggregateDailyMoney(
   client: SB,
   warehouseId: string,
   bounds: PeriodBounds,
-  lotIds: string[],
-): Promise<{ collected: number; paidOut: number }> {
+): Promise<{ collected: number; paidOut: number; byDay: Map<string, { rec: number; pay: number }> }> {
   const from = toISODate(bounds.start);
   const to = toISODate(bounds.end);
-
-  const [recRes, paidCharges] = await Promise.all([
-    client
-      .from('customer_receipts')
-      .select('total_amount')
-      .eq('warehouse_id', warehouseId)
-      .gte('receipt_date', from)
-      .lte('receipt_date', to),
-    fetchChargesForLots(client, lotIds, { is_paid: true, paid_from: from, paid_to: to }),
-  ]);
-
-  if (recRes.error) throw recRes.error;
-
-  const collected = (recRes.data ?? []).reduce((s, r) => s + Number(r.total_amount), 0);
-  const paidOut = paidCharges.reduce((s, r) => s + r.charge_amount, 0);
-  return { collected, paidOut };
-}
-
-async function moneySeriesForPeriod(
-  client: SB,
-  warehouseId: string,
-  lotIds: string[],
-  bounds: PeriodBounds,
-): Promise<{ label: string; lodged: number; delivered: number }[]> {
-  const from = toISODate(bounds.start);
-  const to = toISODate(bounds.end);
-  const byDay = new Map<string, { lodged: number; delivered: number }>();
-
-  const [recRes, paidCharges] = await Promise.all([
-    client
-      .from('customer_receipts')
-      .select('receipt_date, total_amount')
-      .eq('warehouse_id', warehouseId)
-      .gte('receipt_date', from)
-      .lte('receipt_date', to),
-    fetchChargesForLots(client, lotIds, { is_paid: true, paid_from: from, paid_to: to }),
-  ]);
-  if (recRes.error) throw recRes.error;
-
-  for (const r of recRes.data ?? []) {
-    const d = r.receipt_date;
-    const cur = byDay.get(d) ?? { lodged: 0, delivered: 0 };
-    cur.lodged += Number(r.total_amount);
-    byDay.set(d, cur);
+  const { data, error } = await client
+    .from('daily_money_summary')
+    .select('summary_date, receipts_amount, payments_amount, net_amount')
+    .eq('warehouse_id', warehouseId)
+    .gte('summary_date', from)
+    .lte('summary_date', to);
+  if (error) throw error;
+  const rows = (data ?? []) as DailyMoneyRow[];
+  let collected = 0;
+  let paidOut = 0;
+  const byDay = new Map<string, { rec: number; pay: number }>();
+  for (const row of rows) {
+    collected += Number(row.receipts_amount);
+    paidOut += Number(row.payments_amount);
+    const cur = byDay.get(row.summary_date) ?? { rec: 0, pay: 0 };
+    cur.rec += Number(row.receipts_amount);
+    cur.pay += Number(row.payments_amount);
+    byDay.set(row.summary_date, cur);
   }
-  for (const c of paidCharges) {
-    const d = c.paid_date;
-    if (!d) continue;
-    const cur = byDay.get(d) ?? { lodged: 0, delivered: 0 };
-    cur.delivered += c.charge_amount;
-    byDay.set(d, cur);
-  }
-
-  const days = eachDayOfInterval({ start: startOfDay(bounds.start), end: startOfDay(bounds.end) });
-  return days.map((day) => {
-    const k = toISODate(day);
-    const v = byDay.get(k) ?? { lodged: 0, delivered: 0 };
-    return { label: k.slice(5), lodged: v.lodged, delivered: v.delivered };
-  });
+  return { collected, paidOut, byDay };
 }
 
 export async function fetchMoneyPerformance(
@@ -513,16 +389,26 @@ export async function fetchMoneyPerformance(
   current: PeriodBounds,
   previous: PeriodBounds,
 ): Promise<MoneyPerformanceData> {
-  const lotIds = await lotIdsForWarehouse(client, warehouseId);
-  const [cur, prev, series] = await Promise.all([
-    fetchMoneyPeriod(client, warehouseId, current, lotIds),
-    fetchMoneyPeriod(client, warehouseId, previous, lotIds),
-    moneySeriesForPeriod(client, warehouseId, lotIds, current),
+  const [cur, prev] = await Promise.all([
+    aggregateDailyMoney(client, warehouseId, current),
+    aggregateDailyMoney(client, warehouseId, previous),
   ]);
+
   const daysCur = calendarDaysInBounds(current);
   const daysPrev = calendarDaysInBounds(previous);
   const net = cur.collected - cur.paidOut;
   const prevNet = prev.collected - prev.paidOut;
+
+  const days = eachDayOfInterval({
+    start: startOfDay(current.start),
+    end: startOfDay(current.end),
+  });
+  const series = days.map((day) => {
+    const key = toISODate(day);
+    const v = cur.byDay.get(key) ?? { rec: 0, pay: 0 };
+    return { label: key.slice(5), lodged: v.rec, delivered: v.pay };
+  });
+
   return {
     collected: cur.collected,
     paidOut: cur.paidOut,
@@ -536,25 +422,6 @@ export async function fetchMoneyPerformance(
   };
 }
 
-function paidInFullCount(
-  lots: { customer_id: string; balance_bags: number }[],
-  customerIds: Set<string>,
-): number {
-  const bagsByCustomer = new Map<string, number>();
-  for (const l of lots) {
-    bagsByCustomer.set(
-      l.customer_id,
-      (bagsByCustomer.get(l.customer_id) ?? 0) + l.balance_bags,
-    );
-  }
-  let n = 0;
-  for (const cid of customerIds) {
-    if (!bagsByCustomer.has(cid)) continue;
-    if ((bagsByCustomer.get(cid) ?? 0) === 0) n += 1;
-  }
-  return n;
-}
-
 export async function fetchPartiesPerformance(
   client: SB,
   warehouseId: string,
@@ -566,106 +433,95 @@ export async function fetchPartiesPerformance(
   const pFrom = toISODate(previous.start);
   const pTo = toISODate(previous.end);
 
-  const [curRec, prevRec, lotsRes] = await Promise.all([
-    client
-      .from('customer_receipts')
-      .select('customer_id, total_amount, receipt_date')
-      .eq('warehouse_id', warehouseId)
-      .gte('receipt_date', cFrom)
-      .lte('receipt_date', cTo),
-    client
-      .from('customer_receipts')
-      .select('customer_id, total_amount')
-      .eq('warehouse_id', warehouseId)
-      .gte('receipt_date', pFrom)
-      .lte('receipt_date', pTo),
-    client
-      .from('lots')
-      .select('id, customer_id, lodgement_date, balance_bags, status')
-      .eq('warehouse_id', warehouseId),
-  ]);
+  const [curMoney, prevMoney, curAct, prevAct, newCur, newPrev, paidCur, paidPrev] =
+    await Promise.all([
+      aggregateDailyMoney(client, warehouseId, current),
+      aggregateDailyMoney(client, warehouseId, previous),
+      client
+        .from('customer_summary')
+        .select('customer_id', { count: 'exact', head: true })
+        .eq('warehouse_id', warehouseId)
+        .gte('last_activity_date', cFrom)
+        .lte('last_activity_date', cTo),
+      client
+        .from('customer_summary')
+        .select('customer_id', { count: 'exact', head: true })
+        .eq('warehouse_id', warehouseId)
+        .gte('last_activity_date', pFrom)
+        .lte('last_activity_date', pTo),
+      client
+        .from('customers')
+        .select('id', { count: 'exact', head: true })
+        .eq('warehouse_id', warehouseId)
+        .gte('created_at', `${cFrom}T00:00:00`)
+        .lte('created_at', `${cTo}T23:59:59.999Z`),
+      client
+        .from('customers')
+        .select('id', { count: 'exact', head: true })
+        .eq('warehouse_id', warehouseId)
+        .gte('created_at', `${pFrom}T00:00:00`)
+        .lte('created_at', `${pTo}T23:59:59.999Z`),
+      client
+        .from('customer_summary')
+        .select('customer_id', { count: 'exact', head: true })
+        .eq('warehouse_id', warehouseId)
+        .lte('outstanding_total', 0)
+        .eq('active_lot_count', 0)
+        .gte('last_activity_date', cFrom)
+        .lte('last_activity_date', cTo),
+      client
+        .from('customer_summary')
+        .select('customer_id', { count: 'exact', head: true })
+        .eq('warehouse_id', warehouseId)
+        .lte('outstanding_total', 0)
+        .eq('active_lot_count', 0)
+        .gte('last_activity_date', pFrom)
+        .lte('last_activity_date', pTo),
+    ]);
 
-  if (curRec.error) throw curRec.error;
-  if (prevRec.error) throw prevRec.error;
-  if (lotsRes.error) throw lotsRes.error;
+  if (curAct.error) throw curAct.error;
+  if (prevAct.error) throw prevAct.error;
+  if (newCur.error) throw newCur.error;
+  if (newPrev.error) throw newPrev.error;
+  if (paidCur.error) throw paidCur.error;
+  if (paidPrev.error) throw paidPrev.error;
 
-  const lots = lotsRes.data ?? [];
-
-  const collections = (curRec.data ?? []).reduce((s, r) => s + Number(r.total_amount), 0);
-  const prevCollections = (prevRec.data ?? []).reduce((s, r) => s + Number(r.total_amount), 0);
-
-  const activeCurrent = new Set((curRec.data ?? []).map((r) => r.customer_id));
-  for (const l of lots) {
-    const ld = l.lodgement_date;
-    if (ld >= cFrom && ld <= cTo) activeCurrent.add(l.customer_id);
-  }
-  const delCur = await fetchDeliveriesInRange(
-    client,
-    lots.map((l) => l.id),
-    cFrom,
-    cTo,
-  );
-  for (const d of delCur) {
-    const lot = lots.find((x) => x.id === d.lot_id);
-    if (lot) activeCurrent.add(lot.customer_id);
-  }
-
-  const activePrev = new Set((prevRec.data ?? []).map((r) => r.customer_id));
-  for (const l of lots) {
-    const ld = l.lodgement_date;
-    if (ld >= pFrom && ld <= pTo) activePrev.add(l.customer_id);
-  }
-  const delPrev = await fetchDeliveriesInRange(
-    client,
-    lots.map((l) => l.id),
-    pFrom,
-    pTo,
-  );
-  for (const d of delPrev) {
-    const lot = lots.find((x) => x.id === d.lot_id);
-    if (lot) activePrev.add(lot.customer_id);
-  }
-
-  const custRows = await client.from('customers').select('id, created_at').eq('warehouse_id', warehouseId);
-  if (custRows.error) throw custRows.error;
-  let newCustomers = 0;
-  let prevNewCustomers = 0;
-  for (const c of custRows.data ?? []) {
-    const cd = c.created_at.slice(0, 10);
-    if (cd >= cFrom && cd <= cTo) newCustomers += 1;
-    if (cd >= pFrom && cd <= pTo) prevNewCustomers += 1;
-  }
-
-  const paidInFull = paidInFullCount(lots, activeCurrent);
-  const prevPaidInFull = paidInFullCount(lots, activePrev);
-
-  const partyByDay = new Map<string, { lodged: number; delivered: number }>();
-  for (const r of curRec.data ?? []) {
-    const d = r.receipt_date;
-    const cur = partyByDay.get(d) ?? { lodged: 0, delivered: 0 };
-    cur.lodged += Number(r.total_amount);
-    cur.delivered += 1;
-    partyByDay.set(d, cur);
-  }
   const partyDays = eachDayOfInterval({
     start: startOfDay(current.start),
     end: startOfDay(current.end),
   });
   const series = partyDays.map((day) => {
-    const k = toISODate(day);
-    const v = partyByDay.get(k) ?? { lodged: 0, delivered: 0 };
-    return { label: k.slice(5), lodged: v.lodged, delivered: v.delivered };
+    const key = toISODate(day);
+    const v = curMoney.byDay.get(key) ?? { rec: 0, pay: 0 };
+    return { label: key.slice(5), lodged: v.rec, delivered: v.pay };
   });
 
   return {
-    collections,
-    activeCustomers: activeCurrent.size,
-    newCustomers,
-    paidInFull,
-    prevCollections,
-    prevActiveCustomers: activePrev.size,
-    prevNewCustomers,
-    prevPaidInFull,
+    collections: curMoney.collected,
+    activeCustomers: curAct.count ?? 0,
+    newCustomers: newCur.count ?? 0,
+    paidInFull: paidCur.count ?? 0,
+    prevCollections: prevMoney.collected,
+    prevActiveCustomers: prevAct.count ?? 0,
+    prevNewCustomers: newPrev.count ?? 0,
+    prevPaidInFull: paidPrev.count ?? 0,
     series,
   };
+}
+
+export async function fetchCommandCenterHome(
+  client: SB,
+  warehouseId: string,
+  today: Date,
+): Promise<CommandCenterHomeResponse> {
+  const [snapshot, activity, alerts] = await Promise.all([
+    fetchBusinessSnapshot(client, warehouseId, today),
+    fetchTodaysActivity(client, warehouseId, today),
+    fetchAlerts(client, warehouseId, today),
+  ]);
+  return CommandCenterHomeResponseSchema.parse({
+    snapshot: CommandCenterSnapshotResponseSchema.parse(snapshot),
+    activity: CommandCenterActivityResponseSchema.parse(activity),
+    alerts: CommandCenterAlertsResponseSchema.parse(alerts),
+  });
 }

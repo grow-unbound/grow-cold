@@ -14,7 +14,7 @@ export default function PartyDetailPage() {
   if (!customerId) {
     return (
       <div className="card w-full max-w-3xl lg:max-w-5xl">
-        <p className="text-body-sm text-danger-600">{t('error_load')}</p>
+        <p className="text-body-sm text-outward">{t('error_load')}</p>
       </div>
     );
   }
@@ -22,7 +22,7 @@ export default function PartyDetailPage() {
   if (!warehouseId) {
     return (
       <div className="card w-full max-w-3xl lg:max-w-5xl">
-        <p className="text-body-sm text-neutral-600">{t('select_warehouse')}</p>
+        <p className="text-body-sm text-text-secondary">{t('select_warehouse')}</p>
       </div>
     );
   }

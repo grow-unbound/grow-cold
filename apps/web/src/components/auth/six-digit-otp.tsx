@@ -103,8 +103,8 @@ export function SixDigitOtp({ disabled, onChange, onComplete, error }: SixDigitO
   };
 
   const borderClass = error
-    ? 'border-danger-500 focus:border-danger-500 focus:ring-1'
-    : 'border-neutral-200 focus:border-primary-500 focus:ring-1';
+    ? 'border-outward-border focus:border-outward-border focus:ring-1'
+    : 'border-border focus:border-brand-ui focus:ring-1';
 
   return (
     <div className="flex justify-center gap-1.5 sm:gap-2" role="group" aria-label="One-time code">
@@ -124,7 +124,7 @@ export function SixDigitOtp({ disabled, onChange, onComplete, error }: SixDigitO
           onChange={(e) => setAt(i, e.target.value)}
           onKeyDown={(e) => onKeyDown(i, e)}
           onPaste={i === 0 ? onPaste : undefined}
-          className={`h-touch w-9 rounded-lg border-2 text-center text-base font-semibold outline-none ring-primary-500 sm:w-10 ${borderClass}`}
+          className={`h-touch w-9 rounded-lg border-2 text-center text-base font-semibold outline-none ring-brand-ui sm:w-10 ${borderClass}`}
           aria-label={`Digit ${i + 1}`}
         />
       ))}

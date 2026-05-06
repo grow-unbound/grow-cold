@@ -18,9 +18,9 @@ export function ReceiptsList({ receipts, hasMore, onLoadMore, isFetchingMore }: 
 
   if (receipts.length === 0) {
     return (
-      <div className="rounded-xl border border-neutral-200 bg-white px-4 py-8 text-center shadow-sm">
-        <p className="text-base font-semibold text-neutral-900">{t('parties.party_detail.empty_receipts_title')}</p>
-        <p className="mt-1 text-body-sm text-neutral-600">{t('parties.party_detail.empty_receipts_body')}</p>
+      <div className="rounded-xl border border-border bg-white px-4 py-8 text-center shadow-sm">
+        <p className="text-base font-semibold text-text-primary">{t('parties.party_detail.empty_receipts_title')}</p>
+        <p className="mt-1 text-body-sm text-text-secondary">{t('parties.party_detail.empty_receipts_body')}</p>
       </div>
     );
   }
@@ -37,13 +37,13 @@ export function ReceiptsList({ receipts, hasMore, onLoadMore, isFetchingMore }: 
             <li key={r.id}>
               <Link
                 href={`/transaction/receipt/${r.id}`}
-                className="block min-h-touch rounded-xl border border-neutral-200 bg-white p-3 shadow-sm transition-colors hover:border-neutral-300"
+                className="block min-h-touch rounded-xl border border-border bg-white p-3 shadow-sm transition-colors hover:border-border"
               >
-                <p className="text-base font-semibold text-neutral-900">
+                <p className="text-base font-semibold text-text-primary">
                   {formatYmdLong(r.receipt_date, i18n.language)} • {formatINR(r.amount)}
                 </p>
-                <p className="mt-1 text-body-sm text-neutral-600">{lotLine}</p>
-                <p className="mt-1 text-body-sm text-neutral-600">{paymentMethodLabel(r.payment_method, t)}</p>
+                <p className="mt-1 text-body-sm text-text-secondary">{lotLine}</p>
+                <p className="mt-1 text-body-sm text-text-secondary">{paymentMethodLabel(r.payment_method, t)}</p>
               </Link>
             </li>
           );

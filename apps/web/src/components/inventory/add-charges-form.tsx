@@ -123,31 +123,31 @@ function AddChargesFormBody({
     <>
       <div className="mx-auto mb-28 flex max-w-[560px] flex-col gap-4 pb-4">
         <div>
-          <Link href={`/inventory/${lotId}`} className="text-caption font-medium text-primary-600 hover:underline">
+          <Link href={`/inventory/${lotId}`} className="text-caption font-medium text-brand-text hover:underline">
             ← {t('back_lot')}
           </Link>
-          <h1 className="mt-2 h2 text-neutral-900">{t('title')}</h1>
+          <h1 className="mt-2 h2 text-text-primary">{t('title')}</h1>
         </div>
 
         {!onlineHint ? (
-          <p className="text-caption text-neutral-500">{t('offline_note')}</p>
+          <p className="text-caption text-text-tertiary">{t('offline_note')}</p>
         ) : null}
 
         <div className="card grid gap-2 text-body-sm">
           <div className="flex flex-wrap gap-2">
-            <span className="text-caption font-medium text-neutral-500">{t('party_locked')}</span>
-            <span className="inline-flex rounded-full bg-neutral-100 px-3 py-1 text-sm font-medium text-neutral-900">
+            <span className="text-caption font-medium text-text-tertiary">{t('party_locked')}</span>
+            <span className="inline-flex rounded-full bg-surface-subtle px-3 py-1 text-sm font-medium text-text-primary">
               {partyChip}
             </span>
           </div>
           <div className="flex flex-wrap gap-2">
-            <span className="text-caption font-medium text-neutral-500">{t('lot_locked')}</span>
-            <span className="inline-flex rounded-full bg-neutral-100 px-3 py-1 text-sm font-medium text-neutral-900">
+            <span className="text-caption font-medium text-text-tertiary">{t('lot_locked')}</span>
+            <span className="inline-flex rounded-full bg-surface-subtle px-3 py-1 text-sm font-medium text-text-primary">
               {data.lot.lot_number}
             </span>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-caption font-medium text-neutral-500">{t('movement')}</span>
+            <span className="text-caption font-medium text-text-tertiary">{t('movement')}</span>
             <select
               aria-label={t('movement')}
               className="input-base max-w-[12rem]"
@@ -166,7 +166,7 @@ function AddChargesFormBody({
           </div>
           {movement === 'delivery' && deliveryOptions.length > 0 ? (
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-caption font-medium text-neutral-500">{t('which_delivery')}</span>
+              <span className="text-caption font-medium text-text-tertiary">{t('which_delivery')}</span>
               <select
                 aria-label={t('which_delivery')}
                 className="input-base min-w-[12rem]"
@@ -186,7 +186,7 @@ function AddChargesFormBody({
             </div>
           ) : null}
           <div className="flex flex-wrap gap-2">
-            <span className="text-caption font-medium text-neutral-500">{t('date_label')}</span>
+            <span className="text-caption font-medium text-text-tertiary">{t('date_label')}</span>
             <span>{chipDate}</span>
           </div>
         </div>
@@ -194,7 +194,7 @@ function AddChargesFormBody({
         <MovementChargesEditor bagsMax={originalBags} data={data} draft={draft} setRow={setRow} />
       </div>
 
-      <footer className="fixed bottom-0 left-0 right-0 z-30 border-t border-neutral-200 bg-white px-4 py-3 lg:left-48">
+      <footer className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-white px-4 py-3 lg:left-48">
         <div className="mx-auto flex max-w-[560px] justify-between gap-3">
           <button type="button" className="btn-secondary min-h-touch" onClick={() => router.back()}>
             {t('cancel')}
@@ -273,11 +273,11 @@ export function AddChargesForm({ lotId }: { lotId: string }) {
   if (noDeliveries) {
     return (
       <div className="mx-auto mb-28 max-w-[560px]">
-        <Link href={`/inventory/${lotId}`} className="text-caption font-medium text-primary-600 hover:underline">
+        <Link href={`/inventory/${lotId}`} className="text-caption font-medium text-brand-text hover:underline">
           ← {t('back_lot')}
         </Link>
         <h1 className="mt-2 h2">{t('title')}</h1>
-        <p className="mt-4 text-body-sm text-neutral-600">{t('no_deliveries_hint')}</p>
+        <p className="mt-4 text-body-sm text-text-secondary">{t('no_deliveries_hint')}</p>
         <Link href={`/inventory/${lotId}`} className="btn-primary mt-4 inline-flex">
           {tPages('back')}
         </Link>
@@ -300,7 +300,7 @@ export function AddChargesForm({ lotId }: { lotId: string }) {
     return (
       <div className="flex max-w-[560px] flex-col gap-3">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="card skeleton h-28 w-full animate-pulse bg-neutral-100" />
+          <div key={i} className="card skeleton h-28 w-full animate-pulse bg-surface-subtle" />
         ))}
       </div>
     );

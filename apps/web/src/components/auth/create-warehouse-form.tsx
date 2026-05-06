@@ -65,12 +65,12 @@ export function CreateWarehouseForm() {
   return (
     <div className="auth-panel">
       <div>
-        <h1 className="text-lg font-semibold text-neutral-900">{t('title')}</h1>
-        <p className="mt-1 text-caption text-neutral-600">{t('subtitle')}</p>
+        <h1 className="text-lg font-semibold text-text-primary">{t('title')}</h1>
+        <p className="mt-1 text-caption text-text-secondary">{t('subtitle')}</p>
       </div>
       <form className="flex flex-col gap-3" onSubmit={onSubmit} noValidate>
         <div className="form-field">
-          <label htmlFor="wh-name" className="text-label-lg font-semibold text-neutral-700">
+          <label htmlFor="wh-name" className="text-label-lg font-semibold text-text-secondary">
             {t('name_label')}
           </label>
           <input id="wh-name" disabled={busy} className="input-base" {...form.register('name')} />
@@ -81,13 +81,13 @@ export function CreateWarehouseForm() {
           ) : null}
         </div>
         <div className="form-field">
-          <label htmlFor="wh-loc" className="text-label-lg font-semibold text-neutral-700">
+          <label htmlFor="wh-loc" className="text-label-lg font-semibold text-text-secondary">
             {t('location_label')}
           </label>
           <input id="wh-loc" disabled={busy} className="input-base" {...form.register('location')} />
         </div>
         <div className="form-field">
-          <label htmlFor="wh-cap" className="text-label-lg font-semibold text-neutral-700">
+          <label htmlFor="wh-cap" className="text-label-lg font-semibold text-text-secondary">
             {t('capacity_label')}
           </label>
           <input

@@ -173,26 +173,26 @@ function AllocationFifoBody({
               <div
                 className={cn(
                   'flex h-10 w-10 shrink-0 items-center justify-center rounded-base',
-                  full ? 'bg-success-100 text-success-700' : 'bg-warning-100 text-warning-800',
+                  full ? 'bg-inward-bg text-inward' : 'bg-pending-bg text-pending',
                 )}
               >
                 <Icon className="h-5 w-5" aria-hidden />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-neutral-900">
+                <p className="truncate text-sm font-semibold text-text-primary">
                   {line.meta.lot_number}
                 </p>
-                <p className="truncate text-caption text-neutral-600">
+                <p className="truncate text-caption text-text-secondary">
                   {line.meta.line_label} · {line.meta.display_period}
                 </p>
               </div>
               <div className="shrink-0 text-right">
-                <p className="text-caption text-neutral-500">{t('receipts.due_label')}</p>
-                <p className="text-body-sm text-neutral-700">{formatINR(line.remaining)}</p>
+                <p className="text-caption text-text-tertiary">{t('receipts.due_label')}</p>
+                <p className="text-body-sm text-text-secondary">{formatINR(line.remaining)}</p>
                 <p
                   className={cn(
                     'text-sm font-semibold',
-                    full ? 'text-success-700' : 'text-warning-800',
+                    full ? 'text-inward' : 'text-pending',
                   )}
                 >
                   {t('receipts.applied_label')}{' '}
@@ -216,7 +216,7 @@ function AllocationFifoBody({
 
           if (layout === 'cards') {
             return (
-              <li key={line.line_id} className="card rounded-base border border-neutral-200 p-3">
+              <li key={line.line_id} className="card rounded-base border border-border p-3">
                 <div className="flex flex-row items-start gap-3">{inner}</div>
               </li>
             );
@@ -225,7 +225,7 @@ function AllocationFifoBody({
           return (
             <li
               key={line.line_id}
-              className="flex flex-row items-center gap-3 border-b border-neutral-100 py-2 last:border-b-0"
+              className="flex flex-row items-center gap-3 border-b border-border py-2 last:border-b-0"
             >
               {inner}
             </li>
@@ -235,29 +235,29 @@ function AllocationFifoBody({
 
       <div
         className={cn(
-          'mt-auto space-y-2 border-t border-neutral-200 pt-3',
-          over && 'rounded-base bg-danger-50 px-2 py-2',
+          'mt-auto space-y-2 border-t border-border pt-3',
+          over && 'rounded-base bg-outward-bg px-2 py-2',
         )}
       >
         <div className="flex justify-between text-body-sm">
-          <span className="text-neutral-600">{t('receipts.applied_total')}</span>
-          <span className={cn('font-semibold', over && 'text-danger-700')}>
+          <span className="text-text-secondary">{t('receipts.applied_total')}</span>
+          <span className={cn('font-semibold', over && 'text-outward')}>
             {formatINR(totalApplied)}
           </span>
         </div>
         <div className="flex justify-between text-body-sm">
-          <span className="text-neutral-600">{t('receipts.credit_total')}</span>
+          <span className="text-text-secondary">{t('receipts.credit_total')}</span>
           <span
-            className={cn('font-semibold', credit > 0 ? 'text-warning-800' : 'text-neutral-800')}
+            className={cn('font-semibold', credit > 0 ? 'text-pending' : 'text-text-primary')}
           >
             {formatINR(credit)}
           </span>
         </div>
         {credit > 0 ? (
-          <p className="text-caption text-warning-800">{t('receipts.credit_unapplied_help')}</p>
+          <p className="text-caption text-pending">{t('receipts.credit_unapplied_help')}</p>
         ) : null}
         {over ? (
-          <p className="text-caption text-danger-700">{t('receipts.over_allocation')}</p>
+          <p className="text-caption text-outward">{t('receipts.over_allocation')}</p>
         ) : null}
 
         <Button
@@ -315,23 +315,23 @@ export function ReceiptAllocationEditor(props: ReceiptAllocationEditorProps) {
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
       <div className="min-w-0">
-        <p className="text-label font-semibold text-neutral-900">{customerName}</p>
+        <p className="text-label font-semibold text-text-primary">{customerName}</p>
         {showSyncNote ? (
-          <p className="text-caption text-neutral-500">{t('receipts.accruals_sync_note')}</p>
+          <p className="text-caption text-text-tertiary">{t('receipts.accruals_sync_note')}</p>
         ) : null}
       </div>
 
       {outstandingQ.isPending ? (
-        <p className="text-body-sm text-neutral-600">{t('loading')}</p>
+        <p className="text-body-sm text-text-secondary">{t('loading')}</p>
       ) : null}
       {outstandingQ.isError ? (
-        <p className="text-body-sm text-danger-600">{t('error_load')}</p>
+        <p className="text-body-sm text-outward">{t('error_load')}</p>
       ) : null}
 
       {emptyOutstanding ? (
-        <div className="card rounded-base border border-neutral-200 bg-neutral-50 p-3">
-          <p className="text-body-sm text-neutral-600">{t('receipts.no_outstanding')}</p>
-          <p className="mt-2 text-sm font-semibold text-neutral-900">
+        <div className="card rounded-base border border-border bg-surface-subtle p-3">
+          <p className="text-body-sm text-text-secondary">{t('receipts.no_outstanding')}</p>
+          <p className="mt-2 text-sm font-semibold text-text-primary">
             {formatINR(receiptAmount)} → {t('receipts.credit_total')}
           </p>
         </div>
@@ -348,7 +348,7 @@ export function ReceiptAllocationEditor(props: ReceiptAllocationEditorProps) {
       )}
 
       {emptyOutstanding ? (
-        <div className="mt-auto border-t border-neutral-200 pt-3">
+        <div className="mt-auto border-t border-border pt-3">
           <Button
             type="button"
             className="btn-primary min-h-touch w-full"

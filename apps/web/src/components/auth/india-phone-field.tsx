@@ -41,16 +41,16 @@ export function IndiaPhoneField({
 
   return (
     <div className="form-field">
-      <label htmlFor={id} className="text-label-lg font-semibold text-neutral-700">
+      <label htmlFor={id} className="text-label-lg font-semibold text-text-secondary">
         {label}
       </label>
       <div
-        className={`flex min-h-touch w-full min-w-0 items-stretch overflow-hidden rounded-base border-2 bg-white transition-[border-color,box-shadow] focus-within:border-primary-500 focus-within:ring-0 focus-within:shadow-focus disabled:opacity-50 ${
-          errorMessage ? 'border-danger-500' : 'border-neutral-200'
+        className={`flex min-h-touch w-full min-w-0 items-stretch overflow-hidden rounded-base border-2 bg-white transition-[border-color,box-shadow] focus-within:border-brand-ui focus-within:ring-0 focus-within:shadow-focus disabled:opacity-50 ${
+          errorMessage ? 'border-outward-border' : 'border-border'
         }`}
       >
         <span
-          className="inline-flex shrink-0 items-center border-r-2 border-neutral-200 bg-neutral-50 px-3 text-base font-medium text-neutral-700"
+          className="inline-flex shrink-0 items-center border-r-2 border-border bg-surface-subtle px-3 text-base font-medium text-text-secondary"
           aria-hidden
         >
           +91
@@ -62,7 +62,7 @@ export function IndiaPhoneField({
           autoComplete="tel-national"
           disabled={disabled}
           placeholder={placeholder}
-          className="min-h-touch min-w-0 flex-1 border-0 bg-transparent px-3 py-3 text-base text-neutral-900 outline-none ring-0 placeholder:text-neutral-400"
+          className="min-h-touch min-w-0 flex-1 border-0 bg-transparent px-3 py-3 text-base text-text-primary outline-none ring-0 placeholder:text-text-tertiary"
           value={formatDisplay(value)}
           onChange={(e) => onInputChange(e.target.value)}
         />

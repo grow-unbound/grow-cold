@@ -1,6 +1,7 @@
 import { formatIndianNumber, type StockTabSummary } from '@growcold/shared';
-import { Box, Pressable, Text, VStack } from '@gluestack-ui/themed';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { colors as c } from '@growcold/tokens';
 
 interface Props {
   data: StockTabSummary | undefined;
@@ -9,98 +10,148 @@ interface Props {
   onToggle: () => void;
 }
 
+interface KpiColProps {
+  value: string;
+  label: string;
+  hint?: string;
+}
+
+function KpiCol({ value, label, hint }: KpiColProps) {
+  return (
+    <View style={styles.col}>
+      <Text style={styles.colNum}>{value}</Text>
+      <Text style={styles.colLabel}>{label}</Text>
+      {hint ? <Text style={styles.colHint}>{hint}</Text> : null}
+    </View>
+  );
+}
+
 export function StockStatusCard({ data, isLoading, expanded, onToggle }: Props) {
   const { t } = useTranslation('pages');
 
   return (
-    <Box
-      mx="$2"
-      mb="$3"
-      p="$3"
-      borderRadius={12}
-      bg="$backgroundLight0"
-      style={{
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.06,
-        shadowRadius: 3,
-        elevation: 2,
-      }}
-    >
-      <Pressable onPress={onToggle} accessibilityRole="button">
-        <Box flexDirection="row" alignItems="center" justifyContent="space-between">
-          <Text fontSize={12} fontWeight="$semibold" color="$textLight500" letterSpacing={0.5}>
-            {t('stock.stock_status')}
-          </Text>
-          <Text fontSize={16} color="$textLight400">
-            {expanded ? '▼' : '▶'}
-          </Text>
-        </Box>
+    <View style={styles.card}>
+      <Pressable onPress={onToggle} accessibilityRole="button" style={styles.header}>
+        <Text style={styles.sectionLabel}>{t('stock.stock_status')}</Text>
+        <Text style={styles.chevron}>{expanded ? '▼' : '▶'}</Text>
       </Pressable>
 
-      {isLoading ? (
-        <Text mt="$2" size="sm" color="$textLight500">
-          {t('loading')}
-        </Text>
-      ) : null}
+      {isLoading ? <Text style={styles.loading}>{t('loading')}</Text> : null}
 
-      {!isLoading && data && !expanded ? (
-        <Text mt="$1" fontSize={14} color="$textLight500">
-          {t('stock.bags_lots_line', {
-            bags: formatIndianNumber(data.totalBags),
-            lots: data.totalLots,
-          })}
-        </Text>
-      ) : null}
+      {!isLoading && data ? (
+        <View style={styles.body}>
+          <Text style={styles.mainNum}>{formatIndianNumber(data.totalBags)}</Text>
+          <Text style={styles.mainSub}>
+            {t('stock.bags_lots_line', { bags: '', lots: data.totalLots }).replace(/^\s*•?\s*/, '')}
+          </Text>
 
-      {!isLoading && data && expanded ? (
-        <VStack mt="$3" space="md">
-          <Text textAlign="center" fontSize={22} fontWeight="$bold" color="$textLight900">
-            {t('stock.bags_lots_line', {
-              bags: formatIndianNumber(data.totalBags),
-              lots: data.totalLots,
-            })}
-          </Text>
-          <Box flexDirection="row">
-            <VStack flex={1} alignItems="center" space="xs">
-              <Text fontSize={16} fontWeight="$semibold" color="$textLight900">
-                {formatIndianNumber(data.freshBags)}
+          {expanded ? (
+            <>
+              <View style={styles.divider} />
+              <View style={styles.cols}>
+                <KpiCol value={formatIndianNumber(data.freshBags)} label={t('stock.fresh')} hint={t('stock.fresh_hint')} />
+                <KpiCol value={formatIndianNumber(data.agingBags)} label={t('stock.aging')} hint={t('stock.aging_hint')} />
+                <KpiCol value={formatIndianNumber(data.staleBags)} label={t('stock.stale')} hint={t('stock.stale_hint')} />
+              </View>
+              <Text style={styles.updatedAt}>
+                {t('stock.updated_ago', { time: new Date(data.updatedAt).toLocaleTimeString() })}
               </Text>
-              <Text fontSize={11} color="$textLight500">
-                {t('stock.fresh_hint')}
-              </Text>
-              <Text fontSize={14} fontWeight="$semibold" color="$textLight800">
-                {t('stock.fresh')}
-              </Text>
-            </VStack>
-            <VStack flex={1} alignItems="center" space="xs">
-              <Text fontSize={16} fontWeight="$semibold" color="$textLight900">
-                {formatIndianNumber(data.agingBags)}
-              </Text>
-              <Text fontSize={11} color="$textLight500">
-                {t('stock.aging_hint')}
-              </Text>
-              <Text fontSize={14} fontWeight="$semibold" color="$textLight800">
-                {t('stock.aging')}
-              </Text>
-            </VStack>
-            <VStack flex={1} alignItems="center" space="xs">
-              <Text fontSize={16} fontWeight="$semibold" color="$textLight900">
-                {formatIndianNumber(data.staleBags)}
-              </Text>
-              <Text fontSize={11} color="$textLight500">
-                {t('stock.stale_hint')}
-              </Text>
-              <Text fontSize={14} fontWeight="$semibold" color="$textLight800">
-                {t('stock.stale')}
-              </Text>
-            </VStack>
-          </Box>
-          <Text textAlign="center" fontSize={11} color="$textLight400">
-            {t('stock.updated_ago', { time: new Date(data.updatedAt).toLocaleString() })}
-          </Text>
-        </VStack>
+            </>
+          ) : null}
+        </View>
       ) : null}
-    </Box>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  card: {
+    marginHorizontal: 16,
+    marginBottom: 12,
+    padding: 16,
+    borderRadius: 12,
+    backgroundColor: c.bgSurface,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  sectionLabel: {
+    fontFamily: 'NotoSansMono_400Regular',
+    fontSize: 11,
+    fontWeight: '500',
+    color: c.textTertiary,
+    textTransform: 'uppercase',
+    letterSpacing: 1.1,
+  },
+  chevron: {
+    fontSize: 12,
+    color: c.textTertiary,
+  },
+  loading: {
+    marginTop: 8,
+    fontFamily: 'NotoSans_400Regular',
+    fontSize: 13,
+    color: c.textTertiary,
+  },
+  body: {
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  mainNum: {
+    fontFamily: 'NotoSerif_700Bold',
+    fontSize: 38,
+    fontVariant: ['tabular-nums'],
+    color: c.textPrimary,
+    lineHeight: 44,
+  },
+  mainSub: {
+    fontFamily: 'NotoSans_400Regular',
+    fontSize: 13,
+    color: c.textSecondary,
+    marginTop: 2,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: c.borderDefault,
+    alignSelf: 'stretch',
+    marginVertical: 12,
+  },
+  cols: {
+    flexDirection: 'row',
+    alignSelf: 'stretch',
+  },
+  col: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 3,
+  },
+  colNum: {
+    fontFamily: 'NotoSerif_700Bold',
+    fontSize: 22,
+    fontVariant: ['tabular-nums'],
+    color: c.textPrimary,
+  },
+  colLabel: {
+    fontFamily: 'NotoSans_600SemiBold',
+    fontSize: 12,
+    color: c.textSecondary,
+  },
+  colHint: {
+    fontFamily: 'NotoSans_400Regular',
+    fontSize: 11,
+    color: c.textTertiary,
+  },
+  updatedAt: {
+    marginTop: 8,
+    fontFamily: 'NotoSans_400Regular',
+    fontSize: 11,
+    color: c.textTertiary,
+  },
+});
