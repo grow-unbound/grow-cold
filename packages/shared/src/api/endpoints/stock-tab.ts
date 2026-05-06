@@ -70,7 +70,7 @@ export const CreateStockDeliveryResponseSchema = z.object({
 
 export type CreateStockDeliveryResponse = z.infer<typeof CreateStockDeliveryResponseSchema>;
 
-export const ListLocationsResponseSchema = z.object({
+export const StockTabListLocationsResponseSchema = z.object({
   data: z.array(
     z.object({
       id: uuidSchema,
@@ -79,4 +79,4 @@ export const ListLocationsResponseSchema = z.object({
   ),
 });
 
-export type ListLocationsResponse = z.infer<typeof ListLocationsResponseSchema>;
+export type StockTabListLocationsResponse = z.infer<typeof StockTabListLocationsResponseSchema>;

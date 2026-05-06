@@ -13,3 +13,5 @@ export * from './money-tab';
 export * from './parties-tab';
 export * from './transaction-detail';
 export * from './party-detail';
+export * from './utils/rental-mode';
+export * from './utils/fifo-allocation';

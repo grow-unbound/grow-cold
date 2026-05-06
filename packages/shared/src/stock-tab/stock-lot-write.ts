@@ -15,6 +15,9 @@ export async function insertWarehouseLot(client: SB, input: CreateLotInput): Pro
     throw new Error('balance_bags cannot exceed original_bags');
   }
 
+  const lodgement_date = p.lodgement_date ?? new Date().toISOString().slice(0, 10);
+  const rental_mode = p.rental_mode ?? 'MONTHLY';
+
   const { error } = await client.from('lots').insert({
     warehouse_id: p.warehouse_id,
     customer_id: p.customer_id,
@@ -22,8 +25,8 @@ export async function insertWarehouseLot(client: SB, input: CreateLotInput): Pro
     lot_number: p.lot_number,
     original_bags: p.original_bags,
     balance_bags: balance,
-    lodgement_date: p.lodgement_date,
-    rental_mode: p.rental_mode,
+    lodgement_date,
+    rental_mode,
     location_ids: p.location_ids ?? [],
     driver_name: p.driver_name ?? null,
     vehicle_number: p.vehicle_number ?? null,

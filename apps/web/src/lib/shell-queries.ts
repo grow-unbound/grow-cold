@@ -1,62 +1,102 @@
 'use client';
 
 import {
+  CheckLotNumberResponseSchema,
   CommandCenterActivityResponseSchema,
   CommandCenterAlertsResponseSchema,
   CommandCenterMoneyResponseSchema,
   CommandCenterPartiesResponseSchema,
   CommandCenterSnapshotResponseSchema,
   CommandCenterStockResponseSchema,
+  ConfirmReceiptAllocationRequestSchema,
+  ConfirmReceiptAllocationResponseSchema,
   CreateCustomerRequestSchema,
   CreateCustomerResponseSchema,
   CreateLotRequestSchema,
   CreateLotResponseSchema,
+  CreateOperationalPaymentRequestSchema,
+  CreateOperationalPaymentResponseSchema,
   CreateReceiptRequestSchema,
   CreateReceiptResponseSchema,
   CreateStockDeliveryRequestSchema,
   CreateStockDeliveryResponseSchema,
-  GetLotDetailResponseSchema,
+  CreateWarehouseCashPaymentRequestSchema,
+  CreateWarehouseCashPaymentResponseSchema,
+  CustomerOutstandingResponseSchema,
+  DashboardSummaryResponseSchema,
+  GetLotResponseSchema,
+  GetOperationalPaymentResponseSchema,
+  GetReceiptResponseSchema,
   ListCustomersResponseSchema,
   ListLocationsResponseSchema,
   ListLotsResponseSchema,
+  ListOutstandingAllocatableResponseSchema,
+  ListPaymentTypesResponseSchema,
   ListProductsResponseSchema,
   ListReceiptsResponseSchema,
   MoneyTabMovementsResponseSchema,
   MoneyTabSummaryResponseSchema,
+  PartiesListResponseSchema,
+  PartiesReceivablesSummarySchema,
+  PartyDetailResponseSchema,
+  RecordDeliveryRequestSchema,
+  RecordDeliveryResponseSchema,
   StockTabMovementsResponseSchema,
   StockTabSummaryResponseSchema,
-  CreateWarehouseCashPaymentRequestSchema,
-  CreateWarehouseCashPaymentResponseSchema,
+  StockTabListLocationsResponseSchema,
+  SuggestLotNumberResponseSchema,
+  UpdateLotRequestSchema,
+  UpdateLotResponseSchema,
+  UpdateOperationalPaymentRequestSchema,
+  UpdateOperationalPaymentResponseSchema,
+  UpdateReceiptRequestSchema,
+  UpdateReceiptResponseSchema,
+  checkLotNumberHttpPath,
   commandCenterActivityPath,
   commandCenterAlertsPath,
   commandCenterMoneyPath,
   commandCenterPartiesPath,
   commandCenterSnapshotPath,
   commandCenterStockPath,
+  customerOutstandingHttpPath,
+  customerSchema,
+  dashboardSummaryHttpPath,
+  fetchTransactionDetailPayload,
+  getOperationalPaymentHttpPath,
+  getReceiptHttpPath,
   listCustomersHttpPath,
+  listLocationsHttpPath,
+  listLocationsPath,
   listLotsHttpPath,
+  listOperationalPaymentsHttpPath,
+  listPaymentTypesHttpPath,
   listProductsHttpPath,
   listReceiptsHttpPath,
+  moneyMovementsPath,
+  moneyPaymentsPath,
+  moneySummaryPath,
+  outstandingAllocatableHttpPath,
+  partiesListPath,
+  partiesReceivablesPath,
+  receiptConfirmAllocationHttpPath,
   stockDeliveriesPath,
   stockMovementsPath,
   stockSummaryPath,
-  listLocationsPath,
-  moneyMovementsPath,
-  moneySummaryPath,
-  moneyPaymentsPath,
-  partiesListPath,
-  partiesReceivablesPath,
-  PartiesListResponseSchema,
-  PartiesReceivablesSummarySchema,
-  PartyDetailResponseSchema,
-  customerSchema,
-  fetchTransactionDetailPayload,
+  suggestLotNumberHttpPath,
   type HomeTimeFilter,
 } from '@growcold/shared';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
+import {
+  ChargesBootstrapResponseSchema,
+  LotDeliveriesResponseSchema,
+  SaveChargesRequestSchema,
+  SaveChargesResponseSchema,
+} from '@/lib/charges-api-schemas';
 import { createBrowserSupabaseClient } from '@/lib/supabase-browser';
 import { useDebouncedValue } from '@/lib/use-debounced-value';
+
+type SaveChargesInput = z.infer<typeof SaveChargesRequestSchema>;
 
 async function readError(res: Response): Promise<string> {
   try {
@@ -77,6 +117,18 @@ function lotsListUrl(warehouseId: string, status?: string): string {
   u.searchParams.set('warehouseId', warehouseId);
   if (status) u.searchParams.set('status', status);
   return u.toString();
+}
+
+export function useDashboardSummary(warehouseId: string | null) {
+  return useQuery({
+    queryKey: ['dashboard', 'summary', warehouseId],
+    enabled: Boolean(warehouseId),
+    queryFn: async () => {
+      const u = new URL(dashboardSummaryHttpPath, window.location.origin);
+      u.searchParams.set('warehouseId', warehouseId!);
+      return parseRes(await fetch(u.toString()), DashboardSummaryResponseSchema);
+    },
+  });
 }
 
 function commandCenterUrl(path: string, params: Record<string, string>): string {
@@ -344,7 +396,7 @@ export function useStockLocations(warehouseId: string | null) {
     queryFn: async () =>
       parseRes(
         await fetch(stockUrl(listLocationsPath, { warehouseId: warehouseId! })),
-        ListLocationsResponseSchema,
+        StockTabListLocationsResponseSchema,
       ),
   });
 }
@@ -383,7 +435,7 @@ export function useLotDetail(lotId: string | null) {
     queryKey: ['lots', 'detail', lotId],
     enabled: Boolean(lotId),
     queryFn: async () =>
-      parseRes(await fetch(`${window.location.origin}/api/lots/${lotId}`), GetLotDetailResponseSchema),
+      parseRes(await fetch(`${window.location.origin}/api/lots/${lotId}`), GetLotResponseSchema),
   });
 }
 
@@ -455,6 +507,44 @@ export function useProductsList() {
   });
 }
 
+export function useLocationsList(warehouseId: string | null) {
+  return useQuery({
+    queryKey: ['locations', warehouseId],
+    enabled: Boolean(warehouseId),
+    queryFn: async () => {
+      const u = new URL(listLocationsHttpPath, window.location.origin);
+      u.searchParams.set('warehouseId', warehouseId!);
+      return parseRes(await fetch(u.toString()), ListLocationsResponseSchema);
+    },
+  });
+}
+
+export function useSuggestLotNumber(warehouseId: string | null, bagCount: number, queryEnabled: boolean) {
+  return useQuery({
+    queryKey: ['lots', 'suggest', warehouseId, bagCount],
+    enabled: Boolean(warehouseId) && bagCount > 0 && queryEnabled,
+    queryFn: async () => {
+      const u = new URL(suggestLotNumberHttpPath, window.location.origin);
+      u.searchParams.set('warehouseId', warehouseId!);
+      u.searchParams.set('bagCount', String(bagCount));
+      return parseRes(await fetch(u.toString()), SuggestLotNumberResponseSchema);
+    },
+  });
+}
+
+export async function checkLotNumberAvailable(
+  warehouseId: string,
+  lotNumber: string,
+  excludeLotId?: string,
+): Promise<boolean> {
+  const u = new URL(checkLotNumberHttpPath, window.location.origin);
+  u.searchParams.set('warehouseId', warehouseId);
+  u.searchParams.set('lotNumber', lotNumber);
+  if (excludeLotId) u.searchParams.set('excludeLotId', excludeLotId);
+  const r = await parseRes(await fetch(u.toString()), CheckLotNumberResponseSchema);
+  return r.available;
+}
+
 export function useReceiptsList(warehouseId: string | null) {
   return useQuery({
     queryKey: ['receipts', warehouseId],
@@ -506,6 +596,26 @@ export function useCreateLot(warehouseId: string | null) {
   });
 }
 
+export function useUpdateLot(warehouseId: string | null) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (args: { lotId: string; body: z.infer<typeof UpdateLotRequestSchema> }) => {
+      const parsed = UpdateLotRequestSchema.parse(args.body);
+      const res = await fetch(`${window.location.origin}/api/lots/${args.lotId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(parsed),
+      });
+      return parseRes(res, UpdateLotResponseSchema);
+    },
+    onSuccess: (_d, v) => {
+      void qc.invalidateQueries({ queryKey: ['lots', warehouseId] });
+      void qc.invalidateQueries({ queryKey: ['lots', 'detail', v.lotId] });
+      void qc.invalidateQueries({ queryKey: ['dashboard', 'summary', warehouseId] });
+    },
+  });
+}
+
 export function useCreateReceipt(warehouseId: string | null) {
   const qc = useQueryClient();
   return useMutation({
@@ -522,6 +632,259 @@ export function useCreateReceipt(warehouseId: string | null) {
       void qc.invalidateQueries({ queryKey: ['receipts', warehouseId] });
       void qc.invalidateQueries({ queryKey: ['money', warehouseId] });
       void qc.invalidateQueries({ queryKey: ['command-center'] });
+    },
+  });
+}
+
+function outstandingAllocatableUrl(warehouseId: string, customerId: string): string {
+  const u = new URL(outstandingAllocatableHttpPath, window.location.origin);
+  u.searchParams.set('warehouseId', warehouseId);
+  u.searchParams.set('customerId', customerId);
+  return u.toString();
+}
+
+export function useOutstandingAllocatable(warehouseId: string | null, customerId: string | null) {
+  return useQuery({
+    queryKey: ['outstanding-allocatable', warehouseId, customerId],
+    enabled: Boolean(warehouseId && customerId),
+    staleTime: 60_000,
+    queryFn: async () =>
+      parseRes(
+        await fetch(outstandingAllocatableUrl(warehouseId!, customerId!)),
+        ListOutstandingAllocatableResponseSchema,
+      ),
+  });
+}
+
+export function useReceiptDetail(receiptId: string | null) {
+  return useQuery({
+    queryKey: ['receipts', 'detail', receiptId],
+    enabled: Boolean(receiptId),
+    queryFn: async () =>
+      parseRes(
+        await fetch(`${window.location.origin}${getReceiptHttpPath(receiptId!)}`),
+        GetReceiptResponseSchema,
+      ),
+  });
+}
+
+export function useUpdateReceipt(warehouseId: string | null, receiptId: string | null) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (body: z.infer<typeof UpdateReceiptRequestSchema>) => {
+      const parsed = UpdateReceiptRequestSchema.parse(body);
+      const res = await fetch(`${window.location.origin}${getReceiptHttpPath(receiptId!)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(parsed),
+      });
+      return parseRes(res, UpdateReceiptResponseSchema);
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['receipts', warehouseId] });
+      void qc.invalidateQueries({ queryKey: ['receipts', 'detail', receiptId] });
+      void qc.invalidateQueries({ queryKey: ['dashboard', 'summary', warehouseId] });
+    },
+  });
+}
+
+export function useConfirmReceiptAllocation(warehouseId: string | null, receiptId: string | null) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (body: z.infer<typeof ConfirmReceiptAllocationRequestSchema>) => {
+      const parsed = ConfirmReceiptAllocationRequestSchema.parse(body);
+      const res = await fetch(`${window.location.origin}${receiptConfirmAllocationHttpPath(receiptId!)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(parsed),
+      });
+      return parseRes(res, ConfirmReceiptAllocationResponseSchema);
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['receipts', warehouseId] });
+      void qc.invalidateQueries({ queryKey: ['receipts', 'detail', receiptId] });
+      void qc.invalidateQueries({ queryKey: ['outstanding-allocatable', warehouseId] });
+      void qc.invalidateQueries({ queryKey: ['dashboard', 'summary', warehouseId] });
+    },
+  });
+}
+
+export function useLotDeliveries(lotId: string | null, queryEnabled = true) {
+  return useQuery({
+    queryKey: ['lots', lotId, 'deliveries'],
+    enabled: Boolean(lotId) && queryEnabled,
+    queryFn: async () =>
+      parseRes(
+        await fetch(`${window.location.origin}/api/lots/${lotId}/deliveries`),
+        LotDeliveriesResponseSchema,
+      ),
+  });
+}
+
+export function chargesBootstrapUrl(
+  lotId: string,
+  movement: 'lodgement' | 'delivery',
+  deliveryId: string | null,
+  forNewDelivery = false,
+): string {
+  const u = new URL(`${window.location.origin}/api/lots/${lotId}/charges/bootstrap`);
+  u.searchParams.set('movement', forNewDelivery ? 'lodgement' : movement);
+  if (forNewDelivery) {
+    u.searchParams.set('forNewDelivery', '1');
+    return u.toString();
+  }
+  if (movement === 'delivery' && deliveryId) u.searchParams.set('deliveryId', deliveryId);
+  return u.toString();
+}
+
+export function useChargesBootstrap(
+  lotId: string | null,
+  movement: 'lodgement' | 'delivery',
+  deliveryId: string | null,
+  opts?: { enabled?: boolean; forNewDelivery?: boolean },
+) {
+  const forNewDelivery = opts?.forNewDelivery ?? false;
+  const enabledExtra = opts?.enabled ?? true;
+  const enabled =
+    Boolean(lotId) &&
+    enabledExtra &&
+    (forNewDelivery || movement !== 'delivery' || Boolean(deliveryId));
+
+  const movKey = forNewDelivery ? 'record' : movement;
+  const delKey = forNewDelivery ? 'none' : deliveryId ?? 'none';
+
+  return useQuery({
+    queryKey: ['charges-bootstrap', lotId, movKey, delKey, forNewDelivery ? 'new-del' : ''],
+    enabled,
+    staleTime: 30_000,
+    queryFn: async () =>
+      parseRes(
+        await fetch(chargesBootstrapUrl(lotId!, movement, deliveryId, forNewDelivery)),
+        ChargesBootstrapResponseSchema,
+      ),
+  });
+}
+
+export function useSaveCharges(warehouseId: string | null) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ lotId, body }: { lotId: string; body: SaveChargesInput }) => {
+      const parsed = SaveChargesRequestSchema.parse(body);
+      const res = await fetch(`${window.location.origin}/api/lots/${lotId}/charges`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(parsed),
+      });
+      return parseRes(res, SaveChargesResponseSchema);
+    },
+    onSuccess: (_data, variables) => {
+      void qc.invalidateQueries({ queryKey: ['lots', warehouseId] });
+      void qc.invalidateQueries({ queryKey: ['lots', 'detail', variables.lotId] });
+      void qc.invalidateQueries({
+        queryKey: ['charges-bootstrap', variables.lotId],
+      });
+      void qc.invalidateQueries({ queryKey: ['dashboard', 'summary', warehouseId] });
+    },
+  });
+}
+
+export function usePaymentTypes(warehouseId: string | null) {
+  return useQuery({
+    queryKey: ['payment-types', warehouseId],
+    enabled: Boolean(warehouseId),
+    queryFn: async () =>
+      parseRes(await fetch(`${window.location.origin}${listPaymentTypesHttpPath}`), ListPaymentTypesResponseSchema),
+  });
+}
+
+export function useOperationalPaymentDetail(id: string | null) {
+  return useQuery({
+    queryKey: ['operational-payments', 'detail', id],
+    enabled: Boolean(id),
+    queryFn: async () =>
+      parseRes(
+        await fetch(`${window.location.origin}${getOperationalPaymentHttpPath(id!)}`),
+        GetOperationalPaymentResponseSchema,
+      ),
+  });
+}
+
+export function useCreateOperationalPayment(warehouseId: string | null) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (body: z.infer<typeof CreateOperationalPaymentRequestSchema>) => {
+      const parsed = CreateOperationalPaymentRequestSchema.parse(body);
+      const res = await fetch(`${window.location.origin}${listOperationalPaymentsHttpPath}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(parsed),
+      });
+      return parseRes(res, CreateOperationalPaymentResponseSchema);
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['operational-payments', warehouseId] });
+      void qc.invalidateQueries({ queryKey: ['dashboard', 'summary', warehouseId] });
+    },
+  });
+}
+
+export function useUpdateOperationalPayment(warehouseId: string | null, paymentId: string | null) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (body: z.infer<typeof UpdateOperationalPaymentRequestSchema>) => {
+      const parsed = UpdateOperationalPaymentRequestSchema.parse(body);
+      const res = await fetch(`${window.location.origin}${getOperationalPaymentHttpPath(paymentId!)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(parsed),
+      });
+      return parseRes(res, UpdateOperationalPaymentResponseSchema);
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['operational-payments', warehouseId] });
+      void qc.invalidateQueries({ queryKey: ['operational-payments', 'detail', paymentId] });
+      void qc.invalidateQueries({ queryKey: ['dashboard', 'summary', warehouseId] });
+    },
+  });
+}
+
+export function useCustomerOutstanding(customerId: string | null, warehouseId: string | null) {
+  return useQuery({
+    queryKey: ['customers', customerId, 'outstanding', warehouseId],
+    enabled: Boolean(customerId && warehouseId),
+    staleTime: 30_000,
+    queryFn: async () => {
+      const u = new URL(`${window.location.origin}${customerOutstandingHttpPath(customerId!)}`);
+      u.searchParams.set('warehouseId', warehouseId!);
+      return parseRes(await fetch(u.toString()), CustomerOutstandingResponseSchema);
+    },
+  });
+}
+
+type RecordDeliveryInput = z.infer<typeof RecordDeliveryRequestSchema>;
+
+export function useRecordDelivery(warehouseId: string | null) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (args: { lotId: string; body: RecordDeliveryInput }) => {
+      const parsed = RecordDeliveryRequestSchema.parse(args.body);
+      const res = await fetch(`${window.location.origin}/api/lots/${args.lotId}/deliveries`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(parsed),
+      });
+      return parseRes(res, RecordDeliveryResponseSchema);
+    },
+    onSuccess: (_data, variables) => {
+      void qc.invalidateQueries({ queryKey: ['lots', warehouseId] });
+      void qc.invalidateQueries({ queryKey: ['lots', 'detail', variables.lotId] });
+      void qc.invalidateQueries({ queryKey: ['lots', variables.lotId, 'deliveries'] });
+      void qc.invalidateQueries({ queryKey: ['charges-bootstrap', variables.lotId] });
+      void qc.invalidateQueries({
+        predicate: (q) =>
+          Array.isArray(q.queryKey) && q.queryKey[0] === 'customers' && q.queryKey[2] === 'outstanding',
+      });
+      void qc.invalidateQueries({ queryKey: ['dashboard', 'summary', warehouseId] });
     },
   });
 }

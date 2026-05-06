@@ -1,12 +1,17 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { resources } from '@growcold/shared';
+import { chargesEn } from '@/locales/charges-en';
+import { chargesTe } from '@/locales/charges-te';
 
 void i18n.use(initReactI18next).init({
   lng: 'en',
   fallbackLng: 'te',
-  ns: ['nav', 'menu', 'common', 'login', 'signup', 'authVerify', 'onboarding', 'pages', 'home'],
+  ns: ['nav', 'menu', 'common', 'login', 'signup', 'authVerify', 'onboarding', 'pages', 'home', 'charges'],
   defaultNS: 'nav',
+  react: {
+    useSuspense: false,
+  },
   resources: {
     te: {
       nav: resources.te.nav,
@@ -18,6 +23,7 @@ void i18n.use(initReactI18next).init({
       onboarding: resources.te.onboarding,
       pages: resources.te.pages,
       home: resources.te.home,
+      charges: chargesTe,
     },
     en: {
       nav: resources.en.nav,
@@ -29,6 +35,7 @@ void i18n.use(initReactI18next).init({
       onboarding: resources.en.onboarding,
       pages: resources.en.pages,
       home: resources.en.home,
+      charges: chargesEn,
     },
   },
   interpolation: { escapeValue: false },

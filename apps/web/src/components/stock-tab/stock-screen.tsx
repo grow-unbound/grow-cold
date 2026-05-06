@@ -48,9 +48,7 @@ export function StockScreen() {
   const debouncedSearch = useDebouncedValue(search, 300);
   const [filter, setFilter] = useState<StockMovementFilter>('all');
   const [statusExpanded, setStatusExpanded] = useState(true);
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-    __today__: true,
-  });
+  const [sectionExpanded, setSectionExpanded] = useState<Record<string, boolean>>({});
   const [recordOpen, setRecordOpen] = useState(false);
 
   const summaryQ = useStockSummary(warehouseId);
@@ -87,17 +85,14 @@ export function StockScreen() {
     return keys.map((key) => ({ key, items: map.get(key) ?? [] }));
   }, [filtered]);
 
-  useEffect(() => {
-    setExpandedSections((prev) => {
-      const next = { ...prev };
-      for (const g of grouped) {
-        if (next[g.key] === undefined) {
-          next[g.key] = g.key === '__today__';
-        }
-      }
-      return next;
-    });
-  }, [grouped]);
+  const expandedSections = useMemo(() => {
+    const out: Record<string, boolean> = {};
+    for (const g of grouped) {
+      const o = sectionExpanded[g.key];
+      out[g.key] = o !== undefined ? o : g.key === '__today__';
+    }
+    return out;
+  }, [grouped, sectionExpanded]);
 
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const fetchNextPage = movementsQ.fetchNextPage;
@@ -118,7 +113,11 @@ export function StockScreen() {
   }, [hasNextPage, fetchNextPage, grouped.length]);
 
   const toggleSection = useCallback((key: string) => {
-    setExpandedSections((s) => ({ ...s, [key]: !s[key] }));
+    setSectionExpanded((u) => {
+      const defaultOpen = key === '__today__';
+      const isOpen = u[key] !== undefined ? u[key]! : defaultOpen;
+      return { ...u, [key]: !isOpen };
+    });
   }, []);
 
   if (!warehouseId) {

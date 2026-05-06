@@ -1,4 +1,4 @@
-import { ListLocationsResponseSchema, StockTabWarehouseQuerySchema } from '@growcold/shared';
+import { StockTabListLocationsResponseSchema, StockTabWarehouseQuerySchema } from '@growcold/shared';
 import { NextResponse } from 'next/server';
 import { authorizeCommandCenterRequest } from '@/lib/command-center-route';
 
@@ -16,7 +16,7 @@ export async function GET(request: Request) {
     if (error) throw error;
 
     return NextResponse.json(
-      ListLocationsResponseSchema.parse({ data: data ?? [] }),
+      StockTabListLocationsResponseSchema.parse({ data: data ?? [] }),
     );
   } catch (e) {
     console.error(e);

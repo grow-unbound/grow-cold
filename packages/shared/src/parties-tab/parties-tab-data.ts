@@ -103,7 +103,7 @@ export async function fetchPartiesPage(
   });
   if (error) throw error;
   const rows = data ?? [];
-  const filterTotal = rows.length > 0 ? Number(rows[0].filter_total) : 0;
+  const filterTotal = rows.length > 0 ? Number(rows[0]?.filter_total ?? 0) : 0;
   const items: PartiesListRowDto[] = rows.map((row) => mapListRow(row));
   const hasMore = off + items.length < filterTotal;
   return {

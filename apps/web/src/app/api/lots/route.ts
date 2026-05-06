@@ -3,9 +3,12 @@ import {
   CreateLotResponseSchema,
   ListLotsQuerySchema,
   ListLotsResponseSchema,
+  computeRentalModeFromLodgementDate,
 } from '@growcold/shared';
 import { NextResponse } from 'next/server';
 import { toListLotRow } from '@/lib/api-row-mappers';
+import { assembleLotDetailRow } from '@/lib/lot-detail-assemble';
+import { todayInBusinessTimezone } from '@/lib/business-date';
 import { createSupabaseRouteHandlerClient } from '@/lib/supabase-route-handler';
 import { getRoleForWarehouse } from '@/lib/warehouse-role';
 
@@ -118,6 +121,30 @@ export async function POST(request: Request) {
     );
   }
 
+  const lodgement_date = p.lodgement_date ?? todayInBusinessTimezone();
+
+  const { data: ws, error: wsErr } = await supabase
+    .from('warehouse_settings')
+    .select('yearly_rent_cutoff_month, yearly_rent_cutoff_day')
+    .eq('warehouse_id', p.warehouse_id)
+    .maybeSingle();
+
+  if (wsErr || !ws) {
+    console.error(wsErr);
+    return NextResponse.json(
+      { error: 'Warehouse settings not found', code: 'DB_ERROR' },
+      { status: 500 },
+    );
+  }
+
+  const rental_mode =
+    p.rental_mode ??
+    computeRentalModeFromLodgementDate(
+      lodgement_date,
+      ws.yearly_rent_cutoff_month,
+      ws.yearly_rent_cutoff_day,
+    );
+
   const { data: inserted, error } = await supabase
     .from('lots')
     .insert({
@@ -127,8 +154,8 @@ export async function POST(request: Request) {
       lot_number: p.lot_number,
       original_bags: p.original_bags,
       balance_bags: balance,
-      lodgement_date: p.lodgement_date,
-      rental_mode: p.rental_mode,
+      lodgement_date,
+      rental_mode,
       location_ids: p.location_ids ?? [],
       driver_name: p.driver_name ?? null,
       vehicle_number: p.vehicle_number ?? null,
@@ -143,16 +170,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Could not create lot', code: 'DB_ERROR' }, { status: 500 });
   }
 
-  const [{ data: cust }, { data: prod }] = await Promise.all([
-    supabase.from('customers').select('customer_name').eq('id', inserted.customer_id).single(),
-    supabase.from('products').select('product_name').eq('id', inserted.product_id).single(),
-  ]);
-
-  const row = toListLotRow(
-    inserted,
-    cust?.customer_name ?? 'Unknown',
-    prod?.product_name ?? 'Unknown',
-  );
+  const row = await assembleLotDetailRow(supabase, inserted);
   const out = CreateLotResponseSchema.parse({ data: row });
   return NextResponse.json(out);
 }
