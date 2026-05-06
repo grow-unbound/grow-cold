@@ -62,49 +62,49 @@ export default function LotDetailPage() {
             {t('inventory.add_delivery_cta')}
           </Link>
           {role !== 'STAFF' ? (
-          <div className="relative self-end">
-            <button
-              type="button"
-              className="min-h-touch min-w-touch rounded-base border border-neutral-200 p-2 text-neutral-700 hover:bg-neutral-50"
-              aria-label={t('inventory.edit_lot')}
-              aria-expanded={menuOpen}
-              aria-haspopup="true"
-              onClick={() => setMenuOpen((o) => !o)}
-            >
-              <MoreVertical className="h-5 w-5" aria-hidden />
-            </button>
-            {menuOpen ? (
-              <div
-                className="absolute right-0 z-20 mt-1 min-w-[10rem] rounded-base border border-neutral-200 bg-white py-1 shadow-lg"
-                role="menu"
+            <div className="relative self-end">
+              <button
+                type="button"
+                className="min-h-touch min-w-touch rounded-base border border-neutral-200 p-2 text-neutral-700 hover:bg-neutral-50"
+                aria-label={t('inventory.edit_lot')}
+                aria-expanded={menuOpen}
+                aria-haspopup="true"
+                onClick={() => setMenuOpen((o) => !o)}
               >
-                <Link
-                  href={`/inventory/${lotId}/charges`}
-                  className="block px-3 py-2 text-sm text-neutral-900 hover:bg-neutral-50"
-                  role="menuitem"
-                  onClick={() => setMenuOpen(false)}
+                <MoreVertical className="h-5 w-5" aria-hidden />
+              </button>
+              {menuOpen ? (
+                <div
+                  className="absolute right-0 z-20 mt-1 min-w-[10rem] rounded-base border border-neutral-200 bg-white py-1 shadow-lg"
+                  role="menu"
                 >
-                  {tCharges('title')}
-                </Link>
-                <Link
-                  href={`/transactions/payments/new?lotId=${encodeURIComponent(lotId)}`}
-                  className="block px-3 py-2 text-sm text-neutral-900 hover:bg-neutral-50"
-                  role="menuitem"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {t('operational_payment.add_from_lot')}
-                </Link>
-                <Link
-                  href={`/inventory/${lotId}/edit`}
-                  className="block px-3 py-2 text-sm text-neutral-900 hover:bg-neutral-50"
-                  role="menuitem"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {t('inventory.edit_lot')}
-                </Link>
-              </div>
-            ) : null}
-          </div>
+                  <Link
+                    href={`/inventory/${lotId}/charges`}
+                    className="block px-3 py-2 text-sm text-neutral-900 hover:bg-neutral-50"
+                    role="menuitem"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {tCharges('title')}
+                  </Link>
+                  <Link
+                    href={`/transactions/payments/new?lotId=${encodeURIComponent(lotId)}`}
+                    className="block px-3 py-2 text-sm text-neutral-900 hover:bg-neutral-50"
+                    role="menuitem"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {t('operational_payment.add_from_lot')}
+                  </Link>
+                  <Link
+                    href={`/inventory/${lotId}/edit`}
+                    className="block px-3 py-2 text-sm text-neutral-900 hover:bg-neutral-50"
+                    role="menuitem"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {t('inventory.edit_lot')}
+                  </Link>
+                </div>
+              ) : null}
+            </div>
           ) : null}
         </div>
       </div>
@@ -136,7 +136,7 @@ export default function LotDetailPage() {
         </div>
         <div>
           <p className="text-caption font-medium text-neutral-500">{t('inventory.locations')}</p>
-          <p className="text-sm text-neutral-900">{lot.location_ids.length}</p>
+          <p className="text-sm text-neutral-900">{(lot.location_ids ?? []).length}</p>
         </div>
         <div>
           <p className="text-caption font-medium text-neutral-500">{t('inventory.driver_name')}</p>

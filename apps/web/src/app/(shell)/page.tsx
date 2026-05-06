@@ -1,127 +1,95 @@
 'use client';
 
-import { formatINR } from '@growcold/shared';
-import Link from 'next/link';
-import { useTranslation } from 'react-i18next';
-import { useDashboardSummary } from '@/lib/shell-queries';
+import {
+  AlertsSection,
+  BusinessSnapshot,
+  MoneyPerformance,
+  PartiesPerformance,
+  StockPerformance,
+  TodaysActivity,
+} from '@/components/command-center';
+import {
+  useCommandCenterActivity,
+  useCommandCenterAlerts,
+  useCommandCenterSnapshot,
+} from '@/lib/shell-queries';
 import { useSessionStore } from '@/stores/session-store';
-import { cn } from '@/lib/utils';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function HomePage() {
-  const { t } = useTranslation('pages');
+  const { t } = useTranslation('home');
+  const { t: tPages } = useTranslation('pages');
   const warehouseId = useSessionStore((s) => s.selectedWarehouseId);
-  const q = useDashboardSummary(warehouseId);
+  const [offline, setOffline] = useState(false);
+
+  useEffect(() => {
+    function sync() {
+      setOffline(typeof navigator !== 'undefined' && navigator.onLine === false);
+    }
+    sync();
+    window.addEventListener('online', sync);
+    window.addEventListener('offline', sync);
+    return () => {
+      window.removeEventListener('online', sync);
+      window.removeEventListener('offline', sync);
+    };
+  }, []);
+
+  const snapshot = useCommandCenterSnapshot(warehouseId);
+  const activity = useCommandCenterActivity(warehouseId);
+  const alerts = useCommandCenterAlerts(warehouseId);
+
+  const configured = Boolean(warehouseId);
+  const updatedLabel = t('updated', { time: new Date().toLocaleTimeString() });
 
   if (!warehouseId) {
     return (
       <div className="card w-full">
-        <p className="text-body-sm text-neutral-600">{t('select_warehouse')}</p>
+        <p className="text-body-sm text-neutral-600">{tPages('select_warehouse')}</p>
       </div>
     );
   }
 
-  if (q.isPending) {
+  if (snapshot.isPending) {
     return (
       <div className="card w-full">
-        <p className="text-body-sm text-neutral-600">{t('loading')}</p>
+        <p className="text-body-sm text-neutral-600">{tPages('loading')}</p>
       </div>
     );
   }
 
-  if (q.isError) {
+  if (snapshot.isError) {
     return (
       <div className="card w-full">
-        <p className="text-danger-600 text-body-sm">{t('error_load')}</p>
+        <p className="text-danger-600 text-body-sm">{tPages('error_load')}</p>
       </div>
     );
   }
 
-  const d = q.data;
   return (
-    <div className="flex w-full flex-col gap-3">
-      <section className="rounded-2xl bg-gradient-to-b from-primary-50/80 via-white to-white p-3 ring-1 ring-primary-100/40 sm:p-4">
-        <h1 className="h2 tracking-tight text-neutral-900">{t('home.title')}</h1>
-        <p className="mt-1 text-body-sm text-neutral-600">{t('home.subtitle_hint')}</p>
-        <div className="mt-3 grid grid-cols-1 gap-2.5 sm:mt-4 sm:grid-cols-3 sm:gap-2">
-          <StatCard label={t('home.active_lots')} value={d.lot_counts.ACTIVE} emphasize />
-          <StatCard label={t('home.stale_lots')} value={d.lot_counts.STALE} />
-          <StatCard label={t('home.total_lots')} value={d.total_lots} />
+    <div className="flex w-full flex-col bg-dashboard-surface pb-8">
+      {offline ? (
+        <div className="mb-2 rounded-lg bg-neutral-200 px-4 py-2">
+          <p className="text-sm text-dashboard-muted">{t('offline_banner')}</p>
         </div>
-      </section>
+      ) : null}
 
-      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-        <Link href="/inventory" className="btn-primary w-full min-w-0 sm:min-w-[8rem] sm:flex-1 sm:w-auto">
-          {t('home.open_inventory')}
-        </Link>
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:flex-1">
-          <Link href="/parties" className="btn-secondary w-full min-w-0 sm:w-auto">
-            {t('home.open_parties')}
-          </Link>
-          <Link href="/transactions" className="btn-secondary w-full min-w-0 sm:w-auto">
-            {t('home.open_transactions')}
-          </Link>
-        </div>
+      <div className="flex flex-col gap-0 px-1 sm:px-0">
+        <BusinessSnapshot data={snapshot.data} isLoading={configured && snapshot.isPending} />
+        <TodaysActivity data={activity.data} isLoading={configured && activity.isPending} />
+        <AlertsSection alerts={alerts.data} isLoading={configured && alerts.isPending} />
+
+        {configured ? (
+          <>
+            <h2 className="mt-6 text-base font-bold text-neutral-900">{t('summary')}</h2>
+            <StockPerformance warehouseId={warehouseId} />
+            <MoneyPerformance warehouseId={warehouseId} />
+            <PartiesPerformance warehouseId={warehouseId} />
+            <p className="mt-2 text-xs text-dashboard-muted">{updatedLabel}</p>
+          </>
+        ) : null}
       </div>
-
-      <section className="card-elevated w-full">
-        <h2 className="h3 mb-2">{t('home.recent_deliveries')}</h2>
-        {d.recent_deliveries.length === 0 ? (
-          <p className="text-body-sm text-neutral-500">{t('empty')}</p>
-        ) : (
-          <ul className="divide-y divide-neutral-100">
-            {d.recent_deliveries.map((row) => (
-              <li key={row.id} className="flex flex-col gap-0.5 py-2 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm font-medium text-neutral-900">
-                    {row.customer_name} · {row.product_name}
-                  </p>
-                  <p className="text-caption text-neutral-500">
-                    {row.lot_number} · {row.delivery_date}
-                  </p>
-                </div>
-                <p className="text-sm text-neutral-700">
-                  {t('home.bags_out')}: {row.num_bags_out}
-                </p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <section className="card-elevated w-full">
-        <h2 className="h3 mb-2">{t('home.recent_receipts')}</h2>
-        {d.recent_receipts.length === 0 ? (
-          <p className="text-body-sm text-neutral-500">{t('empty')}</p>
-        ) : (
-          <ul className="divide-y divide-neutral-100">
-            {d.recent_receipts.map((row) => (
-              <li key={row.id} className="flex flex-col gap-0.5 py-2 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm font-medium text-neutral-900">{row.customer_name}</p>
-                  <p className="text-caption text-neutral-500">{row.receipt_date}</p>
-                </div>
-                <p className="text-sm font-semibold text-neutral-900">
-                  {formatINR(Number(row.total_amount))}
-                </p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-    </div>
-  );
-}
-
-function StatCard({ label, value, emphasize }: { label: string; value: number; emphasize?: boolean }) {
-  return (
-    <div
-      className={cn(
-        'card-elevated flex flex-col gap-0.5 p-3 sm:p-3.5',
-        emphasize && 'ring-1 ring-primary-200/50',
-      )}
-    >
-      <span className="text-caption font-semibold uppercase tracking-wide text-neutral-500">{label}</span>
-      <span className="text-3xl font-bold tabular-nums tracking-tight text-neutral-900">{value}</span>
     </div>
   );
 }

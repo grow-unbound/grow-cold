@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { lotStatusSchema, rentalModeSchema } from '../../schemas/common';
+import { lotStatusSchema, rentalModeSchema, uuidSchema } from '../../schemas/common';
 import { lotSchema } from '../../schemas/domain';
 
 /** Canonical path for listing lots (Next route, Edge fn, or PostgREST proxy). */
@@ -59,11 +59,47 @@ export const GetLotParamsSchema = z.object({
   lotId: z.string().uuid(),
 });
 
+/** Single-lot GET: slim row for list/detail UI and forms. */
 export const GetLotResponseSchema = z.object({
   data: lotDetailRowSchema,
 });
 
 export type GetLotResponse = z.infer<typeof GetLotResponseSchema>;
+
+export const lotDetailDeliveryRowSchema = z.object({
+  id: uuidSchema,
+  delivery_date: z.string(),
+  num_bags_out: z.number().int().positive(),
+  driver_name: z.string().nullable().optional(),
+  vehicle_number: z.string().nullable().optional(),
+});
+
+export const lotDetailChargeRowSchema = z.object({
+  id: uuidSchema,
+  charge_type_label: z.string(),
+  charge_amount: z.string(),
+  is_paid: z.boolean(),
+  charge_date: z.string(),
+});
+
+export const lotDetailDataSchema = listLotRowSchema.extend({
+  customer_code: z.string(),
+  location_label: z.string(),
+  delivered_bags_sum: z.number().int().nonnegative(),
+  delivery_count: z.number().int().nonnegative(),
+  deliveries: z.array(lotDetailDeliveryRowSchema),
+  charges: z.array(lotDetailChargeRowSchema),
+});
+
+export type LotDetailDeliveryRow = z.infer<typeof lotDetailDeliveryRowSchema>;
+export type LotDetailChargeRow = z.infer<typeof lotDetailChargeRowSchema>;
+export type LotDetailData = z.infer<typeof lotDetailDataSchema>;
+
+export const GetLotDetailResponseSchema = z.object({
+  data: lotDetailDataSchema,
+});
+
+export type GetLotDetailResponse = z.infer<typeof GetLotDetailResponseSchema>;
 
 export const suggestLotNumberHttpPath = '/api/lots/suggest-number' as const;
 

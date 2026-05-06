@@ -1,0 +1,248 @@
+{
+  "data": {
+    "branding": {
+      "colorScheme": "light",
+      "fonts": [
+        {
+          "family": "Inter",
+          "role": "body"
+        }
+      ],
+      "colors": {
+        "primary": "#00804A",
+        "accent": "#00B14F",
+        "background": "#FFFFFF",
+        "textPrimary": "#383E43",
+        "link": "#00B14F"
+      },
+      "typography": {
+        "fontFamilies": {
+          "primary": "Inter",
+          "heading": "Inter"
+        },
+        "fontStacks": {
+          "heading": [
+            "Inter",
+            "sans-serif"
+          ],
+          "body": [
+            "Inter",
+            "sans-serif"
+          ],
+          "paragraph": [
+            "Inter",
+            "sans-serif"
+          ]
+        },
+        "fontSizes": {
+          "h1": "96px",
+          "h2": "96px",
+          "body": "14px"
+        }
+      },
+      "spacing": {
+        "baseUnit": 4,
+        "borderRadius": "5px"
+      },
+      "components": {
+        "buttonSecondary": {
+          "background": "transparent",
+          "textColor": "#383E43",
+          "borderColor": "#E5E9F0",
+          "borderRadius": "0px",
+          "borderRadiusCorners": {
+            "topLeft": "0px",
+            "topRight": "0px",
+            "bottomRight": "0px",
+            "bottomLeft": "0px"
+          },
+          "shadow": "none"
+        }
+      },
+      "images": {
+        "logo": "https://assets.grab.com/wp-content/uploads/media/grab_logo.png",
+        "favicon": "https://www.grab.com/favicon.ico",
+        "ogImage": "https://www.grab.com/sg/wp-content/uploads/sites/4/2016/08/cropped-GC_FM_IMG_4200.jpg",
+        "logoHref": "https://www.grab.com/sg"
+      },
+      "__llm_logo_reasoning": {
+        "selectedIndex": 0,
+        "reasoning": "Selected #0 because it is visible, located in the header, and matches the brand name 'Grab'.",
+        "confidence": 0.95,
+        "source": "llm"
+      },
+      "__llm_button_reasoning": {
+        "primary": {
+          "index": -1,
+          "text": "N/A",
+          "reasoning": "The only detected button has a transparent background, which is not suitable for a primary CTA. Primary CTAs typically have vibrant, brand-colored backgrounds."
+        },
+        "secondary": {
+          "index": 0,
+          "text": "Show More Services                                \n                        \n                        ",
+          "reasoning": "The button with a transparent background is more suitable as a secondary button due to its subtle appearance."
+        },
+        "confidence": 0.8
+      },
+      "personality": {
+        "tone": "modern",
+        "energy": "medium",
+        "targetAudience": "urban tech-savvy users"
+      },
+      "designSystem": {
+        "framework": "custom",
+        "componentLibrary": ""
+      },
+      "confidence": {
+        "buttons": 0.8,
+        "colors": 0.9,
+        "overall": 0.8500000000000001
+      },
+      "__llm_metadata": {
+        "logoSelection": {
+          "llmCalled": true,
+          "llmSucceeded": true,
+          "finalSource": "llm",
+          "rawLogoSelection": {
+            "selectedLogoIndex": 0,
+            "selectedLogoReasoning": "Selected #0 because it is visible, located in the header, and matches the brand name 'Grab'.",
+            "confidence": 0.95
+          }
+        },
+        "buttonClassification": {
+          "llmCalled": true,
+          "llmSucceeded": true
+        }
+      }
+    },
+    "metadata": {
+      "og:title": "Grab. The Everyday Everything App",
+      "twitter:description": "Grab is Southeast Asia’s leading superapp. It provides everyday services like Deliveries, Mobility, Financial Services, and More.",
+      "ogLocale": "en_US",
+      "msvalidate.01": [
+        "62D708192352CDCE3B73BA9B4A94A95C",
+        "62D708192352CDCE3B73BA9B4A94A95C"
+      ],
+      "twitter:site": "@GrabSG",
+      "twitter:title": "Grab. The Everyday Everything App",
+      "ogUrl": "https://www.grab.com/sg/",
+      "ogSiteName": "Grab",
+      "viewport": "width=device-width, initial-scale=1.0, user-scalable=no",
+      "ogTitle": "Grab. The Everyday Everything App",
+      "robots": "max-image-preview:large",
+      "og:image:height": "1051",
+      "og:url": "https://www.grab.com/sg/",
+      "og:locale": "en_US",
+      "ogImage": "https://www.grab.com/sg/wp-content/uploads/sites/4/2016/08/cropped-GC_FM_IMG_4200.jpg",
+      "title": "\n        Grab. The Everyday Everything App    ",
+      "twitter:image:width": "2000",
+      "og:image:width": "2000",
+      "language": "en-US",
+      "og:image": "https://www.grab.com/sg/wp-content/uploads/sites/4/2016/08/cropped-GC_FM_IMG_4200.jpg",
+      "og:site_name": "Grab",
+      "twitter:card": "summary_large_image",
+      "og:type": "website",
+      "generator": "Elementor 3.20.3; settings: css_print_method-internal, google_font-enabled, font_display-auto",
+      "twitter:image:height": "1051",
+      "facebook-domain-verification": "qrruo04moisardv6fp17skdn44rn0m",
+      "google-site-verification": "vfxuon_ZyPfaowDg8ecP-FSfSGVGrBY08WH0gISpyGk",
+      "ogDescription": "Grab is Southeast Asia’s leading superapp. It provides everyday services like Deliveries, Mobility, Financial Services, and More.",
+      "description": "Grab is Southeast Asia’s leading superapp. It provides everyday services like Deliveries, Mobility, Financial Services, and More.",
+      "twitter:image": "https://www.grab.com/sg/wp-content/uploads/sites/4/2016/08/cropped-GC_FM_IMG_4200.jpg",
+      "og:description": "Grab is Southeast Asia’s leading superapp. It provides everyday services like Deliveries, Mobility, Financial Services, and More.",
+      "favicon": "https://www.grab.com/favicon.ico",
+      "scrapeId": "019dfbbe-7eaf-767b-b517-85293a2963b4",
+      "sourceURL": "https://grab.com",
+      "url": "https://www.grab.com/sg/",
+      "statusCode": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "timezone": "America/New_York",
+      "proxyUsed": "basic",
+      "indexId": "dba5d2df-dccf-4ef5-b6cd-031addd3e20e",
+      "creditsUsed": 1,
+      "concurrencyLimited": false
+    }
+  },
+  "scrape_id": "019dfbbe-7eaf-767b-b517-85293a2963b4",
+  "id": "GL-CXr2ar6oXmkkIsDuLP",
+  "startedAt": "2026-05-06T05:24:18.008Z",
+  "endedAt": "2026-05-06T05:24:26.428Z",
+  "endpoint": "scrape",
+  "formState": {
+    "parseFile": null,
+    "parseFileMeta": null,
+    "extractSetupCompleted": false,
+    "urls": [],
+    "extractSchema": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "company_mission": {
+          "type": "string"
+        },
+        "supports_sso": {
+          "type": "boolean"
+        },
+        "is_open_source": {
+          "type": "boolean"
+        },
+        "is_in_yc": {
+          "type": "boolean"
+        }
+      }
+    },
+    "extractPrompt": "Extract the company details, following the schema.",
+    "enableWebSearch": false,
+    "constrainUrls": false,
+    "options": {
+      "onlyMainContent": false,
+      "parsePDF": true,
+      "stealthMode": false,
+      "excludeTags": [],
+      "includeTags": [],
+      "waitFor": "",
+      "timeout": "",
+      "maxAge": "2 days",
+      "ignoreSitemap": false,
+      "crawlEntireDomain": false,
+      "sitemap": "include",
+      "limit": "10",
+      "maxDepth": "",
+      "excludePaths": [],
+      "includePaths": [],
+      "includeSubdomains": false,
+      "search": "",
+      "scrapeContentFromSearchResults": true,
+      "timeBasedSearch": "",
+      "location": "",
+      "prompt": ""
+    },
+    "formats": [
+      "branding"
+    ],
+    "sources": [
+      "web"
+    ],
+    "categories": [],
+    "jsonSchema": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "company_name": {
+          "type": "string"
+        },
+        "company_description": {
+          "type": "string"
+        }
+      }
+    },
+    "jsonPrompt": "",
+    "queryPrompt": "",
+    "agent": {},
+    "url": "grab.com",
+    "endpoint": "scrape"
+  },
+  "status": "success",
+  "version": "7vphf0KpXPgDDxxParyEk",
+  "isPreview": false
+}
