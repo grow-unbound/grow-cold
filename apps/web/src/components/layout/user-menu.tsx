@@ -77,7 +77,7 @@ function WarehousePicker({
       <div className="flex flex-col gap-2 px-2 py-1.5">
       <div className="flex items-center gap-2">
         <Building2 className="h-4 w-4 shrink-0 text-text-tertiary" aria-hidden />
-        <span className="text-label-lg font-semibold text-text-secondary">{t('warehouse')}</span>
+        <span className="type-label">{t('warehouse')}</span>
       </div>
       <select
         className="input-base"

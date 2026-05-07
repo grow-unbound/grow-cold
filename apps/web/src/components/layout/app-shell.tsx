@@ -4,7 +4,7 @@ import type { LucideIcon } from 'lucide-react';
 import { Home, IndianRupee, Package, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DesktopInlineSearch } from '@/components/layout/desktop-inline-search';
 import { DesktopWarehouseSwitcher } from '@/components/layout/desktop-warehouse-switcher';
@@ -27,16 +27,60 @@ const tabs: {
   { href: '/transactions', i18nKey: 'money', Icon: IndianRupee },
 ];
 
+const HOME_TAB = { href: '/', end: true, i18nKey: 'home' as NavKey, Icon: Home };
+
+const NAV_GROUPS = [
+  {
+    label: 'Operations',
+    items: [
+      { href: '/inventory', end: false, i18nKey: 'stock' as NavKey, Icon: Package },
+    ],
+  },
+  {
+    label: 'Finance',
+    items: [
+      { href: '/parties', end: false, i18nKey: 'parties' as NavKey, Icon: Users },
+      { href: '/transactions', end: false, i18nKey: 'money' as NavKey, Icon: IndianRupee },
+    ],
+  },
+];
+
 function isTabActive(pathname: string, href: string, end?: boolean) {
   if (end) return pathname === href;
   if (href === '/') return pathname === '/';
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
+function NetworkBadge() {
+  const [online, setOnline] = useState(true);
+  useEffect(() => {
+    const sync = () => setOnline(navigator.onLine);
+    sync();
+    window.addEventListener('online', sync);
+    window.addEventListener('offline', sync);
+    return () => {
+      window.removeEventListener('online', sync);
+      window.removeEventListener('offline', sync);
+    };
+  }, []);
+
+  return online ? (
+    <span className="badge-inward flex items-center gap-1.5 text-small">
+      <span className="inline-block h-1.5 w-1.5 rounded-full bg-inward" aria-hidden />
+      Online
+    </span>
+  ) : (
+    <span className="badge-pending flex items-center gap-1.5 text-small">
+      ⚡ Offline
+    </span>
+  );
+}
+
 function DesktopTopBar() {
   return (
-    <header className="sticky top-0 z-20 hidden h-[52px] w-full shrink-0 bg-transparent lg:flex">
+    <header className="sticky top-0 z-20 hidden h-[52px] w-full shrink-0 border-b border-border bg-surface lg:flex">
       <div className="flex min-h-[52px] w-full min-w-0 items-center justify-end gap-3 px-4">
+        <NetworkBadge />
         <DesktopInlineSearch />
         <DesktopWarehouseSwitcher />
         <UserMenu triggerVariant="avatar-only" />
@@ -111,22 +155,42 @@ export function AppShell({ children }: { children: ReactNode }) {
 function AppShellWordmark() {
   const { t } = useTranslation('common');
   return (
-    <span className="font-display text-xl font-semibold tracking-tight text-text-primary">{t('app_name')}</span>
+    <span className="flex items-center gap-2 font-display text-xl font-semibold tracking-tight text-text-primary">
+      <span className="relative inline-flex h-3.5 w-3.5 shrink-0 rounded-full bg-brand-ui" aria-hidden>
+        <span className="absolute inset-[3px] rounded-full bg-white" />
+      </span>
+      {t('app_name')}
+    </span>
   );
 }
 
 function AppShellNav(props: { pathname: string }) {
   return (
     <>
-      {tabs.map((tab) => (
-        <SidebarNavLink
-          key={tab.href}
-          href={tab.href}
-          end={tab.end}
-          pathname={props.pathname}
-          i18nKey={tab.i18nKey}
-          Icon={tab.Icon}
-        />
+      <SidebarNavLink
+        key={HOME_TAB.href}
+        href={HOME_TAB.href}
+        end={HOME_TAB.end}
+        pathname={props.pathname}
+        i18nKey={HOME_TAB.i18nKey}
+        Icon={HOME_TAB.Icon}
+      />
+      {NAV_GROUPS.map((group) => (
+        <div key={group.label} className="mt-2">
+          <span className="type-label px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wider text-text-tertiary">
+            {group.label}
+          </span>
+          {group.items.map((item) => (
+            <SidebarNavLink
+              key={item.href}
+              href={item.href}
+              end={item.end}
+              pathname={props.pathname}
+              i18nKey={item.i18nKey}
+              Icon={item.Icon}
+            />
+          ))}
+        </div>
       ))}
     </>
   );
@@ -148,18 +212,18 @@ function BottomTabLink(props: {
         href={props.href}
         className={cn(
           'flex min-h-touch flex-col items-center justify-center gap-1 px-1.5 py-1 text-center transition-colors',
-          active ? 'text-brand-text' : 'text-text-tertiary hover:text-text-primary',
+          active ? 'text-brand-ui' : 'text-text-tertiary hover:text-text-primary',
         )}
       >
         <Icon
-          className={cn('h-5 w-5 shrink-0', active ? 'text-brand-text' : 'text-text-tertiary')}
+          className={cn('h-5 w-5 shrink-0', active ? 'text-brand-ui' : 'text-text-tertiary')}
           strokeWidth={active ? 2.25 : 1.75}
           aria-hidden
         />
         <span
           className={cn(
             'text-caption font-semibold leading-tight',
-            active ? 'text-brand-text' : 'text-text-tertiary',
+            active ? 'text-brand-ui' : 'text-text-tertiary',
           )}
         >
           {t(props.i18nKey)}
@@ -185,12 +249,12 @@ function SidebarNavLink(props: {
       className={cn(
         'flex h-9 items-center gap-2.5 rounded-lg px-3 text-sm transition-colors',
         active
-          ? 'bg-brand-subtle font-semibold text-brand-text'
+          ? 'bg-brand-ui font-semibold text-white'
           : 'font-medium text-text-secondary hover:bg-surface-subtle',
       )}
     >
       <Icon
-        className={cn('h-4 w-4 shrink-0', active ? 'text-brand-text' : 'text-text-tertiary')}
+        className={cn('h-4 w-4 shrink-0', active ? 'text-white' : 'text-text-tertiary')}
         strokeWidth={active ? 2.25 : 1.75}
         aria-hidden
       />

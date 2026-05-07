@@ -8,6 +8,7 @@ import { Text as RNText } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { MoneyTabMovementRowDto } from '@growcold/shared';
 import { colors as c } from '@growcold/tokens';
+import { Search } from 'lucide-react-native';
 import { useAuthReady } from '../../features/home/useAuthReady';
 import { useMoneyMovementsQuery, useMoneySummaryQuery } from '../../features/money/useMoneyQueries';
 import { useDebouncedValue } from '../../features/home/useDebouncedValue';
@@ -166,7 +167,17 @@ export function MoneyScreen() {
         borderBottomWidth={1}
         borderColor="$borderLight200"
       >
-        <Box position="relative">
+        <HStack
+          alignItems="center"
+          bg="$bgSurface"
+          borderWidth={1.5}
+          borderColor="$borderDefault"
+          borderRadius={10}
+          px="$3"
+          space="sm"
+          style={{ height: 44 }}
+        >
+          <Search size={16} color={c.textTertiary} strokeWidth={1.75} />
           <TextInput
             value={search}
             onChangeText={setSearch}
@@ -174,10 +185,7 @@ export function MoneyScreen() {
             placeholderTextColor={c.textTertiary}
             style={styles.searchInput}
           />
-          <Text position="absolute" left={12} top={14} fontSize={16} color="$textTertiary">
-            🔍
-          </Text>
-        </Box>
+        </HStack>
         <Box mt="$2">
           <FilterChips value={filter} onChange={setFilter} />
         </Box>
@@ -275,11 +283,7 @@ export function MoneyScreen() {
 
 const styles = StyleSheet.create({
   searchInput: {
-    height: 48,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingLeft: 40,
-    backgroundColor: c.bgSubtle,
+    flex: 1,
     fontSize: 16,
     color: c.textPrimary,
     fontFamily: 'NotoSans_400Regular',

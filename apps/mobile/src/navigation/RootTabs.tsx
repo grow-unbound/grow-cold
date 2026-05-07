@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     color: t.textTertiary,
   },
   labelActive: {
-    color: t.brandText,
+    color: t.brandUi,
     fontWeight: '600',
     fontFamily: 'NotoSans_600SemiBold',
   },

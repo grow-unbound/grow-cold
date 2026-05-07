@@ -41,7 +41,7 @@ export function IndiaPhoneField({
 
   return (
     <div className="form-field">
-      <label htmlFor={id} className="text-label-lg font-semibold text-text-secondary">
+      <label htmlFor={id} className="type-label">
         {label}
       </label>
       <div

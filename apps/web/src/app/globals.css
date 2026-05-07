@@ -90,3 +90,32 @@
   0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
+@layer components {
+  .card {
+    transition: box-shadow var(--duration-fast) var(--ease-out),
+                transform var(--duration-fast) var(--ease-out);
+  }
+  .card:hover {
+    box-shadow: 0 4px 12px rgba(28, 26, 22, 0.08), 0 2px 4px rgba(28, 26, 22, 0.04);
+  }
+  .card:active {
+    transform: scale(0.985);
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .chip-active,
+  .chip-inactive {
+    transition: background-color var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out),
+                border-color var(--duration-fast) var(--ease-out),
+                transform var(--duration-fast) var(--ease-out);
+  }
+  .btn-primary:active,
+  .btn-secondary:active,
+  .chip-active:active,
+  .chip-inactive:active {
+    transform: scale(0.97);
+  }
+}

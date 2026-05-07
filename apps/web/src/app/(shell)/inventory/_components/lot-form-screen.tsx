@@ -715,7 +715,7 @@ export function LotFormScreen({ mode, lotId, presentation = 'route' }: LotFormSc
       {mode === 'edit' && hasDeliveries ? (
         <>
           <div className="form-field">
-            <span className="text-label-lg font-semibold text-text-secondary">{t('inventory.party')} *</span>
+            <span className="type-label">{t('inventory.party')} *</span>
             <div className="input-base min-h-touch bg-surface-subtle text-text-primary">
               {selectedParty
                 ? partyLabel(selectedParty.customer_code, selectedParty.customer_name)
@@ -723,7 +723,7 @@ export function LotFormScreen({ mode, lotId, presentation = 'route' }: LotFormSc
             </div>
           </div>
           <div className="form-field">
-            <span className="text-label-lg font-semibold text-text-secondary">{t('inventory.product')} *</span>
+            <span className="type-label">{t('inventory.product')} *</span>
             <div className="input-base min-h-touch bg-surface-subtle text-text-primary">
               {selectedProduct?.product_name ?? '—'}
             </div>
@@ -734,7 +734,7 @@ export function LotFormScreen({ mode, lotId, presentation = 'route' }: LotFormSc
       {mode === 'edit' && !hasDeliveries ? (
         <>
           <div className="form-field">
-            <label className="text-label-lg font-semibold text-text-secondary" htmlFor="party_pick">
+            <label className="type-label" htmlFor="party_pick">
               {t('inventory.party')} *
             </label>
             <select
@@ -756,7 +756,7 @@ export function LotFormScreen({ mode, lotId, presentation = 'route' }: LotFormSc
             ) : null}
           </div>
           <div className="form-field">
-            <label className="text-label-lg font-semibold text-text-secondary" htmlFor="product_pick">
+            <label className="type-label" htmlFor="product_pick">
               {t('inventory.product')} *
             </label>
             <select
@@ -782,7 +782,7 @@ export function LotFormScreen({ mode, lotId, presentation = 'route' }: LotFormSc
 
       <div className="grid gap-3 md:grid-cols-2">
         <div className="form-field">
-          <label htmlFor="original_bags" className="text-label-lg font-semibold text-text-secondary">
+          <label htmlFor="original_bags" className="type-label">
             {t('inventory.bags')} *
           </label>
           <div className="flex items-center gap-2">
@@ -806,7 +806,7 @@ export function LotFormScreen({ mode, lotId, presentation = 'route' }: LotFormSc
           ) : null}
         </div>
         <div className="form-field">
-          <label htmlFor="lot_number" className="text-label-lg font-semibold text-text-secondary">
+          <label htmlFor="lot_number" className="type-label">
             {t('inventory.lot_number')} *
           </label>
           <div className="flex items-start gap-2">
@@ -870,7 +870,7 @@ export function LotFormScreen({ mode, lotId, presentation = 'route' }: LotFormSc
       </div>
 
       <div className="form-field">
-        <span className="text-label-lg font-semibold text-text-secondary">{t('inventory.locations')} *</span>
+        <span className="type-label">{t('inventory.locations')} *</span>
         <LocationsMultiSelect
           locations={locations}
           value={locIdsWatch ?? []}
@@ -886,7 +886,7 @@ export function LotFormScreen({ mode, lotId, presentation = 'route' }: LotFormSc
       </div>
 
       <div className="form-field">
-        <label htmlFor="notes" className="text-label-lg font-semibold text-text-secondary">
+        <label htmlFor="notes" className="type-label">
           {t('inventory.notes')}
         </label>
         <textarea id="notes" className="input-base min-h-[4rem]" {...form.register('notes')} />
@@ -895,7 +895,7 @@ export function LotFormScreen({ mode, lotId, presentation = 'route' }: LotFormSc
       <div className="rounded-base border border-border bg-surface-subtle/40 p-3">
         <button
           type="button"
-          className="flex w-full items-center justify-between text-left text-label-lg font-semibold text-text-secondary"
+          className="flex w-full items-center justify-between text-left type-label"
           onClick={() => setTransportOpen((o) => !o)}
           aria-expanded={transportOpen}
         >
@@ -905,13 +905,13 @@ export function LotFormScreen({ mode, lotId, presentation = 'route' }: LotFormSc
         {transportOpen ? (
           <div className="mt-3 flex flex-col gap-3">
             <div className="form-field">
-              <label htmlFor="driver_name" className="text-label-lg font-semibold text-text-secondary">
+              <label htmlFor="driver_name" className="type-label">
                 {t('inventory.driver_name')}
               </label>
               <input id="driver_name" className="input-base" {...form.register('driver_name')} />
             </div>
             <div className="form-field">
-              <label htmlFor="vehicle_number" className="text-label-lg font-semibold text-text-secondary">
+              <label htmlFor="vehicle_number" className="type-label">
                 {t('inventory.vehicle_number')}
               </label>
               <input id="vehicle_number" className="input-base" {...form.register('vehicle_number')} />
@@ -924,7 +924,7 @@ export function LotFormScreen({ mode, lotId, presentation = 'route' }: LotFormSc
         <div className="rounded-base border border-border bg-surface-subtle/40 p-3">
           <button
             type="button"
-            className="flex w-full items-center justify-between text-left text-label-lg font-semibold text-text-secondary"
+            className="flex w-full items-center justify-between text-left type-label"
             onClick={() => setChargesOpen((o) => !o)}
             aria-expanded={chargesOpen}
           >
@@ -945,13 +945,13 @@ export function LotFormScreen({ mode, lotId, presentation = 'route' }: LotFormSc
                     key={row.product_charge_type_id}
                     className="rounded-base border border-border bg-white p-3 shadow-sm"
                   >
-                    <p className="text-label-lg font-semibold text-text-primary">
+                    <p className="font-mono text-[11px] font-medium uppercase tracking-[0.1em] text-text-primary">
                       {row.display_name}
                       {rateLabel}
                     </p>
                     {row.is_transport ? (
                       <div className="form-field mt-2">
-                        <label className="text-label-lg font-semibold text-text-secondary">
+                        <label className="type-label">
                           {t('inventory.charges_receivable')}
                         </label>
                         <input
@@ -971,7 +971,7 @@ export function LotFormScreen({ mode, lotId, presentation = 'route' }: LotFormSc
                     ) : (
                       <>
                         <div className="form-field mt-2">
-                          <label className="text-label-lg font-semibold text-text-secondary">
+                          <label className="type-label">
                             {t('inventory.num_bags_charge')}
                           </label>
                           <input
@@ -997,7 +997,7 @@ export function LotFormScreen({ mode, lotId, presentation = 'route' }: LotFormSc
                     )}
                     {row.has_labor ? (
                       <div className="form-field mt-2">
-                        <label className="text-label-lg font-semibold text-text-secondary">
+                        <label className="type-label">
                           {t('inventory.charges_paid_field')}
                         </label>
                         <input
@@ -1033,7 +1033,7 @@ export function LotFormScreen({ mode, lotId, presentation = 'route' }: LotFormSc
                   </div>
                 );
               })}
-              <p className="text-label-lg font-semibold text-text-primary">
+              <p className="font-mono text-[11px] font-medium uppercase tracking-[0.1em] text-text-primary">
                 {t('inventory.total_receivable')}: ₹
                 {round2(
                   chargeRows.reduce((s, r) => s + (chargeDraft[r.product_charge_type_id]?.recv ?? 0), 0),

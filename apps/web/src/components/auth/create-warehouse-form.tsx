@@ -70,7 +70,7 @@ export function CreateWarehouseForm() {
       </div>
       <form className="flex flex-col gap-3" onSubmit={onSubmit} noValidate>
         <div className="form-field">
-          <label htmlFor="wh-name" className="text-label-lg font-semibold text-text-secondary">
+          <label htmlFor="wh-name" className="type-label">
             {t('name_label')}
           </label>
           <input id="wh-name" disabled={busy} className="input-base" {...form.register('name')} />
@@ -81,13 +81,13 @@ export function CreateWarehouseForm() {
           ) : null}
         </div>
         <div className="form-field">
-          <label htmlFor="wh-loc" className="text-label-lg font-semibold text-text-secondary">
+          <label htmlFor="wh-loc" className="type-label">
             {t('location_label')}
           </label>
           <input id="wh-loc" disabled={busy} className="input-base" {...form.register('location')} />
         </div>
         <div className="form-field">
-          <label htmlFor="wh-cap" className="text-label-lg font-semibold text-text-secondary">
+          <label htmlFor="wh-cap" className="type-label">
             {t('capacity_label')}
           </label>
           <input

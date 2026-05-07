@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text as RNText, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors as c } from '@growcold/tokens';
+import { Search } from 'lucide-react-native';
 import { useAuthReady } from '../../features/home/useAuthReady';
 import { useDebouncedValue } from '../../features/home/useDebouncedValue';
 import { usePartiesListQuery, usePartiesReceivablesQuery } from '../../features/parties/usePartiesQueries';
@@ -101,7 +102,17 @@ export function PartiesScreen() {
       </HStack>
 
       <VStack px="$3" pt="$2" pb="$2" space="sm" bg="$bgSurface" borderBottomWidth={1} borderColor="$borderLight200">
-        <Box position="relative">
+        <HStack
+          alignItems="center"
+          bg="$bgSurface"
+          borderWidth={1.5}
+          borderColor="$borderDefault"
+          borderRadius={10}
+          px="$3"
+          space="sm"
+          style={{ height: 44 }}
+        >
+          <Search size={16} color={c.textTertiary} strokeWidth={1.75} />
           <TextInput
             value={search}
             onChangeText={setSearch}
@@ -109,10 +120,7 @@ export function PartiesScreen() {
             placeholderTextColor={c.textTertiary}
             style={styles.searchInput}
           />
-          <Text position="absolute" left={12} top={14} fontSize={16} color="$textTertiary">
-            🔍
-          </Text>
-        </Box>
+        </HStack>
 
         <ReceivablesCard
           data={receivablesQ.data ?? null}
@@ -198,11 +206,7 @@ export function PartiesScreen() {
 
 const styles = StyleSheet.create({
   searchInput: {
-    height: 48,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingLeft: 40,
-    backgroundColor: c.bgSubtle,
+    flex: 1,
     fontSize: 16,
     color: c.textPrimary,
     fontFamily: 'NotoSans_400Regular',

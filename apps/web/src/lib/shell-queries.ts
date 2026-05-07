@@ -2,13 +2,6 @@
 
 import {
   CheckLotNumberResponseSchema,
-  CommandCenterActivityResponseSchema,
-  CommandCenterAlertsResponseSchema,
-  CommandCenterHomeResponseSchema,
-  CommandCenterMoneyResponseSchema,
-  CommandCenterPartiesResponseSchema,
-  CommandCenterSnapshotResponseSchema,
-  CommandCenterStockResponseSchema,
   ConfirmReceiptAllocationRequestSchema,
   ConfirmReceiptAllocationResponseSchema,
   CreateCustomerRequestSchema,
@@ -53,13 +46,6 @@ import {
   UpdateReceiptRequestSchema,
   UpdateReceiptResponseSchema,
   checkLotNumberHttpPath,
-  commandCenterActivityPath,
-  commandCenterAlertsPath,
-  commandCenterHomePath,
-  commandCenterMoneyPath,
-  commandCenterPartiesPath,
-  commandCenterSnapshotPath,
-  commandCenterStockPath,
   customerOutstandingHttpPath,
   customerSchema,
   dashboardSummaryHttpPath,
@@ -85,7 +71,6 @@ import {
   stockMovementsPath,
   stockSummaryPath,
   suggestLotNumberHttpPath,
-  type HomeTimeFilter,
 } from '@growcold/shared';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
@@ -97,7 +82,6 @@ import {
   SaveChargesResponseSchema,
 } from '@/lib/charges-api-schemas';
 import { createBrowserSupabaseClient } from '@/lib/supabase-browser';
-import { useDebouncedValue } from '@/lib/use-debounced-value';
 
 type SaveChargesInput = z.infer<typeof SaveChargesRequestSchema>;
 
@@ -134,12 +118,6 @@ export function useDashboardSummary(warehouseId: string | null) {
   });
 }
 
-function commandCenterUrl(path: string, params: Record<string, string>): string {
-  const u = new URL(path, window.location.origin);
-  for (const [k, v] of Object.entries(params)) u.searchParams.set(k, v);
-  return u.toString();
-}
-
 function stockUrl(path: string, params: Record<string, string | undefined>): string {
   const u = new URL(path, window.location.origin);
   for (const [k, v] of Object.entries(params)) {
@@ -154,115 +132,6 @@ function partiesUrl(path: string, params: Record<string, string | undefined>): s
     if (v !== undefined) u.searchParams.set(k, v);
   }
   return u.toString();
-}
-
-export function useCommandCenterSnapshot(warehouseId: string | null) {
-  return useQuery({
-    queryKey: ['command-center', 'snapshot', warehouseId],
-    enabled: Boolean(warehouseId),
-    staleTime: 60_000,
-    queryFn: async () =>
-      parseRes(
-        await fetch(commandCenterUrl(commandCenterSnapshotPath, { warehouseId: warehouseId! })),
-        CommandCenterSnapshotResponseSchema,
-      ),
-  });
-}
-
-export function useCommandCenterActivity(warehouseId: string | null) {
-  return useQuery({
-    queryKey: ['command-center', 'activity', warehouseId],
-    enabled: Boolean(warehouseId),
-    staleTime: 60_000,
-    queryFn: async () =>
-      parseRes(
-        await fetch(commandCenterUrl(commandCenterActivityPath, { warehouseId: warehouseId! })),
-        CommandCenterActivityResponseSchema,
-      ),
-  });
-}
-
-export function useCommandCenterAlerts(warehouseId: string | null) {
-  return useQuery({
-    queryKey: ['command-center', 'alerts', warehouseId],
-    enabled: Boolean(warehouseId),
-    staleTime: 120_000,
-    queryFn: async () =>
-      parseRes(
-        await fetch(commandCenterUrl(commandCenterAlertsPath, { warehouseId: warehouseId! })),
-        CommandCenterAlertsResponseSchema,
-      ),
-  });
-}
-
-export function useCommandCenterHome(warehouseId: string | null) {
-  return useQuery({
-    queryKey: ['command-center', 'home', warehouseId],
-    enabled: Boolean(warehouseId),
-    staleTime: 60_000,
-    queryFn: async () =>
-      parseRes(
-        await fetch(commandCenterUrl(commandCenterHomePath, { warehouseId: warehouseId! })),
-        CommandCenterHomeResponseSchema,
-      ),
-  });
-}
-
-export function useCommandCenterStockPerformance(warehouseId: string | null, filter: HomeTimeFilter) {
-  const debounced = useDebouncedValue(filter, 300);
-  return useQuery({
-    queryKey: ['command-center', 'stock', warehouseId, debounced],
-    enabled: Boolean(warehouseId),
-    staleTime: 60_000,
-    queryFn: async () =>
-      parseRes(
-        await fetch(
-          commandCenterUrl(commandCenterStockPath, {
-            warehouseId: warehouseId!,
-            filter: debounced,
-          }),
-        ),
-        CommandCenterStockResponseSchema,
-      ),
-  });
-}
-
-export function useCommandCenterMoneyPerformance(warehouseId: string | null, filter: HomeTimeFilter) {
-  const debounced = useDebouncedValue(filter, 300);
-  return useQuery({
-    queryKey: ['command-center', 'money', warehouseId, debounced],
-    enabled: Boolean(warehouseId),
-    staleTime: 60_000,
-    queryFn: async () =>
-      parseRes(
-        await fetch(
-          commandCenterUrl(commandCenterMoneyPath, {
-            warehouseId: warehouseId!,
-            filter: debounced,
-          }),
-        ),
-        CommandCenterMoneyResponseSchema,
-      ),
-  });
-}
-
-export function useCommandCenterPartiesPerformance(warehouseId: string | null, filter: HomeTimeFilter) {
-  const debounced = useDebouncedValue(filter, 300);
-  return useQuery({
-    queryKey: ['command-center', 'parties', warehouseId, debounced],
-    enabled: Boolean(warehouseId),
-    staleTime: 60_000,
-    queryFn: async () =>
-      parseRes(
-        await fetch(
-          commandCenterUrl(commandCenterPartiesPath, {
-            warehouseId: warehouseId!,
-            filter: debounced,
-          }),
-        ),
-        CommandCenterPartiesResponseSchema,
-      ),
-  });
 }
 
 export function useStockSummary(warehouseId: string | null) {
