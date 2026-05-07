@@ -18,7 +18,7 @@ export type SnapshotData = {
 export type StockEvent = {
   id: string;
   event_type: string;
-  bags: number;
+  num_bags: number;
   lot_number: string;
   customer_name: string;
   product_name: string;

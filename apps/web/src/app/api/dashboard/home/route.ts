@@ -15,25 +15,25 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized', code: 'UNAUTHORIZED' }, { status: 401 });
   }
 
-  const [snapshotRes, stockEventsRes, moneyEventsRes] = await Promise.all([
+  const [snapshotRes, lotsRes, receiptsRes] = await Promise.all([
     supabase
       .from('warehouse_snapshot')
       .select(
-        'total_bags,total_lots,active_lots,stale_lots,cash_balance,today_receipts,today_payments,total_receivable,today_lodged_bags,today_delivered_bags,today_lodged_lots,today_delivered_lots,last_updated_at',
+        'total_bags,total_lots,active_lots,stale_lots,cash_balance,today_receipts,today_payments,total_receivable,today_lodged_bags,today_delivered_bags,last_updated_at',
       )
       .eq('warehouse_id', warehouseId)
       .single(),
     supabase
-      .from('stock_events')
-      .select('id,event_type,bags,lot_number,customer_name,product_name,event_date')
+      .from('lots')
+      .select('id, lot_number, lodgement_date, original_bags, customers(customer_name), products(product_name)')
       .eq('warehouse_id', warehouseId)
-      .order('event_date', { ascending: false })
+      .order('lodgement_date', { ascending: false })
       .limit(10),
     supabase
-      .from('money_events')
-      .select('id,event_type,amount,customer_name,payment_method,event_date')
+      .from('customer_receipts')
+      .select('id, receipt_date, total_amount, payment_method, customers(customer_name)')
       .eq('warehouse_id', warehouseId)
-      .order('event_date', { ascending: false })
+      .order('receipt_date', { ascending: false })
       .limit(10),
   ]);
 
@@ -41,9 +41,28 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: snapshotRes.error.message }, { status: 500 });
   }
 
+  const stockEvents = (lotsRes.data ?? []).map((r) => ({
+    id: r.id,
+    event_type: 'lodgement',
+    num_bags: r.original_bags,
+    lot_number: r.lot_number,
+    customer_name: (r.customers as { customer_name: string } | null)?.customer_name ?? '—',
+    product_name: (r.products as { product_name: string } | null)?.product_name ?? '—',
+    event_date: r.lodgement_date,
+  }));
+
+  const moneyEvents = (receiptsRes.data ?? []).map((r) => ({
+    id: r.id,
+    event_type: 'receipt',
+    amount: Number(r.total_amount),
+    customer_name: (r.customers as { customer_name: string } | null)?.customer_name ?? '—',
+    payment_method: r.payment_method ?? null,
+    event_date: r.receipt_date ?? '',
+  }));
+
   return NextResponse.json({
     snapshot: snapshotRes.data,
-    stockEvents: stockEventsRes.data ?? [],
-    moneyEvents: moneyEventsRes.data ?? [],
+    stockEvents,
+    moneyEvents,
   });
 }

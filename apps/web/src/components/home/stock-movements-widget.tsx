@@ -38,7 +38,7 @@ export function StockMovementsWidget({ events }: { events: StockEvent[] }) {
                 </div>
                 <div className="shrink-0 text-right">
                   <p className="font-display text-[28px] font-bold leading-none tabular-nums text-text-primary">
-                    {e.bags}
+                    {e.num_bags}
                   </p>
                   <p className="type-label mt-0.5">bags</p>
                 </div>
