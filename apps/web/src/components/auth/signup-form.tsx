@@ -61,7 +61,7 @@ export function SignupForm() {
       </div>
       <form className="flex flex-col gap-3" onSubmit={onSubmit} noValidate>
         <div className="form-field">
-          <label htmlFor="full_name" className="text-label-lg font-semibold text-text-secondary">
+          <label htmlFor="full_name" className="type-label">
             {t('full_name')}
           </label>
           <input
@@ -78,7 +78,7 @@ export function SignupForm() {
           ) : null}
         </div>
         <div className="form-field">
-          <label htmlFor="phone" className="text-label-lg font-semibold text-text-secondary">
+          <label htmlFor="phone" className="type-label">
             {t('phone')}
           </label>
           <input
@@ -97,7 +97,7 @@ export function SignupForm() {
           ) : null}
         </div>
         <div className="form-field">
-          <label htmlFor="email" className="text-label-lg font-semibold text-text-secondary">
+          <label htmlFor="email" className="type-label">
             {t('email')}
           </label>
           <input
@@ -116,7 +116,7 @@ export function SignupForm() {
           ) : null}
         </div>
         <div className="form-field">
-          <label htmlFor="company_name" className="text-label-lg font-semibold text-text-secondary">
+          <label htmlFor="company_name" className="type-label">
             {t('company')}
           </label>
           <input
