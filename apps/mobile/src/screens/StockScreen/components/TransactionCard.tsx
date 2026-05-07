@@ -30,8 +30,8 @@ export function TransactionCard({ row }: Props) {
         {/* Left: emoji + content */}
         <Text style={styles.emoji}>{row.productGroupEmoji}</Text>
         <View style={styles.content}>
-          <Text style={styles.lotNum}>Lot {row.lotNumber}</Text>
-          <Text style={styles.partyName} numberOfLines={1}>{row.customerCode}</Text>
+          <Text style={styles.lotNum}>{row.lotNumber} · {row.transactionDate}</Text>
+          <Text style={styles.partyName} numberOfLines={1}>{row.customerName}</Text>
           <Text style={styles.meta} numberOfLines={1}>{row.productName}</Text>
         </View>
 
@@ -83,10 +83,10 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   partyName: {
-    fontFamily: 'NotoSerif_700Bold',
-    fontSize: 17,
+    fontFamily: 'NotoSerif_600SemiBold',
+    fontSize: 20,
     color: c.textPrimary,
-    lineHeight: 22,
+    lineHeight: 26,
   },
   meta: {
     fontFamily: 'NotoSans_400Regular',

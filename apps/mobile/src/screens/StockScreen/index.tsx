@@ -12,6 +12,7 @@ import { useStockMovementsQuery, useStockSummaryQuery } from '../../features/sto
 import { useAuthReady } from '../../features/home/useAuthReady';
 import { supabase } from '../../lib/supabase';
 import { useWarehouseStore } from '../../stores/warehouse-store';
+import { Search } from 'lucide-react-native';
 import { FilterChips, type StockMovementFilter } from './components/FilterChips';
 import { RecordTransactionSheet } from './components/RecordTransactionSheet';
 import { StockStatusCard } from './components/StockStatusCard';
@@ -165,27 +166,30 @@ export function StockScreen() {
         borderBottomWidth={1}
         borderColor="$borderLight200"
       >
-        <Box position="relative">
+        <HStack
+          alignItems="center"
+          bg="$bgSurface"
+          borderWidth={1.5}
+          borderColor="$borderDefault"
+          borderRadius={10}
+          px="$3"
+          space="sm"
+          style={{ height: 44 }}
+        >
+          <Search size={16} color={c.textTertiary} strokeWidth={1.75} />
           <TextInput
             value={search}
             onChangeText={setSearch}
             placeholder={t('stock.search_placeholder')}
             placeholderTextColor={c.textTertiary}
             style={{
-              height: 48,
-              borderRadius: 12,
-              paddingHorizontal: 16,
-              paddingLeft: 40,
-              backgroundColor: c.bgSubtle,
+              flex: 1,
               fontSize: 16,
               color: c.textPrimary,
               fontFamily: 'NotoSans_400Regular',
             }}
           />
-          <Text position="absolute" left={12} top={14} fontSize={16} color="#7A6F61">
-            🔍
-          </Text>
-        </Box>
+        </HStack>
         <Box mt="$2">
           <FilterChips value={filter} onChange={setFilter} />
         </Box>

@@ -110,10 +110,10 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   partyName: {
-    fontFamily: 'NotoSerif_700Bold',
-    fontSize: 17,
+    fontFamily: 'NotoSerif_600SemiBold',
+    fontSize: 20,
     color: c.textPrimary,
-    lineHeight: 22,
+    lineHeight: 26,
   },
   meta: {
     fontFamily: 'NotoSans_400Regular',
