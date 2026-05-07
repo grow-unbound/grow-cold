@@ -29,16 +29,16 @@ export function LotsList({ lots }: Props) {
 
   if (lots.length === 0) {
     return (
-      <div className="rounded-xl border border-neutral-200 bg-white px-4 py-8 text-center shadow-sm">
-        <p className="text-base font-semibold text-neutral-900">{t('parties.party_detail.empty_lots_title')}</p>
-        <p className="mt-1 text-body-sm text-neutral-600">{t('parties.party_detail.empty_lots_body')}</p>
+      <div className="rounded-xl border border-border bg-white px-4 py-8 text-center shadow-sm">
+        <p className="text-base font-semibold text-text-primary">{t('parties.party_detail.empty_lots_title')}</p>
+        <p className="mt-1 text-body-sm text-text-secondary">{t('parties.party_detail.empty_lots_body')}</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-3">
-      <h3 className="text-caption font-medium uppercase tracking-wide text-neutral-500">
+      <h3 className="text-caption font-medium uppercase tracking-wide text-text-tertiary">
         {t('parties.party_detail.lots_heading', { count: lots.length })}
       </h3>
       <ul className="space-y-3">
@@ -60,13 +60,13 @@ export function LotsList({ lots }: Props) {
               <Link
                 href={`/inventory/${lot.lotId}`}
                 className={cn(
-                  'block min-h-touch rounded-xl border border-neutral-200 bg-white p-3 shadow-sm transition-colors hover:border-neutral-300',
+                  'block min-h-touch rounded-xl border border-border bg-white p-3 shadow-sm transition-colors hover:border-border',
                 )}
               >
-                <p className="text-base font-semibold text-neutral-900">
+                <p className="text-base font-semibold text-text-primary">
                   {t('lot_detail.lot_header_label', { number: lot.lot_number })} • {lot.product_name}
                 </p>
-                <p className="mt-1 text-body-sm text-neutral-600">
+                <p className="mt-1 text-body-sm text-text-secondary">
                   {t('parties.party_detail.lot_lodged_delivered', {
                     lodged: lot.original_bags.toLocaleString('en-IN'),
                     delivered: lot.delivered_bags.toLocaleString('en-IN'),
@@ -74,8 +74,8 @@ export function LotsList({ lots }: Props) {
                 </p>
                 <p
                   className={cn(
-                    'mt-1 text-body-sm text-neutral-600',
-                    isCompleted && 'font-medium text-success-600',
+                    'mt-1 text-body-sm text-text-secondary',
+                    isCompleted && 'font-medium text-inward',
                   )}
                 >
                   {line3}

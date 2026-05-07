@@ -2,14 +2,91 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   GrowCold — Design Tokens (light mode)
+   Brand Language v3. Dark mode deferred to follow-up PR.
+   ============================================================ */
+:root {
+  /* Surfaces */
+  --bg-page:    #FEFCF8;
+  --bg-surface: #FFFFFF;
+  --bg-subtle:  #F5F0E8;
+  --bg-inset:   #EDE6D9;
+
+  /* Text */
+  --text-primary:     #1C1A16;
+  --text-secondary:   #4A4237;
+  --text-tertiary:    #7A6F61;
+  --text-placeholder: #C0B8B0;
+  --text-on-brand:    #FFFFFF;
+
+  /* Brand — two-token system */
+  --brand-ui:       #C8712A;
+  --brand-ui-hover: #AD5E1F;
+  --brand-ui-press: #9A5418;
+  --brand-text:     #8C4A12;
+  --brand-subtle:   #F5E8D8;
+  --brand-border:   #E0B08A;
+
+  /* Semantic states */
+  --inward:        #0B7B6E;
+  --inward-bg:     #E6F5F3;
+  --inward-border: #A8DDD7;
+
+  --outward:        #A83422;
+  --outward-bg:     #F7EAE7;
+  --outward-border: #E0B8B0;
+
+  --pending:        #7B5200;
+  --pending-bg:     #FAF2D9;
+  --pending-border: #E0CC88;
+
+  /* Borders */
+  --border-default: #E5DED2;
+  --border-strong:  #C9BFB0;
+  --focus-ring:     rgba(200, 113, 42, 0.12);
+
+  /* Motion */
+  --ease-out:      cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in:       cubic-bezier(0.4, 0, 1, 1);
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 350ms;
+}
+
 @layer base {
-  html {
-    @apply h-full;
-  }
+  html { @apply h-full; }
 
   body {
-    /* App-native sans stack (super-app style; no trademark assets) */
-    @apply m-0 min-h-screen bg-neutral-50 text-base text-neutral-900 antialiased;
-    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    font-family: var(--font-body), "Noto Sans", system-ui, sans-serif;
+    @apply m-0 min-h-screen antialiased;
+    font-size: 15px;
+    line-height: 1.5;
+    text-rendering: optimizeLegibility;
   }
+
+  h1, h2, h3 {
+    font-family: var(--font-display), "Noto Serif", Georgia, serif;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  a {
+    color: var(--brand-text);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color var(--duration-fast) var(--ease-out);
+  }
+  a:hover { border-bottom-color: var(--brand-text); }
+
+  code, kbd, pre {
+    font-family: var(--font-mono), "Noto Sans Mono", Menlo, monospace;
+  }
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }

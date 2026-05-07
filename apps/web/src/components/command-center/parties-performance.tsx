@@ -21,8 +21,8 @@ export function PartiesPerformance({ warehouseId }: Props) {
   if (isLoading || !data) {
     return (
       <section className="mt-6">
-        <h2 className="mb-2 text-base font-semibold text-neutral-900">{t('parties')}</h2>
-        <div className="h-[280px] animate-pulse rounded-xl bg-neutral-200" />
+        <h2 className="mb-2 text-base font-semibold text-text-primary">{t('parties')}</h2>
+        <div className="h-[280px] animate-pulse rounded-xl bg-surface-inset" />
       </section>
     );
   }
@@ -34,13 +34,13 @@ export function PartiesPerformance({ warehouseId }: Props) {
 
   return (
     <section className="mt-6">
-      <h2 className="mb-1 text-base font-semibold text-neutral-900">{t('parties')}</h2>
+      <h2 className="mb-1 text-base font-semibold text-text-primary">{t('parties')}</h2>
       <TimeFilterChips value={filter} onChange={setFilter} />
       <div className="mt-2 rounded-xl bg-white p-3 shadow-sm ring-1 ring-black/[0.04]">
         <PerformanceChart
           series={data.series}
-          lodgedColor="#7C3AED"
-          deliveredColor="#0891B2"
+          lodgedColor="#C8712A"
+          deliveredColor="#A83422"
           lodgedLegend={t('legend_collections')}
           deliveredLegend={t('legend_receipts')}
           valueFormatter={(n: number) => formatIndianNumber(n)}

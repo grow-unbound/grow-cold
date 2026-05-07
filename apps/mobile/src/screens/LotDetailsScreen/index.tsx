@@ -45,7 +45,7 @@ function LotDetailLoaded({
       alignItems="center"
       justifyContent="space-between"
       borderBottomWidth={1}
-      borderBottomColor="#E2E4E8"
+      borderBottomColor="#E5DED2"
       bg="$white"
       px="$2"
       style={{ paddingTop: Math.max(insets.top, 8) }}
@@ -61,7 +61,7 @@ function LotDetailLoaded({
         justifyContent="center"
         alignItems="center"
       >
-        <Text fontSize="$lg" color="$dashboardLodged" fontWeight="$medium">
+        <Text fontSize="$lg" color="$inward" fontWeight="$medium">
           ←
         </Text>
       </Pressable>
@@ -70,7 +70,7 @@ function LotDetailLoaded({
         textAlign="center"
         fontSize="$lg"
         fontWeight="$semibold"
-        color="$textLight900"
+        color="$textPrimary"
         numberOfLines={1}
       >
         {t('lot_detail.lot_header_label', { number: data.lot_number })}
@@ -87,7 +87,7 @@ function LotDetailLoaded({
         alignItems="center"
         opacity={0.35}
       >
-        <Text fontSize="$xl" color="$dashboardMuted">
+        <Text fontSize="$xl" color="$textTertiary">
           ⋮
         </Text>
       </Pressable>
@@ -95,7 +95,7 @@ function LotDetailLoaded({
   );
 
   const tabBar = (
-    <Box flexDirection="row" borderBottomWidth={1} borderBottomColor="#E2E4E8" bg="$white">
+    <Box flexDirection="row" borderBottomWidth={1} borderBottomColor="#E5DED2" bg="$white">
       {tabs.map((item) => {
         const active = tab === item.id;
         return (
@@ -107,12 +107,12 @@ function LotDetailLoaded({
             justifyContent="center"
             alignItems="center"
             borderBottomWidth={3}
-            borderBottomColor={active ? '#00B14F' : 'transparent'}
+            borderBottomColor={active ? '#C8712A' : 'transparent'}
           >
             <Text
               fontSize="$sm"
               fontWeight={active ? '$semibold' : '$medium'}
-              color={active ? '#00B14F' : '$dashboardMuted'}
+              color={active ? '#C8712A' : '$textTertiary'}
             >
               {item.label}
             </Text>
@@ -124,7 +124,7 @@ function LotDetailLoaded({
 
   const meta =
     dataUpdatedAt > 0 || isOffline ? (
-      <Text fontSize="$xs" color="$dashboardMuted" textAlign="center" mt="$2">
+      <Text fontSize="$xs" color="$textTertiary" textAlign="center" mt="$2">
         {isOffline ? t('lot_detail.offline') : ''}
         {isOffline && dataUpdatedAt > 0 ? ' · ' : ''}
         {dataUpdatedAt > 0
@@ -137,7 +137,7 @@ function LotDetailLoaded({
     <Box flex={1} bg="$white">
       <ScrollView flex={1} stickyHeaderIndices={[0, 2]} showsVerticalScrollIndicator={false}>
         {header}
-        <Box px="$3" pt="$3" bg="$backgroundLight50">
+        <Box px="$3" pt="$3" bg="$bgSubtle">
           <LotSummary data={data} />
           {meta}
         </Box>
@@ -161,9 +161,9 @@ export function LotDetailsScreen({ navigation, route }: Props) {
 
   if (q.isPending) {
     return (
-      <Box flex={1} justifyContent="center" alignItems="center" bg="$backgroundLight50">
-        <ActivityIndicator size="large" color="#00B14F" />
-        <Text mt="$3" color="$dashboardMuted">
+      <Box flex={1} justifyContent="center" alignItems="center" bg="$bgSubtle">
+        <ActivityIndicator size="large" color="#C8712A" />
+        <Text mt="$3" color="$textTertiary">
           {t('loading')}
         </Text>
       </Box>
@@ -172,10 +172,10 @@ export function LotDetailsScreen({ navigation, route }: Props) {
 
   if (q.isError || !q.data) {
     return (
-      <Box flex={1} p="$4" bg="$backgroundLight50" justifyContent="center">
-        <Text color="$dashboardDanger">{t('error_load')}</Text>
+      <Box flex={1} p="$4" bg="$bgSubtle" justifyContent="center">
+        <Text color="$outward">{t('error_load')}</Text>
         <Pressable mt="$4" onPress={() => navigation.goBack()}>
-          <Text color="$dashboardLodged" fontWeight="$semibold">
+          <Text color="$inward" fontWeight="$semibold">
             {t('back')}
           </Text>
         </Pressable>

@@ -47,8 +47,8 @@ function WarehousePicker({
     return (
       <div className="flex items-center justify-between gap-2 px-2 py-1.5">
         <div className="flex min-w-0 flex-1 items-center gap-2">
-          <Building2 className="h-4 w-4 shrink-0 text-neutral-500" aria-hidden />
-          <span className="truncate text-caption text-neutral-800">{name}</span>
+          <Building2 className="h-4 w-4 shrink-0 text-text-tertiary" aria-hidden />
+          <span className="truncate text-caption text-text-primary">{name}</span>
         </div>
         <Switch checked={false} onCheckedChange={() => {}} disabled aria-label={t('warehouse_switch_aria')} />
       </div>
@@ -61,8 +61,8 @@ function WarehousePicker({
     return (
       <div className="flex items-center justify-between gap-2 px-2 py-1.5">
         <div className="flex min-w-0 flex-1 items-center gap-2">
-          <Building2 className="h-4 w-4 shrink-0 text-neutral-500" aria-hidden />
-          <span className="truncate text-caption text-neutral-800">{name}</span>
+          <Building2 className="h-4 w-4 shrink-0 text-text-tertiary" aria-hidden />
+          <span className="truncate text-caption text-text-primary">{name}</span>
         </div>
         <Switch
           checked={isSecond}
@@ -76,8 +76,8 @@ function WarehousePicker({
   return (
       <div className="flex flex-col gap-2 px-2 py-1.5">
       <div className="flex items-center gap-2">
-        <Building2 className="h-4 w-4 shrink-0 text-neutral-500" aria-hidden />
-        <span className="text-label-lg font-semibold text-neutral-700">{t('warehouse')}</span>
+        <Building2 className="h-4 w-4 shrink-0 text-text-tertiary" aria-hidden />
+        <span className="text-label-lg font-semibold text-text-secondary">{t('warehouse')}</span>
       </div>
       <select
         className="input-base"
@@ -95,7 +95,11 @@ function WarehousePicker({
   );
 }
 
-export function UserMenu() {
+export interface UserMenuProps {
+  triggerVariant?: 'default' | 'avatar-only';
+}
+
+export function UserMenu({ triggerVariant = 'default' }: UserMenuProps) {
   const { t } = useTranslation('menu');
   const router = useRouter();
   const {
@@ -125,38 +129,52 @@ export function UserMenu() {
     }
   };
 
+  const avatarInner = (
+    <span
+      className="flex h-9 w-9 items-center justify-center rounded-full bg-surface-inset text-caption font-semibold text-text-primary"
+      aria-hidden
+    >
+      {initials(displayName)}
+    </span>
+  );
+
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
-        <Button
-          variant="secondary"
-          className="min-h-touch gap-0.5 rounded-full border-neutral-200 px-2.5 py-0"
-          type="button"
-        >
-          <span className="sr-only">{t('user_menu')}</span>
-          <span
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-200 text-caption font-semibold text-neutral-800"
-            aria-hidden
+        {triggerVariant === 'avatar-only' ? (
+          <button
+            type="button"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-text-primary outline-none focus-visible:ring-2 focus-visible:ring-brand-ui focus-visible:ring-offset-2"
           >
-            {initials(displayName)}
-          </span>
-          <ChevronDown className="h-3.5 w-3.5 opacity-60" aria-hidden />
-        </Button>
+            <span className="sr-only">{t('user_menu')}</span>
+            {avatarInner}
+          </button>
+        ) : (
+          <Button
+            variant="secondary"
+            className="min-h-touch gap-0.5 rounded-full border-border px-2.5 py-0"
+            type="button"
+          >
+            <span className="sr-only">{t('user_menu')}</span>
+            {avatarInner}
+            <ChevronDown className="h-3.5 w-3.5 opacity-60" aria-hidden />
+          </Button>
+        )}
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
         <DropdownMenu.Content
-          className="z-50 min-w-[14rem] rounded-base border border-neutral-200 bg-white p-0.5 text-sm shadow-md"
+          className="z-50 min-w-[14rem] rounded-base border border-border bg-white p-0.5 text-sm shadow-md"
           sideOffset={6}
           align="end"
         >
-          <div className="border-b border-neutral-100 px-2 py-2">
-            <p className="truncate text-sm font-semibold text-neutral-900">{displayName ?? t('unknown_user')}</p>
-            <p className="mt-0.5 truncate text-caption text-neutral-600">{phone ?? '—'}</p>
-            <p className="mt-1 truncate text-caption text-neutral-600">
-              <span className="font-medium text-neutral-700">{roleLabel(role)}</span>
+          <div className="border-b border-border px-2 py-2">
+            <p className="truncate text-sm font-semibold text-text-primary">{displayName ?? t('unknown_user')}</p>
+            <p className="mt-0.5 truncate text-caption text-text-secondary">{phone ?? '—'}</p>
+            <p className="mt-1 truncate text-caption text-text-secondary">
+              <span className="font-medium text-text-secondary">{roleLabel(role)}</span>
               {tenantName ? (
                 <>
-                  <span className="text-neutral-400"> · </span>
+                  <span className="text-text-tertiary"> · </span>
                   <span>{tenantName}</span>
                 </>
               ) : null}
@@ -172,37 +190,37 @@ export function UserMenu() {
             }}
           />
 
-          <DropdownMenu.Separator className="my-0.5 h-px bg-neutral-200" />
+          <DropdownMenu.Separator className="my-0.5 h-px bg-surface-inset" />
 
           <DropdownMenu.Item asChild>
             <Link
               href="/settings"
-              className="flex cursor-pointer items-center gap-2 rounded-base px-2 py-1.5 text-sm text-neutral-800 outline-none hover:bg-neutral-100"
+              className="flex cursor-pointer items-center gap-2 rounded-base px-2 py-1.5 text-sm text-text-primary outline-none hover:bg-surface-subtle"
             >
-              <Settings className="h-4 w-4 shrink-0 text-neutral-500" aria-hidden />
+              <Settings className="h-4 w-4 shrink-0 text-text-tertiary" aria-hidden />
               {t('settings')}
             </Link>
           </DropdownMenu.Item>
           <DropdownMenu.Item asChild>
             <Link
               href="/profile"
-              className="flex cursor-pointer items-center gap-2 rounded-base px-2 py-1.5 text-sm text-neutral-800 outline-none hover:bg-neutral-100"
+              className="flex cursor-pointer items-center gap-2 rounded-base px-2 py-1.5 text-sm text-text-primary outline-none hover:bg-surface-subtle"
             >
-              <User className="h-4 w-4 shrink-0 text-neutral-500" aria-hidden />
+              <User className="h-4 w-4 shrink-0 text-text-tertiary" aria-hidden />
               {t('profile')}
             </Link>
           </DropdownMenu.Item>
 
-          <DropdownMenu.Separator className="my-0.5 h-px bg-neutral-200" />
+          <DropdownMenu.Separator className="my-0.5 h-px bg-surface-inset" />
 
           <DropdownMenu.Item
-            className="flex cursor-pointer items-center gap-2 rounded-base px-2 py-1.5 text-sm text-neutral-800 outline-none hover:bg-neutral-100"
+            className="flex cursor-pointer items-center gap-2 rounded-base px-2 py-1.5 text-sm text-text-primary outline-none hover:bg-surface-subtle"
             onSelect={(e) => {
               e.preventDefault();
               void signOut();
             }}
           >
-            <LogOut className="h-4 w-4 shrink-0 text-neutral-500" aria-hidden />
+            <LogOut className="h-4 w-4 shrink-0 text-text-tertiary" aria-hidden />
             {t('logout')}
           </DropdownMenu.Item>
         </DropdownMenu.Content>

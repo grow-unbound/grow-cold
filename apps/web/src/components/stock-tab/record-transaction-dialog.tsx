@@ -17,7 +17,7 @@ import {
 } from '@/lib/shell-queries';
 import { cn } from '@/lib/utils';
 
-const GREEN = '#00B14F';
+const GREEN = '#C8712A';
 
 const lodgementFormSchema = CreateLotRequestSchema;
 type LodgementForm = z.infer<typeof lodgementFormSchema>;
@@ -151,19 +151,19 @@ export function RecordTransactionDialog({ open, onClose, warehouseId, role }: Pr
         aria-labelledby="record-stock-title"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="border-b border-neutral-200 px-4 py-3">
-          <h2 id="record-stock-title" className="text-lg font-semibold text-neutral-900">
+        <div className="border-b border-border px-4 py-3">
+          <h2 id="record-stock-title" className="text-lg font-semibold text-text-primary">
             {t('stock.record_title')}
           </h2>
         </div>
 
         {canLodgement && (
-          <div className="flex gap-2 border-b border-neutral-100 px-4 py-2">
+          <div className="flex gap-2 border-b border-border px-4 py-2">
             <button
               type="button"
               className={cn(
                 'flex-1 rounded-full py-2 text-sm font-semibold',
-                mode === 'lodgement' ? 'text-white' : 'bg-neutral-100 text-neutral-600',
+                mode === 'lodgement' ? 'text-white' : 'bg-surface-subtle text-text-secondary',
               )}
               style={mode === 'lodgement' ? { backgroundColor: GREEN } : undefined}
               onClick={() => setMode('lodgement')}
@@ -174,7 +174,7 @@ export function RecordTransactionDialog({ open, onClose, warehouseId, role }: Pr
               type="button"
               className={cn(
                 'flex-1 rounded-full py-2 text-sm font-semibold',
-                mode === 'delivery' ? 'text-white' : 'bg-neutral-100 text-neutral-600',
+                mode === 'delivery' ? 'text-white' : 'bg-surface-subtle text-text-secondary',
               )}
               style={mode === 'delivery' ? { backgroundColor: GREEN } : undefined}
               onClick={() => setMode('delivery')}
@@ -188,7 +188,7 @@ export function RecordTransactionDialog({ open, onClose, warehouseId, role }: Pr
           {mode === 'lodgement' && (
             <form className="flex flex-col gap-3" onSubmit={lForm.handleSubmit(onSubmitLodgement)}>
               <div className="form-field">
-                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="l_customer">
+                <label className="text-label-lg font-semibold text-text-secondary" htmlFor="l_customer">
                   {t('stock.select_customer')}
                 </label>
                 <select
@@ -205,7 +205,7 @@ export function RecordTransactionDialog({ open, onClose, warehouseId, role }: Pr
                 </select>
               </div>
               <div className="form-field">
-                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="l_product">
+                <label className="text-label-lg font-semibold text-text-secondary" htmlFor="l_product">
                   {t('stock.select_product')}
                 </label>
                 <select
@@ -222,13 +222,13 @@ export function RecordTransactionDialog({ open, onClose, warehouseId, role }: Pr
                 </select>
               </div>
               <div className="form-field">
-                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="l_lotnum">
+                <label className="text-label-lg font-semibold text-text-secondary" htmlFor="l_lotnum">
                   {t('inventory.lot_number')} *
                 </label>
                 <input id="l_lotnum" className="input-base" {...lForm.register('lot_number')} />
               </div>
               <div className="form-field">
-                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="l_bags">
+                <label className="text-label-lg font-semibold text-text-secondary" htmlFor="l_bags">
                   {t('stock.bags_required')}
                 </label>
                 <input
@@ -240,13 +240,13 @@ export function RecordTransactionDialog({ open, onClose, warehouseId, role }: Pr
                 />
               </div>
               <div className="form-field">
-                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="l_date">
+                <label className="text-label-lg font-semibold text-text-secondary" htmlFor="l_date">
                   {t('inventory.lodgement')} *
                 </label>
                 <input id="l_date" type="date" className="input-base" {...lForm.register('lodgement_date')} />
               </div>
               <div className="form-field">
-                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="l_rental">
+                <label className="text-label-lg font-semibold text-text-secondary" htmlFor="l_rental">
                   {t('inventory.rental_mode')}
                 </label>
                 <select id="l_rental" className="input-base" {...lForm.register('rental_mode')}>
@@ -261,19 +261,19 @@ export function RecordTransactionDialog({ open, onClose, warehouseId, role }: Pr
                 onChange={(ids) => lForm.setValue('location_ids', ids)}
               />
               <div className="form-field">
-                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="l_driver">
+                <label className="text-label-lg font-semibold text-text-secondary" htmlFor="l_driver">
                   {t('inventory.driver_name')}
                 </label>
                 <input id="l_driver" className="input-base" {...lForm.register('driver_name')} />
               </div>
               <div className="form-field">
-                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="l_vehicle">
+                <label className="text-label-lg font-semibold text-text-secondary" htmlFor="l_vehicle">
                   {t('inventory.vehicle_number')}
                 </label>
                 <input id="l_vehicle" className="input-base" {...lForm.register('vehicle_number')} />
               </div>
               <div className="form-field">
-                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="l_notes">
+                <label className="text-label-lg font-semibold text-text-secondary" htmlFor="l_notes">
                   {t('stock.notes')}
                 </label>
                 <textarea id="l_notes" className="input-base min-h-[4rem]" {...lForm.register('notes')} />
@@ -293,7 +293,7 @@ export function RecordTransactionDialog({ open, onClose, warehouseId, role }: Pr
           {mode === 'delivery' && (
             <form className="flex flex-col gap-3" onSubmit={dForm.handleSubmit(onSubmitDelivery)}>
               <div className="form-field">
-                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="d_lot">
+                <label className="text-label-lg font-semibold text-text-secondary" htmlFor="d_lot">
                   {t('stock.select_lot')}
                 </label>
                 <select
@@ -310,7 +310,7 @@ export function RecordTransactionDialog({ open, onClose, warehouseId, role }: Pr
                 </select>
               </div>
               <div className="form-field">
-                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="d_bags">
+                <label className="text-label-lg font-semibold text-text-secondary" htmlFor="d_bags">
                   {t('stock.bags_required')}
                 </label>
                 <input
@@ -322,11 +322,11 @@ export function RecordTransactionDialog({ open, onClose, warehouseId, role }: Pr
                   {...dForm.register('num_bags_out', { valueAsNumber: true })}
                 />
                 {selectedLot ? (
-                  <p className="mt-1 text-caption text-neutral-500">Max {selectedLot.balance_bags}</p>
+                  <p className="mt-1 text-caption text-text-tertiary">Max {selectedLot.balance_bags}</p>
                 ) : null}
               </div>
               <div className="form-field">
-                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="d_date">
+                <label className="text-label-lg font-semibold text-text-secondary" htmlFor="d_date">
                   {t('transactions.date')} *
                 </label>
                 <input id="d_date" type="date" className="input-base" {...dForm.register('delivery_date')} />
@@ -337,19 +337,19 @@ export function RecordTransactionDialog({ open, onClose, warehouseId, role }: Pr
                 onChange={(ids) => dForm.setValue('location_ids', ids)}
               />
               <div className="form-field">
-                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="d_driver">
+                <label className="text-label-lg font-semibold text-text-secondary" htmlFor="d_driver">
                   {t('inventory.driver_name')}
                 </label>
                 <input id="d_driver" className="input-base" {...dForm.register('driver_name')} />
               </div>
               <div className="form-field">
-                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="d_vehicle">
+                <label className="text-label-lg font-semibold text-text-secondary" htmlFor="d_vehicle">
                   {t('inventory.vehicle_number')}
                 </label>
                 <input id="d_vehicle" className="input-base" {...dForm.register('vehicle_number')} />
               </div>
               <div className="form-field">
-                <label className="text-label-lg font-semibold text-neutral-700" htmlFor="d_notes">
+                <label className="text-label-lg font-semibold text-text-secondary" htmlFor="d_notes">
                   {t('stock.notes')}
                 </label>
                 <textarea id="d_notes" className="input-base min-h-[4rem]" {...dForm.register('notes')} />
@@ -379,10 +379,10 @@ function LocationMultiField(props: {
   const { t } = useTranslation('pages');
   return (
     <div className="form-field">
-      <span className="text-label-lg font-semibold text-neutral-700">{t('inventory.locations')}</span>
-      <div className="mt-1 flex max-h-32 flex-wrap gap-2 overflow-y-auto rounded-lg border border-neutral-200 p-2">
+      <span className="text-label-lg font-semibold text-text-secondary">{t('inventory.locations')}</span>
+      <div className="mt-1 flex max-h-32 flex-wrap gap-2 overflow-y-auto rounded-lg border border-border p-2">
         {props.options.length === 0 ? (
-          <span className="text-caption text-neutral-400">—</span>
+          <span className="text-caption text-text-tertiary">—</span>
         ) : (
           props.options.map((loc) => {
             const on = props.value.includes(loc.id);
@@ -392,7 +392,7 @@ function LocationMultiField(props: {
                 type="button"
                 className={cn(
                   'rounded-full border px-2 py-1 text-caption font-medium',
-                  on ? 'border-primary-500 bg-primary-50 text-primary-800' : 'border-neutral-200 text-neutral-600',
+                  on ? 'border-brand-ui bg-brand-subtle text-brand-text' : 'border-border text-text-secondary',
                 )}
                 onClick={() => {
                   if (on) props.onChange(props.value.filter((id) => id !== loc.id));

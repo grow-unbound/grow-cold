@@ -25,7 +25,7 @@ export function StockPerformance() {
         <Text fontSize={16} fontWeight="$semibold" mb="$2">
           {t('stock')}
         </Text>
-        <Box h={280} borderRadius={12} bg="$backgroundLight200" />
+        <Box h={280} borderRadius={12} bg="$bgInset" />
       </Box>
     );
   }
@@ -45,7 +45,7 @@ export function StockPerformance() {
         mt="$2"
         p="$3"
         borderRadius={12}
-        bg="$backgroundLight0"
+        bg="$bgSurface"
         style={{
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 1 },
@@ -56,8 +56,8 @@ export function StockPerformance() {
       >
         <PerformanceGraph
           series={data.series}
-          lodgedColor="#00B14F"
-          deliveredColor="#0891B2"
+          lodgedColor="#C8712A"
+          deliveredColor="#A83422"
           lodgedLegend={t('legend_lodged')}
           deliveredLegend={t('legend_delivered')}
         />

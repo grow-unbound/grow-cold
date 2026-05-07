@@ -7,7 +7,7 @@ const PerformanceChartInner = dynamic(
   () => import('./performance-chart-inner').then((m) => m.PerformanceChartInner),
   {
     ssr: false,
-    loading: () => <div className="h-[220px] animate-pulse rounded-lg bg-neutral-100" aria-hidden />,
+    loading: () => <div className="h-[220px] animate-pulse rounded-lg bg-surface-subtle" aria-hidden />,
   },
 );
 

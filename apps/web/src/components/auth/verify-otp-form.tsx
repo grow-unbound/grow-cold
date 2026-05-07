@@ -190,8 +190,8 @@ export function VerifyOtpForm() {
     return (
       <div className="auth-panel">
         <div>
-          <h1 className="text-lg font-semibold text-neutral-900">{t('title')}</h1>
-          <p className="mt-1 text-caption text-neutral-600">{t('need_session')}</p>
+          <h1 className="text-lg font-semibold text-text-primary">{t('title')}</h1>
+          <p className="mt-1 text-caption text-text-secondary">{t('need_session')}</p>
         </div>
         <form className="flex flex-col gap-3" onSubmit={onSendPhone} noValidate>
           <IndiaPhoneField
@@ -218,8 +218,8 @@ export function VerifyOtpForm() {
             {error}
           </p>
         ) : null}
-        <p className="text-caption text-neutral-500">
-          <Link href="/signup" className="text-primary-600 underline-offset-2 hover:underline">
+        <p className="text-caption text-text-tertiary">
+          <Link href="/signup" className="text-brand-text underline-offset-2 hover:underline">
             {t('create_account')}
           </Link>
         </p>
@@ -230,12 +230,12 @@ export function VerifyOtpForm() {
   return (
     <div className="auth-panel">
       <div>
-        <h1 className="text-lg font-semibold text-neutral-900">{t('enter_otp_title')}</h1>
-        <p className="mt-1 text-caption text-neutral-600">{t('enter_otp_help')}</p>
+        <h1 className="text-lg font-semibold text-text-primary">{t('enter_otp_title')}</h1>
+        <p className="mt-1 text-caption text-text-secondary">{t('enter_otp_help')}</p>
       </div>
-      <p className="text-center text-caption text-neutral-600">
-        <span className="text-neutral-600">{t('otp_sent_to_prefix')}</span>{' '}
-        <span className="font-semibold text-neutral-900">{otpHint || '—'}</span>
+      <p className="text-center text-caption text-text-secondary">
+        <span className="text-text-secondary">{t('otp_sent_to_prefix')}</span>{' '}
+        <span className="font-semibold text-text-primary">{otpHint || '—'}</span>
       </p>
       <SixDigitOtp
         key={otpResetKey}
@@ -266,12 +266,12 @@ export function VerifyOtpForm() {
       </Button>
       <div className="flex flex-col items-center gap-1">
         {resendIn > 0 && !mustResend ? (
-          <p className="text-caption text-neutral-500">{t('resend_otp_in', { seconds: resendIn })}</p>
+          <p className="text-caption text-text-tertiary">{t('resend_otp_in', { seconds: resendIn })}</p>
         ) : (
           <button
             type="button"
             disabled={resending || otpBusy}
-            className="text-caption font-medium text-primary-600 underline-offset-2 hover:underline disabled:opacity-50"
+            className="text-caption font-medium text-brand-text underline-offset-2 hover:underline disabled:opacity-50"
             onClick={() => void onResend()}
           >
             {resending ? t('resending') : t('resend')}
@@ -281,7 +281,7 @@ export function VerifyOtpForm() {
       <div className="flex justify-center">
         <Link
           href="/login"
-          className="inline-flex items-center gap-0.5 text-caption font-medium text-neutral-600 hover:text-neutral-800"
+          className="inline-flex items-center gap-0.5 text-caption font-medium text-text-secondary hover:text-text-primary"
         >
           <ChevronLeft className="h-3.5 w-3.5" aria-hidden />
           {t('change_number')}

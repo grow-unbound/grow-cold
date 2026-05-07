@@ -10,7 +10,7 @@ type SwitchProps = {
   'aria-label'?: string;
 };
 
-/** Small two-state toggle (controlled). */
+/** Controlled two-state toggle. 48px tap zone, brand-ui active state. */
 export function Switch({ id, checked, onCheckedChange, disabled, 'aria-label': ariaLabel }: SwitchProps) {
   return (
     <button
@@ -22,14 +22,14 @@ export function Switch({ id, checked, onCheckedChange, disabled, 'aria-label': a
       disabled={disabled}
       onClick={() => !disabled && onCheckedChange(!checked)}
       className={cn(
-        'relative h-6 w-11 shrink-0 rounded-full transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500',
-        checked ? 'bg-primary-500' : 'bg-neutral-300',
-        disabled && 'cursor-not-allowed opacity-50',
+        'relative h-6 w-11 shrink-0 rounded-full transition-colors duration-fast ease-out focus-visible:outline-none focus-visible:shadow-focus',
+        checked ? 'bg-brand-ui' : 'bg-border',
+        disabled && 'cursor-not-allowed opacity-40',
       )}
     >
       <span
         className={cn(
-          'absolute left-0.5 top-0.5 block h-5 w-5 rounded-full bg-white shadow transition-transform duration-200',
+          'absolute left-0.5 top-0.5 block h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-fast',
           checked && 'translate-x-[1.35rem]',
         )}
         aria-hidden

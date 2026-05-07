@@ -56,12 +56,12 @@ export function SignupForm() {
   return (
     <div className="auth-panel">
       <div>
-        <h1 className="text-lg font-semibold text-neutral-900">{t('title')}</h1>
-        <p className="mt-1 text-caption text-neutral-600">{t('subtitle')}</p>
+        <h1 className="text-lg font-semibold text-text-primary">{t('title')}</h1>
+        <p className="mt-1 text-caption text-text-secondary">{t('subtitle')}</p>
       </div>
       <form className="flex flex-col gap-3" onSubmit={onSubmit} noValidate>
         <div className="form-field">
-          <label htmlFor="full_name" className="text-label-lg font-semibold text-neutral-700">
+          <label htmlFor="full_name" className="text-label-lg font-semibold text-text-secondary">
             {t('full_name')}
           </label>
           <input
@@ -78,7 +78,7 @@ export function SignupForm() {
           ) : null}
         </div>
         <div className="form-field">
-          <label htmlFor="phone" className="text-label-lg font-semibold text-neutral-700">
+          <label htmlFor="phone" className="text-label-lg font-semibold text-text-secondary">
             {t('phone')}
           </label>
           <input
@@ -97,7 +97,7 @@ export function SignupForm() {
           ) : null}
         </div>
         <div className="form-field">
-          <label htmlFor="email" className="text-label-lg font-semibold text-neutral-700">
+          <label htmlFor="email" className="text-label-lg font-semibold text-text-secondary">
             {t('email')}
           </label>
           <input
@@ -116,7 +116,7 @@ export function SignupForm() {
           ) : null}
         </div>
         <div className="form-field">
-          <label htmlFor="company_name" className="text-label-lg font-semibold text-neutral-700">
+          <label htmlFor="company_name" className="text-label-lg font-semibold text-text-secondary">
             {t('company')}
           </label>
           <input
@@ -132,20 +132,20 @@ export function SignupForm() {
             </p>
           ) : null}
         </div>
-        <label className="flex cursor-pointer items-start gap-3 py-1 text-sm text-neutral-700">
+        <label className="flex cursor-pointer items-start gap-3 py-1 text-sm text-text-secondary">
           <input
             type="checkbox"
-            className="mt-0.5 size-5 shrink-0 rounded border-2 border-neutral-300"
+            className="mt-0.5 size-5 shrink-0 rounded border-2 border-border"
             disabled={busy}
             {...form.register('agreed_to_terms')}
           />
           <span>
             {t('terms_prefix')}{' '}
-            <Link href="/terms" className="text-primary-600 underline-offset-2 hover:underline">
+            <Link href="/terms" className="text-brand-text underline-offset-2 hover:underline">
               {t('terms_link')}
             </Link>{' '}
             {t('terms_and')}{' '}
-            <Link href="/privacy" className="text-primary-600 underline-offset-2 hover:underline">
+            <Link href="/privacy" className="text-brand-text underline-offset-2 hover:underline">
               {t('privacy_link')}
             </Link>
           </span>
@@ -164,8 +164,8 @@ export function SignupForm() {
           {error}
         </p>
       ) : null}
-      <p className="text-caption text-neutral-500">
-        <Link href="/login" className="text-primary-600 underline-offset-2 hover:underline">
+      <p className="text-caption text-text-tertiary">
+        <Link href="/login" className="text-brand-text underline-offset-2 hover:underline">
           {t('have_account')}
         </Link>
       </p>

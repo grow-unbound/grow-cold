@@ -4,8 +4,10 @@ import NetInfo from '@react-native-community/netinfo';
 import { format, isToday, isYesterday, parseISO, startOfDay } from 'date-fns';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SectionList, TextInput } from 'react-native';
+import { Pressable as RNPressable, SectionList, StyleSheet, TextInput, View } from 'react-native';
+import { Text as RNText } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { colors as c } from '@growcold/tokens';
 import { useStockMovementsQuery, useStockSummaryQuery } from '../../features/stock/useStockQueries';
 import { useAuthReady } from '../../features/home/useAuthReady';
 import { supabase } from '../../lib/supabase';
@@ -41,7 +43,6 @@ function matchesSearch(row: StockTabMovementRowDto, q: string): boolean {
   );
 }
 
-const GREEN = '#00B14F';
 
 export function StockScreen() {
   const { t } = useTranslation('pages');
@@ -129,11 +130,11 @@ export function StockScreen() {
 
   if (!configured) {
     return (
-      <Box flex={1} p="$4" bg="$backgroundLight0" style={{ paddingTop: Math.max(insets.top, 16) }}>
-        <Text fontSize={20} fontWeight="$semibold" color="$textLight900">
+      <Box flex={1} p="$4" bg="$bgSurface" style={{ paddingTop: Math.max(insets.top, 16) }}>
+        <Text fontSize={20} fontWeight="$semibold" color="$textPrimary">
           {tNav('stock')}
         </Text>
-        <Text mt="$3" color="$textLight600">
+        <Text mt="$3" color="$textSecondary">
           {t('select_warehouse')}
         </Text>
       </Box>
@@ -141,17 +142,17 @@ export function StockScreen() {
   }
 
   return (
-    <Box flex={1} bg="$backgroundLight0">
+    <Box flex={1} bg="$bgSurface">
       {offline ? (
-        <Box bg="$backgroundLight200" px="$4" py="$2">
-          <Text size="sm" color="$textLight500">
+        <Box bg="$bgInset" px="$4" py="$2">
+          <Text size="sm" color="$textTertiary">
             {t('home.offline_banner')}
           </Text>
         </Box>
       ) : null}
 
       <HStack px="$4" pb="$2" alignItems="center" style={{ paddingTop: Math.max(insets.top, 8) }}>
-        <Text fontSize={20} fontWeight="$semibold" color="$textLight900">
+        <Text fontSize={20} fontWeight="$semibold" color="$textPrimary">
           {tNav('stock')}
         </Text>
       </HStack>
@@ -160,7 +161,7 @@ export function StockScreen() {
         px="$2"
         pt="$2"
         pb="$2"
-        bg="$backgroundLight0"
+        bg="$bgSurface"
         borderBottomWidth={1}
         borderColor="$borderLight200"
       >
@@ -169,27 +170,26 @@ export function StockScreen() {
             value={search}
             onChangeText={setSearch}
             placeholder={t('stock.search_placeholder')}
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={c.textTertiary}
             style={{
               height: 48,
               borderRadius: 12,
               paddingHorizontal: 16,
               paddingLeft: 40,
-              backgroundColor: '#F3F4F6',
+              backgroundColor: c.bgSubtle,
               fontSize: 16,
-              color: '#111827',
+              color: c.textPrimary,
+              fontFamily: 'NotoSans_400Regular',
             }}
           />
-          <Text position="absolute" left={12} top={14} fontSize={16} color="#9CA3AF">
+          <Text position="absolute" left={12} top={14} fontSize={16} color="#7A6F61">
             🔍
           </Text>
         </Box>
         <Box mt="$2">
           <FilterChips value={filter} onChange={setFilter} />
         </Box>
-        <Text mt="$2" fontSize={12} fontWeight="$semibold" color="$textLight500" letterSpacing={0.5}>
-          {t('stock.transactions')}
-        </Text>
+        <RNText style={sectionLabelStyle}>{t('stock.transactions')}</RNText>
       </VStack>
 
       <SectionList
@@ -209,14 +209,14 @@ export function StockScreen() {
               onToggle={() => setStatusExpanded((e) => !e)}
             />
             {searching ? (
-              <Text px="$3" mb="$2" size="sm" color="$textLight600">
+              <Text px="$3" mb="$2" size="sm" color="$textSecondary">
                 {filtered.length > 0
                   ? t('stock.showing_results', { count: filtered.length, query: debouncedSearch })
                   : t('stock.no_results', { query: debouncedSearch })}
               </Text>
             ) : null}
             {searching && filtered.length === 0 ? (
-              <Text px="$3" mb="$2" size="xs" color="$textLight500">
+              <Text px="$3" mb="$2" size="xs" color="$textTertiary">
                 {t('stock.no_results_hint')}
               </Text>
             ) : null}
@@ -227,10 +227,10 @@ export function StockScreen() {
             ) : null}
             {!movementsQ.isPending && !searching && flatItems.length === 0 ? (
               <Box px="$4" py="$8" alignItems="center">
-                <Text textAlign="center" color="$textLight700">
+                <Text textAlign="center" color="$textSecondary">
                   {t('stock.empty_movements')}
                 </Text>
-                <Text textAlign="center" mt="$1" size="sm" color="$textLight500">
+                <Text textAlign="center" mt="$1" size="sm" color="$textTertiary">
                   {t('stock.empty_movements_hint')}
                 </Text>
               </Box>
@@ -239,7 +239,7 @@ export function StockScreen() {
         }
         ListFooterComponent={
           movementsQ.isFetchingNextPage ? (
-            <Text textAlign="center" py="$4" size="sm" color="$textLight500">
+            <Text textAlign="center" py="$4" size="sm" color="$textTertiary">
               {t('loading')}
             </Text>
           ) : (
@@ -250,26 +250,14 @@ export function StockScreen() {
           const sec = section as typeof sections[number];
           const open = expandedSections[sec.key] ?? false;
           return (
-            <Pressable
+            <RNPressable
               onPress={() => toggleSection(sec.key)}
-              bg="$backgroundLight0"
-              py="$2"
-              px="$2"
-              borderBottomWidth={1}
-              borderColor="$borderLight100"
+              style={secHeaderStyle}
             >
-              <Box flexDirection="row" alignItems="center" gap="$2">
-                <Text fontSize={12} fontWeight="$semibold" color="$textLight500" letterSpacing={0.5}>
-                  {sec.title}
-                </Text>
-                <Text fontSize={14} color="$textLight400">
-                  {open ? '▼' : '▶'}
-                </Text>
-                <Text fontSize={13} color="$textLight500">
-                  ({sec.count})
-                </Text>
-              </Box>
-            </Pressable>
+              <RNText style={sectionLabelStyle}>{sec.title}</RNText>
+              <RNText style={secChevronStyle}>{open ? '▼' : '▶'}</RNText>
+              <RNText style={secCountStyle}>({sec.count})</RNText>
+            </RNPressable>
           );
         }}
         renderItem={({ item }) => (
@@ -279,30 +267,13 @@ export function StockScreen() {
         )}
       />
 
-      <Pressable
+      <RNPressable
         onPress={() => setRecordOpen(true)}
-        position="absolute"
-        right={16}
-        bottom={24 + insets.bottom}
-        w={56}
-        h={56}
-        borderRadius={28}
-        alignItems="center"
-        justifyContent="center"
-        style={{
-          backgroundColor: GREEN,
-          elevation: 6,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.2,
-          shadowRadius: 8,
-        }}
         accessibilityLabel={t('stock.record_title')}
+        style={[fabStyle, { bottom: 24 + insets.bottom }]}
       >
-        <Text color="$white" fontSize={28} fontWeight="$bold">
-          +
-        </Text>
-      </Pressable>
+        <RNText style={fabIconStyle}>+</RNText>
+      </RNPressable>
 
       <RecordTransactionSheet
         open={recordOpen}
@@ -312,3 +283,63 @@ export function StockScreen() {
     </Box>
   );
 }
+
+// ── Shared style objects (defined outside component to avoid recreation) ─────
+
+const sectionLabelStyle = {
+  fontFamily: 'NotoSansMono_400Regular',
+  fontSize: 11,
+  fontWeight: '500' as const,
+  color: c.textTertiary,
+  textTransform: 'uppercase' as const,
+  letterSpacing: 1.1,
+  marginTop: 8,
+  marginBottom: 2,
+  paddingHorizontal: 16,
+};
+
+const secHeaderStyle = {
+  flexDirection: 'row' as const,
+  alignItems: 'center' as const,
+  gap: 6,
+  paddingVertical: 8,
+  paddingHorizontal: 16,
+  backgroundColor: c.bgSurface,
+  borderBottomWidth: StyleSheet.hairlineWidth,
+  borderBottomColor: c.borderDefault,
+};
+
+const secChevronStyle = {
+  fontSize: 11,
+  color: c.textTertiary,
+};
+
+const secCountStyle = {
+  fontSize: 12,
+  fontFamily: 'NotoSans_400Regular',
+  color: c.textTertiary,
+};
+
+const fabStyle = {
+  position: 'absolute' as const,
+  right: 16,
+  width: 48,
+  height: 48,
+  borderRadius: 24,
+  backgroundColor: c.brandUi,
+  alignItems: 'center' as const,
+  justifyContent: 'center' as const,
+  elevation: 6,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 4 },
+  shadowOpacity: 0.2,
+  shadowRadius: 8,
+};
+
+const fabIconStyle = {
+  color: '#FFFFFF',
+  fontSize: 28,
+  fontWeight: '400' as const,
+  lineHeight: 32,
+  marginTop: -2,
+};

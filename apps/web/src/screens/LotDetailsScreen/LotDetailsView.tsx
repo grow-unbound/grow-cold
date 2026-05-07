@@ -36,23 +36,23 @@ export function LotDetailsView({
     <div className="mx-auto flex w-full max-w-4xl flex-col">
       <header
         className={cn(
-          'sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between gap-2 border-b border-neutral-200 bg-white px-2 sm:px-3',
+          'sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between gap-2 border-b border-border bg-white px-2 sm:px-3',
           'pt-[max(0.25rem,env(safe-area-inset-top,0px))] lg:pt-2',
         )}
       >
         <Link
           href="/inventory"
-          className="focus-ring flex min-h-12 min-w-12 items-center justify-center rounded-lg text-base font-medium text-primary-600 hover:bg-neutral-50"
+          className="focus-ring flex min-h-12 min-w-12 items-center justify-center rounded-lg text-base font-medium text-brand-text hover:bg-surface-subtle"
           aria-label={t('lot_detail.back_aria')}
         >
           ←
         </Link>
-        <h1 className="min-w-0 flex-1 truncate text-center text-lg font-semibold text-neutral-900">
+        <h1 className="min-w-0 flex-1 truncate text-center text-lg font-semibold text-text-primary">
           {t('lot_detail.lot_header_label', { number: data.lot_number })}
         </h1>
         <button
           type="button"
-          className="flex min-h-12 min-w-12 items-center justify-center rounded-lg text-neutral-400 hover:bg-neutral-50 disabled:cursor-not-allowed"
+          className="flex min-h-12 min-w-12 items-center justify-center rounded-lg text-text-tertiary hover:bg-surface-subtle disabled:cursor-not-allowed"
           aria-label={t('lot_detail.menu_aria')}
           aria-disabled="true"
           disabled
@@ -66,7 +66,7 @@ export function LotDetailsView({
         <div className="px-3 pt-3 sm:px-4">
           <LotSummary data={data} />
           {(dataUpdatedAt > 0 || isOffline) && (
-            <p className="mt-2 text-center text-xs text-neutral-500">
+            <p className="mt-2 text-center text-xs text-text-tertiary">
               {isOffline ? t('lot_detail.offline') : null}
               {isOffline && dataUpdatedAt > 0 ? ' · ' : null}
               {dataUpdatedAt > 0
@@ -77,7 +77,7 @@ export function LotDetailsView({
         </div>
 
         <nav
-          className="sticky top-14 z-30 flex border-b border-neutral-200 bg-white/95 px-2 backdrop-blur-sm sm:px-4"
+          className="sticky top-14 z-30 flex border-b border-border bg-white/95 px-2 backdrop-blur-sm sm:px-4"
           aria-label={t('lot_detail.tabs_aria')}
         >
           {tabs.map((item) => {
@@ -91,8 +91,8 @@ export function LotDetailsView({
                 className={cn(
                   'min-h-12 flex-1 border-b-[3px] px-2 text-sm font-medium transition-colors',
                   active
-                    ? 'border-[#00B14F] text-[#00B14F]'
-                    : 'border-transparent text-neutral-500 hover:text-neutral-700',
+                    ? 'border-brand-ui text-brand-text'
+                    : 'border-transparent text-text-tertiary hover:text-text-secondary',
                 )}
                 onClick={() => setTab(item.id)}
               >

@@ -182,19 +182,19 @@ export function AddReceiptFlow({
   if (!warehouseId) {
     return (
       <div className="card w-full">
-        <p className="text-body-sm text-neutral-600">{t('select_warehouse')}</p>
+        <p className="text-body-sm text-text-secondary">{t('select_warehouse')}</p>
       </div>
     );
   }
 
   if (mode === 'edit' && receiptDetailQ.isPending) {
-    return <p className="text-body-sm text-neutral-600">{t('receipts.loading_receipt')}</p>;
+    return <p className="text-body-sm text-text-secondary">{t('receipts.loading_receipt')}</p>;
   }
 
   if (mode === 'edit' && receiptDetailQ.data?.data.allocation_confirmed_at) {
     return (
-      <div className="card border-warning-200 bg-warning-50 p-4">
-        <p className="text-body-sm text-neutral-800">{t('receipts.cannot_edit_confirmed')}</p>
+      <div className="card border-pending-border bg-pending-bg p-4">
+        <p className="text-body-sm text-text-primary">{t('receipts.cannot_edit_confirmed')}</p>
         <Link href="/transactions" className="btn-secondary mt-3 inline-flex min-h-touch">
           {t('transactions.title')}
         </Link>
@@ -231,7 +231,7 @@ export function AddReceiptFlow({
             onSubmit={form.handleSubmit((v) => void onSaveReceipt(v))}
           >
             <div className="form-field">
-              <label className="text-label font-medium text-neutral-800" htmlFor="receipt_date">
+              <label className="text-label font-medium text-text-primary" htmlFor="receipt_date">
                 {t('receipts.date_label')} *
               </label>
               <input id="receipt_date" type="date" className="input-base w-full" {...form.register('receipt_date')} />
@@ -241,7 +241,7 @@ export function AddReceiptFlow({
             </div>
 
             <div className="form-field relative">
-              <label className="text-label font-medium text-neutral-800" htmlFor="party_trigger">
+              <label className="text-label font-medium text-text-primary" htmlFor="party_trigger">
                 {t('receipts.party_label')} *
               </label>
               <button
@@ -254,12 +254,12 @@ export function AddReceiptFlow({
                 )}
                 onClick={() => !lockedCustomerId && mode !== 'edit' && setPartyOpen((o) => !o)}
               >
-                <span className={cn(!customer_id && 'text-neutral-400')}>
+                <span className={cn(!customer_id && 'text-text-tertiary')}>
                   {selectedParty
                     ? partyLabel(selectedParty.customer_code, selectedParty.customer_name)
                     : t('receipts.select_party')}
                 </span>
-                <span aria-hidden className="text-neutral-400">
+                <span aria-hidden className="text-text-tertiary">
                   ▼
                 </span>
               </button>
@@ -268,10 +268,10 @@ export function AddReceiptFlow({
               ) : null}
 
               {partyOpen && !lockedCustomerId && mode !== 'edit' ? (
-                <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-60 overflow-y-auto rounded-base border border-neutral-200 bg-white shadow-lg">
+                <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-60 overflow-y-auto rounded-base border border-border bg-white shadow-lg">
                   <input
                     type="search"
-                    className="input-base sticky top-0 z-10 border-b border-neutral-100"
+                    className="input-base sticky top-0 z-10 border-b border-border"
                     placeholder={t('receipts.search_party')}
                     value={partyQ}
                     onChange={(e) => setPartyQ(e.target.value)}
@@ -282,7 +282,7 @@ export function AddReceiptFlow({
                       <li key={c.id}>
                         <button
                           type="button"
-                          className="flex min-h-touch w-full px-3 py-2 text-left text-body-sm hover:bg-neutral-50"
+                          className="flex min-h-touch w-full px-3 py-2 text-left text-body-sm hover:bg-surface-subtle"
                           onClick={() => {
                             form.setValue('customer_id', c.id, { shouldValidate: true });
                             setPartyOpen(false);
@@ -300,11 +300,11 @@ export function AddReceiptFlow({
             </div>
 
             <div className="form-field">
-              <label className="text-label font-medium text-neutral-800" htmlFor="total_amount">
+              <label className="text-label font-medium text-text-primary" htmlFor="total_amount">
                 {t('receipts.amount_label')} *
               </label>
               <div className="relative">
-                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600">
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary">
                   ₹
                 </span>
                 <input
@@ -320,7 +320,7 @@ export function AddReceiptFlow({
             </div>
 
             <div className="form-field">
-              <label className="text-label font-medium text-neutral-800" htmlFor="payment_method">
+              <label className="text-label font-medium text-text-primary" htmlFor="payment_method">
                 {t('receipts.payment_method_label')} *
               </label>
               <select id="payment_method" className="input-base w-full" {...form.register('payment_method')}>
@@ -334,7 +334,7 @@ export function AddReceiptFlow({
 
             <button
               type="button"
-              className="flex min-h-touch w-full items-center justify-between border-y border-dashed border-neutral-200 py-3 text-left text-body-sm text-primary-600"
+              className="flex min-h-touch w-full items-center justify-between border-y border-dashed border-border py-3 text-left text-body-sm text-brand-text"
               onClick={() => setZone2Open((z) => !z)}
               aria-expanded={zone2Open}
             >
@@ -345,13 +345,13 @@ export function AddReceiptFlow({
             {zone2Open ? (
               <>
                 <div className="form-field">
-                  <label className="text-label font-medium text-neutral-800" htmlFor="reference_number">
+                  <label className="text-label font-medium text-text-primary" htmlFor="reference_number">
                     {t('receipts.reference_label')}
                   </label>
                   <input id="reference_number" className="input-base w-full" {...form.register('reference_number')} />
                 </div>
                 <div className="form-field">
-                  <label className="text-label font-medium text-neutral-800" htmlFor="notes">
+                  <label className="text-label font-medium text-text-primary" htmlFor="notes">
                     {t('receipts.notes_label')}
                   </label>
                   <textarea id="notes" className="input-base min-h-[88px] w-full" {...form.register('notes')} />
@@ -360,12 +360,12 @@ export function AddReceiptFlow({
             ) : null}
 
             {postSavePrompt && !wide ? (
-              <div className="card rounded-base border border-success-200 bg-success-50 p-4">
-                <p className="text-sm font-semibold text-neutral-900">{t('receipts.receipt_saved')}</p>
-                <p className="mt-1 text-body-sm text-neutral-800">
+              <div className="card rounded-base border border-inward-border bg-inward-bg p-4">
+                <p className="text-sm font-semibold text-text-primary">{t('receipts.receipt_saved')}</p>
+                <p className="mt-1 text-body-sm text-text-primary">
                   {formatINR(receiptAmountNum)} {t('receipts.received_suffix')}
                 </p>
-                <p className="mt-2 text-body-sm text-neutral-800">{t('receipts.allocate_question')}</p>
+                <p className="mt-2 text-body-sm text-text-primary">{t('receipts.allocate_question')}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <Button
                     type="button"
@@ -386,7 +386,7 @@ export function AddReceiptFlow({
               </div>
             ) : null}
 
-            <div className="fixed bottom-0 left-0 right-0 z-30 flex gap-2 border-t border-neutral-200 bg-white p-3 lg:relative lg:z-0 lg:border-t-0 lg:bg-transparent lg:p-0">
+            <div className="fixed bottom-0 left-0 right-0 z-30 flex gap-2 border-t border-border bg-white p-3 lg:relative lg:z-0 lg:border-t-0 lg:bg-transparent lg:p-0">
               <Button type="button" variant="ghost" className="min-h-touch flex-1" asChild>
                 <Link href="/transactions">{t('receipts.cancel')}</Link>
               </Button>
@@ -406,7 +406,7 @@ export function AddReceiptFlow({
         </section>
 
         {showAllocationPanel && savedReceiptId && selectedParty ? (
-          <section className="flex min-h-[420px] flex-col rounded-base border border-neutral-200 bg-neutral-50/80 p-4 lg:min-h-[560px]">
+          <section className="flex min-h-[420px] flex-col rounded-base border border-border bg-surface-subtle/80 p-4 lg:min-h-[560px]">
             <ReceiptAllocationEditor
               warehouseId={warehouseId}
               receiptId={savedReceiptId}

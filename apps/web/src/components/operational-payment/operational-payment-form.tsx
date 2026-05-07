@@ -131,21 +131,21 @@ export function OperationalPaymentForm({ mode, paymentId = null, initialLotId = 
   if (!warehouseId) {
     return (
       <div className="card w-full">
-        <p className="text-body-sm text-neutral-600">{t('select_warehouse')}</p>
+        <p className="text-body-sm text-text-secondary">{t('select_warehouse')}</p>
       </div>
     );
   }
 
   if (paymentTypesQ.isError) {
-    return <p className="text-danger-600 text-body-sm">{t('error_load')}</p>;
+    return <p className="text-outward text-body-sm">{t('error_load')}</p>;
   }
 
   if (mode === 'edit' && detailQ.isPending) {
-    return <p className="text-body-sm text-neutral-600">{t('loading')}</p>;
+    return <p className="text-body-sm text-text-secondary">{t('loading')}</p>;
   }
 
   if (mode === 'edit' && (detailQ.isError || !detailQ.data)) {
-    return <p className="text-danger-600 text-body-sm">{t('error_load')}</p>;
+    return <p className="text-outward text-body-sm">{t('error_load')}</p>;
   }
 
   const types = paymentTypesQ.data?.data ?? [];
@@ -197,13 +197,13 @@ export function OperationalPaymentForm({ mode, paymentId = null, initialLotId = 
       >
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="form-field">
-            <label className="text-label font-medium text-neutral-800" htmlFor="op_date">
+            <label className="text-label font-medium text-text-primary" htmlFor="op_date">
               {t('operational_payment.date_label')} *
             </label>
             <input id="op_date" type="date" className="input-base w-full" {...form.register('payment_date')} />
           </div>
           <div className="form-field">
-            <label className="text-label font-medium text-neutral-800" htmlFor="op_ptype">
+            <label className="text-label font-medium text-text-primary" htmlFor="op_ptype">
               {t('operational_payment.payment_type_label')} *
             </label>
             <select id="op_ptype" className="input-base w-full" {...form.register('payment_type_id')}>
@@ -222,11 +222,11 @@ export function OperationalPaymentForm({ mode, paymentId = null, initialLotId = 
 
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="form-field">
-            <label className="text-label font-medium text-neutral-800" htmlFor="op_amt">
+            <label className="text-label font-medium text-text-primary" htmlFor="op_amt">
               {t('operational_payment.amount_label')} *
             </label>
             <div className="relative">
-              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600">₹</span>
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary">₹</span>
               <input
                 id="op_amt"
                 inputMode="decimal"
@@ -239,7 +239,7 @@ export function OperationalPaymentForm({ mode, paymentId = null, initialLotId = 
             ) : null}
           </div>
           <div className="form-field">
-            <label className="text-label font-medium text-neutral-800" htmlFor="op_pm">
+            <label className="text-label font-medium text-text-primary" htmlFor="op_pm">
               {t('operational_payment.payment_method_label')} *
             </label>
             <select id="op_pm" className="input-base w-full" {...form.register('payment_method')}>
@@ -253,7 +253,7 @@ export function OperationalPaymentForm({ mode, paymentId = null, initialLotId = 
         </div>
 
         <div className="form-field sm:max-w-none">
-          <label className="text-label font-medium text-neutral-800" htmlFor="op_st">
+          <label className="text-label font-medium text-text-primary" htmlFor="op_st">
             {t('operational_payment.status_label')} *
           </label>
           <select id="op_st" className="input-base w-full sm:max-w-xs" {...form.register('status')}>
@@ -264,7 +264,7 @@ export function OperationalPaymentForm({ mode, paymentId = null, initialLotId = 
 
         <button
           type="button"
-          className="flex min-h-touch w-full items-center justify-between border-y border-dashed border-neutral-200 py-3 text-left text-body-sm text-primary-600"
+          className="flex min-h-touch w-full items-center justify-between border-y border-dashed border-border py-3 text-left text-body-sm text-brand-text"
           onClick={() => setZone2Open((z) => !z)}
           aria-expanded={zone2Open}
         >
@@ -275,13 +275,13 @@ export function OperationalPaymentForm({ mode, paymentId = null, initialLotId = 
         {zone2Open ? (
           <>
             <div className="form-field">
-              <label className="text-label font-medium text-neutral-800" htmlFor="op_party">
+              <label className="text-label font-medium text-text-primary" htmlFor="op_party">
                 {t('operational_payment.recipient_name_label')}
               </label>
               <input id="op_party" className="input-base w-full" {...form.register('party_name')} />
             </div>
             <div className="form-field">
-              <label className="text-label font-medium text-neutral-800" htmlFor="op_phone">
+              <label className="text-label font-medium text-text-primary" htmlFor="op_phone">
                 {t('operational_payment.recipient_phone_label')}
               </label>
               <input id="op_phone" inputMode="numeric" className="input-base w-full" {...form.register('party_phone')} />
@@ -290,7 +290,7 @@ export function OperationalPaymentForm({ mode, paymentId = null, initialLotId = 
               ) : null}
             </div>
             <div className="form-field">
-              <label className="text-label font-medium text-neutral-800" htmlFor="op_lot">
+              <label className="text-label font-medium text-text-primary" htmlFor="op_lot">
                 {t('operational_payment.lot_label')}
               </label>
               <select
@@ -311,7 +311,7 @@ export function OperationalPaymentForm({ mode, paymentId = null, initialLotId = 
               </select>
             </div>
             <div className="form-field">
-              <label className="text-label font-medium text-neutral-800" htmlFor="op_del">
+              <label className="text-label font-medium text-text-primary" htmlFor="op_del">
                 {t('operational_payment.delivery_label')}
               </label>
               <select
@@ -328,11 +328,11 @@ export function OperationalPaymentForm({ mode, paymentId = null, initialLotId = 
                 ))}
               </select>
               {lotId && !deliveriesQ.isPending && deliveries.length === 0 ? (
-                <p className="help-text text-caption text-neutral-500">{t('operational_payment.no_deliveries')}</p>
+                <p className="help-text text-caption text-text-tertiary">{t('operational_payment.no_deliveries')}</p>
               ) : null}
             </div>
             <div className="form-field">
-              <label className="text-label font-medium text-neutral-800" htmlFor="op_notes">
+              <label className="text-label font-medium text-text-primary" htmlFor="op_notes">
                 {t('operational_payment.notes_label')}
               </label>
               <textarea id="op_notes" className="input-base min-h-[88px] w-full" {...form.register('notes')} />
@@ -344,7 +344,7 @@ export function OperationalPaymentForm({ mode, paymentId = null, initialLotId = 
 
         <div
           className={cn(
-            'fixed bottom-0 left-0 right-0 z-30 flex gap-2 border-t border-neutral-200 bg-white p-3 lg:relative lg:z-0 lg:mt-4 lg:border-t-0 lg:bg-transparent lg:p-0',
+            'fixed bottom-0 left-0 right-0 z-30 flex gap-2 border-t border-border bg-white p-3 lg:relative lg:z-0 lg:mt-4 lg:border-t-0 lg:bg-transparent lg:p-0',
             wide && 'lg:sticky lg:bottom-0',
           )}
         >

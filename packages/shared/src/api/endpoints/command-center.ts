@@ -8,6 +8,7 @@ export const commandCenterAlertsPath = `${commandCenterBasePath}/alerts` as cons
 export const commandCenterStockPath = `${commandCenterBasePath}/stock` as const;
 export const commandCenterMoneyPath = `${commandCenterBasePath}/money` as const;
 export const commandCenterPartiesPath = `${commandCenterBasePath}/parties` as const;
+export const commandCenterHomePath = `${commandCenterBasePath}/home` as const;
 
 export const HomeTimeFilterSchema = z.enum(['today', 'yesterday', 'week', 'month']);
 
@@ -98,9 +99,16 @@ export const CommandCenterPartiesResponseSchema = z.object({
   series: z.array(performanceSeriesPointSchema),
 });
 
+export const CommandCenterHomeResponseSchema = z.object({
+  snapshot: CommandCenterSnapshotResponseSchema,
+  activity: CommandCenterActivityResponseSchema,
+  alerts: CommandCenterAlertsResponseSchema,
+});
+
 export type CommandCenterSnapshotResponse = z.infer<typeof CommandCenterSnapshotResponseSchema>;
 export type CommandCenterActivityResponse = z.infer<typeof CommandCenterActivityResponseSchema>;
 export type CommandCenterAlertItem = z.infer<typeof CommandCenterAlertItemSchema>;
 export type CommandCenterStockResponse = z.infer<typeof CommandCenterStockResponseSchema>;
 export type CommandCenterMoneyResponse = z.infer<typeof CommandCenterMoneyResponseSchema>;
 export type CommandCenterPartiesResponse = z.infer<typeof CommandCenterPartiesResponseSchema>;
+export type CommandCenterHomeResponse = z.infer<typeof CommandCenterHomeResponseSchema>;

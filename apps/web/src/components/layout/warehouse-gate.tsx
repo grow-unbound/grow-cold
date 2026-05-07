@@ -16,21 +16,15 @@ export function WarehouseGate({ children }: { children: ReactNode }) {
     void (async () => {
       const supabase = createBrowserSupabaseClient();
       const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session || cancelled) return;
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
+      if (error || !user || cancelled) return;
 
       await hydrate(supabase);
       if (cancelled) return;
 
-      const { count, error } = await supabase
-        .from('user_warehouse_assignments')
-        .select('warehouse_id', { count: 'exact', head: true })
-        .eq('user_id', session.user.id);
-
-      if (cancelled || error) return;
-
-      const n = count ?? 0;
+      const n = useSessionStore.getState().warehouses.length;
       if (n === 0 && !pathname.startsWith('/onboarding')) {
         router.replace('/onboarding/create-warehouse');
         return;

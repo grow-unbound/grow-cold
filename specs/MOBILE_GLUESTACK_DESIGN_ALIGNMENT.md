@@ -1,58 +1,70 @@
-# Mobile (GlueStack) ↔ design system alignment
+# Mobile (GlueStack) ↔ Brand v3 alignment
 
-This checklist maps the documented GrowCold design system ([DESIGN_SYSTEM_V1.md](./DESIGN_SYSTEM_V1.md), [COMPONENT_SPECS.md](./COMPONENT_SPECS.md)) to **`apps/mobile`** using **GlueStack UI** tokens and components. Theme overrides live in [`apps/mobile/src/theme/gluestack.config.ts`](../apps/mobile/src/theme/gluestack.config.ts) (extends `@gluestack-ui/config`).
+This checklist maps the GrowCold design system ([`specs/GROWCOLD_BRAND_v3.md`](./GROWCOLD_BRAND_v3.md)) to **`apps/mobile`** using **GlueStack UI** tokens and components. Theme overrides live in [`apps/mobile/src/theme/gluestack.config.ts`](../apps/mobile/src/theme/gluestack.config.ts).
 
-## Color tokens (hex → GlueStack)
+## Color tokens (Brand v3 → GlueStack)
 
-| Role | Hex | Notes for GlueStack |
-|------|-----|---------------------|
-| Primary (CTA, brand) | `#00B14F` | `primary500` … `primary700` in custom config; tab bar active tint |
-| Primary tint | `#C4ECD4` | `primary50` / `primary100` |
-| Text (Tuna) | `#363A45` | `textLight900` override in custom config |
-| Page / muted bg | `#F7F7F8` | `backgroundLight50` override |
-| Secondary (neutral) | `#6B7280` | Default secondary scale in base config still available for grays |
-| Accent (mint) | `#7BDCB5` | Use for receipt / alternate rows when matching web `accent-*` |
-| Danger | `#EF4444` | Error / destructive |
-| Success | `#1FA85A` | Positive / cleared / active lot states |
-| Warning / stale | `#F59E0B` | Aging / caution |
-| Borders / dividers | `#E2E4E8` | Align with web `neutral-200` |
+| Role | Token | Hex | GlueStack config key |
+|------|-------|-----|----------------------|
+| Brand CTA (buttons, icons, active) | `brand-ui` | `#C8712A` | `brandUI` in custom config |
+| Brand text / labels | `brand-text` | `#8C4A12` | `brandText` |
+| Brand hover | `brand-ui-hover` | `#AD5E1F` | — |
+| Brand press | `brand-ui-press` | `#9A5418` | — |
+| Brand subtle bg | `brand-subtle` | `#F5E8D8` | `brandSubtle` |
+| Brand tint border | `brand-border` | `#E0B08A` | `brandBorder` |
+| Page canvas | `bg-page` | `#FEFCF8` | `backgroundLight50` override |
+| Card / input bg | `bg-surface` | `#FFFFFF` | `backgroundLight0` |
+| Sidebar / header bg | `bg-subtle` | `#F5F0E8` | `backgroundLight100` override |
+| Pressed / recessed | `bg-inset` | `#EDE6D9` | `backgroundLight200` override |
+| Primary text | `text-primary` | `#1C1A16` | `textLight900` override |
+| Secondary text | `text-secondary` | `#4A4237` | `textLight800` override |
+| Tertiary text | `text-tertiary` | `#7A6F61` | `textLight600` override |
+| Placeholder | `text-placeholder` | `#C0B8B0` | — |
+| Inward (stock in / positive) | `inward` | `#0B7B6E` | `successDark` override |
+| Inward bg | `inward-bg` | `#E6F5F3` | `successLight` override |
+| Outward (stock out / error) | `outward` | `#A83422` | `errorDark` override |
+| Outward bg | `outward-bg` | `#F7EAE7` | `errorLight` override |
+| Pending (waiting / offline) | `pending` | `#7B5200` | `warningDark` override |
+| Pending bg | `pending-bg` | `#FAF2D9` | `warningLight` override |
 
-**Status chips (lot):** See `status.*` in [apps/web/tailwind.config.ts](../apps/web/tailwind.config.ts) — align badge / text colors in GlueStack to the same hex values for cross-platform consistency.
+**Semantic rule:** `inward` = teal = arriving/positive. `outward` = rust = leaving/error. `pending` = amber = waiting/queued. Never swap these.
 
 ## Typography
 
 | Usage | Spec | GlueStack direction |
 |-------|------|---------------------|
-| Body | 16px / 1.5 / 400 | Prefer `$md` or custom token ≥ 16px body; avoid &lt; 16px for critical content on mobile. |
-| Body small (hints, meta) | 14px / ~1.43 / 400 | Secondary text token. |
-| Labels / badges | 12px / semibold | Form labels and tags. |
-| H1 / screen titles | 24px | Large heading token (matches `text-h1` on web). |
-| H2 / sections | 20px | Section headings. |
-| H3 / cards | 18px | Card titles. |
+| Headings / KPI numbers | Noto Serif | Load via `expo-font`; map to `$fontFamily.heading` in GlueStack config |
+| Body / labels | Noto Sans | Map to `$fontFamily.body` |
+| Codes / lot numbers / timestamps | Noto Sans Mono | Map to `$fontFamily.mono` |
+| Body | 15px / 1.5 / 400 | `$md` token or custom ≥ 15px |
+| Labels / badges | 11px / 500 / UPPERCASE | `$xs` + mono font + letter-spacing |
+| H3 / card titles | 24px | `$2xl` |
+| H1 / screen titles | 38px | Custom token |
+| Number / KPI | 38px / 700 | Noto Serif bold |
 
-Design system rationale: system/native fonts — GlueStack defaults are fine once sizes/weights match.
+**Input font is always 16px** — prevents iOS auto-zoom. Never use a smaller font inside `<Input>`.
 
-## Spacing, touch, motion
+## Touch targets, spacing, motion
 
-- **Touch targets:** web standard is **44px** min height for primary controls (`min-h-touch`). On GlueStack, match that for main CTAs and list rows; compact chips may use **~40px** height.
-- **Between tap targets:** ≥ **8px** gap (standard / WCAG 2.2); prefer **12–16px** in dense toolbars.
-- **Transitions:** ~**200ms** for buttons; skeleton shimmer **1.5s** loop per [COMPONENT_SPECS.md](./COMPONENT_SPECS.md) — mirror perceived timing, not necessarily CSS `animation-*`.
-- **Skeletons:** Prefer GlueStack `Skeleton` (or equivalent) with dimensions close to final layout to avoid layout shift.
+- **Tap zone:** 48px — use `hitSlop={{ top: 6, bottom: 6 }}` on `Pressable`/`TouchableOpacity`; visual height 36px
+- **Between tap targets:** ≥ 8px gap; prefer 12–16px in dense toolbars
+- **Transitions:** ~200ms for buttons; skeleton shimmer 1.5s loop
+- **Skeletons:** Use GlueStack `Skeleton` with dimensions matching final layout to avoid layout shift
 
-## Behaviors (parity with specs)
+## Behaviors
 
-- **Offline / queue:** Top bar + queue badge patterns in [DESIGN_SYSTEM_SUMMARY.md](./DESIGN_SYSTEM_SUMMARY.md) — implement in mobile navigation shell when sync UI exists.
-- **Forms:** Label + input + help + `error` copy; never use placeholder-only labels; required field `*` with semantic props.
-- **Destructive actions:** Confirm before delete/write-off; primary destructive styling uses danger palette.
+- **Offline / queue:** Top bar badge pattern from `GROWCOLD_BRAND_v3.md` — always visible, always shows queue count
+- **Forms:** Label + input + help + error; never placeholder-only labels; `*` on required fields
+- **Destructive actions:** Confirm before delete/write-off using `outward` color palette
 
-## React Navigation (tabs)
+## React Navigation (tab bar)
 
-- **Active tint:** `#00B14F` (see `RootTabs.tsx` `tabBarActiveTintColor`).
-- **Inactive tint:** `#9CA0AD`.
-- **Tab bar border:** `#E2E4E8`.
+- **Active tint:** `#C8712A` (`brand-ui`)
+- **Inactive tint:** `#7A6F61` (`text-tertiary`)
+- **Tab bar background:** `#FEFCF8` (`bg-page`)
+- **Tab bar border:** `#EDE6D9` (`bg-inset`)
 
 ## References
 
-- [DESIGN_SYSTEM_V1.md](./DESIGN_SYSTEM_V1.md) — full palette, type scale, spacing, patterns.
-- [COMPONENT_SPECS.md](./COMPONENT_SPECS.md) — button/input/card/modal/skeleton/toast behavior.
-- Web implementation reference: [apps/web/tailwind.config.ts](../apps/web/tailwind.config.ts) (token source of truth for hex/radius/shadow names).
+- [`specs/GROWCOLD_BRAND_v3.md`](./GROWCOLD_BRAND_v3.md) — canonical source of truth for all design decisions
+- [`specs/COMPONENT_SPECS.md`](./COMPONENT_SPECS.md) — button/input/card/modal/skeleton/toast behavior

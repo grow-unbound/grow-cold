@@ -207,10 +207,17 @@ export async function GET(request: Request, context: RouteContext) {
       return NextResponse.json({ error: 'Query failed', code: 'DB_ERROR' }, { status: 500 });
     }
 
-    const pctSet = new Set(chargeRowsUnsorted.map((r) => r.product_charge_type_id));
+    const pctSet = new Set(
+      chargeRowsUnsorted
+        .map((r) => r.product_charge_type_id)
+        .filter((id): id is string => id != null),
+    );
     const tcByPct = new Map(
       (existingRows ?? [])
-        .filter((r) => pctSet.has(r.product_charge_type_id))
+        .filter(
+          (r): r is typeof r & { product_charge_type_id: string } =>
+            r.product_charge_type_id != null && pctSet.has(r.product_charge_type_id),
+        )
         .map((r) => [r.product_charge_type_id, r] as const),
     );
 

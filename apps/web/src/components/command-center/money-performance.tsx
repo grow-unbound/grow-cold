@@ -21,8 +21,8 @@ export function MoneyPerformance({ warehouseId }: Props) {
   if (isLoading || !data) {
     return (
       <section className="mt-6">
-        <h2 className="mb-2 text-base font-semibold text-neutral-900">{t('money')}</h2>
-        <div className="h-[280px] animate-pulse rounded-xl bg-neutral-200" />
+        <h2 className="mb-2 text-base font-semibold text-text-primary">{t('money')}</h2>
+        <div className="h-[280px] animate-pulse rounded-xl bg-surface-inset" />
       </section>
     );
   }
@@ -34,13 +34,13 @@ export function MoneyPerformance({ warehouseId }: Props) {
 
   return (
     <section className="mt-6">
-      <h2 className="mb-1 text-base font-semibold text-neutral-900">{t('money')}</h2>
+      <h2 className="mb-1 text-base font-semibold text-text-primary">{t('money')}</h2>
       <TimeFilterChips value={filter} onChange={setFilter} />
       <div className="mt-2 rounded-xl bg-white p-3 shadow-sm ring-1 ring-black/[0.04]">
         <PerformanceChart
           series={data.series}
           lodgedColor="#16A34A"
-          deliveredColor="#00B14F"
+          deliveredColor="#A83422"
           lodgedLegend={t('kpi_collected')}
           deliveredLegend={t('kpi_paid_out')}
           valueFormatter={(n: number) => formatINR(n)}

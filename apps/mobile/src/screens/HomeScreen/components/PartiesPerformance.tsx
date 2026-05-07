@@ -25,7 +25,7 @@ export function PartiesPerformance() {
         <Text fontSize={16} fontWeight="$semibold" mb="$2">
           {t('parties')}
         </Text>
-        <Box h={280} borderRadius={12} bg="$backgroundLight200" />
+        <Box h={280} borderRadius={12} bg="$bgInset" />
       </Box>
     );
   }
@@ -45,7 +45,7 @@ export function PartiesPerformance() {
         mt="$2"
         p="$3"
         borderRadius={12}
-        bg="$backgroundLight0"
+        bg="$bgSurface"
         style={{
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 1 },
@@ -56,8 +56,8 @@ export function PartiesPerformance() {
       >
         <PerformanceGraph
           series={data.series}
-          lodgedColor="#7C3AED"
-          deliveredColor="#0891B2"
+          lodgedColor="#7B5200"
+          deliveredColor="#A83422"
           lodgedLegend={t('legend_collections')}
           deliveredLegend={t('legend_receipts')}
           valueFormatter={(n) => formatIndianNumber(n)}

@@ -16,7 +16,7 @@ export function KpiCard({ title, primary, secondary, trend, trendPositive }: Kpi
       )}
     >
       <span className="text-xs font-medium text-dashboard-muted">{title}</span>
-      <span className="text-xl font-bold text-neutral-900">{primary}</span>
+      <span className="text-xl font-bold text-text-primary">{primary}</span>
       {secondary ? <span className="text-sm text-dashboard-muted">{secondary}</span> : null}
       {trend ? (
         <span

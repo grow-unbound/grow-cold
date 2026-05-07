@@ -35,16 +35,16 @@ export function ContactSheet({ open, onClose, code, phoneDigits }: Props) {
         aria-labelledby="contact-title"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="border-b border-neutral-200 px-4 py-3">
-          <h2 id="contact-title" className="text-lg font-semibold text-neutral-900">
+        <div className="border-b border-border px-4 py-3">
+          <h2 id="contact-title" className="text-lg font-semibold text-text-primary">
             {t('parties.contact_title', { code })}
           </h2>
-          <p className="text-sm text-neutral-600">{phoneDigits}</p>
+          <p className="text-sm text-text-secondary">{phoneDigits}</p>
         </div>
         <div className="flex flex-col gap-1 p-2">
           <a
             href={tel}
-            className={cn('flex min-h-touch items-center rounded-lg px-3 py-3 text-base font-medium text-cyan-700')}
+            className={cn('flex min-h-touch items-center rounded-lg px-3 py-3 text-base font-medium text-brand-text')}
             onClick={onClose}
           >
             {t('parties.call')}
@@ -54,13 +54,13 @@ export function ContactSheet({ open, onClose, code, phoneDigits }: Props) {
               href={wa}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex min-h-touch items-center rounded-lg px-3 py-3 text-base font-medium text-cyan-700"
+              className="flex min-h-touch items-center rounded-lg px-3 py-3 text-base font-medium text-brand-text"
               onClick={onClose}
             >
               {t('parties.whatsapp')}
             </a>
           ) : null}
-          <button type="button" className="min-h-touch rounded-lg px-3 py-3 text-left text-base text-neutral-700" onClick={onClose}>
+          <button type="button" className="min-h-touch rounded-lg px-3 py-3 text-left text-base text-text-secondary" onClick={onClose}>
             {t('parties.cancel')}
           </button>
         </div>

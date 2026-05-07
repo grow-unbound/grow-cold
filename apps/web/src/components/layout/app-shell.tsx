@@ -1,17 +1,19 @@
 'use client';
 
 import type { LucideIcon } from 'lucide-react';
-import { ArrowLeftRight, Home, Package, Users } from 'lucide-react';
+import { Home, IndianRupee, Package, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { DesktopInlineSearch } from '@/components/layout/desktop-inline-search';
+import { DesktopWarehouseSwitcher } from '@/components/layout/desktop-warehouse-switcher';
 import { UserMenu } from '@/components/layout/user-menu';
 import { createBrowserSupabaseClient } from '@/lib/supabase-browser';
-import { useSelectedWarehouseName, useSessionStore } from '@/stores/session-store';
+import { useSessionStore } from '@/stores/session-store';
 import { cn } from '@/lib/utils';
 
-type NavKey = 'home' | 'inventory' | 'parties' | 'transactions';
+type NavKey = 'home' | 'stock' | 'parties' | 'money';
 
 const tabs: {
   href: string;
@@ -20,9 +22,9 @@ const tabs: {
   Icon: LucideIcon;
 }[] = [
   { href: '/', end: true, i18nKey: 'home', Icon: Home },
-  { href: '/inventory', i18nKey: 'inventory', Icon: Package },
+  { href: '/inventory', i18nKey: 'stock', Icon: Package },
   { href: '/parties', i18nKey: 'parties', Icon: Users },
-  { href: '/transactions', i18nKey: 'transactions', Icon: ArrowLeftRight },
+  { href: '/transactions', i18nKey: 'money', Icon: IndianRupee },
 ];
 
 function isTabActive(pathname: string, href: string, end?: boolean) {
@@ -31,23 +33,22 @@ function isTabActive(pathname: string, href: string, end?: boolean) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-/** Lot drill-down uses its own sticky header on small screens. */
-function isInventoryLotDetailPath(pathname: string): boolean {
-  return /^\/inventory\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(pathname);
-}
-
-/** Money transaction drill-down: same as lot — no double app header on mobile. */
-function isTransactionDetailPath(pathname: string): boolean {
-  return /^\/transaction\/(receipt|payment)\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-    pathname,
+function DesktopTopBar() {
+  return (
+    <header className="sticky top-0 z-20 hidden h-[52px] w-full shrink-0 bg-transparent lg:flex">
+      <div className="flex min-h-[52px] w-full min-w-0 items-center justify-end gap-3 px-4">
+        <DesktopInlineSearch />
+        <DesktopWarehouseSwitcher />
+        <UserMenu triggerVariant="avatar-only" />
+      </div>
+    </header>
   );
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const { t } = useTranslation('common');
   const pathname = usePathname();
-  const warehouseName = useSelectedWarehouseName();
   const hydrate = useSessionStore((s) => s.hydrate);
+  const hideMobileTabBar = pathname === '/search';
 
   useEffect(() => {
     const supabase = createBrowserSupabaseClient();
@@ -61,71 +62,32 @@ export function AppShell({ children }: { children: ReactNode }) {
   }, [pathname, hydrate]);
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-neutral-50 lg:flex-row">
-      {/* Desktop: left sidebar — brand accent strip (color only, no third-party mark) */}
+    <div className="flex min-h-screen w-full flex-col bg-surface-subtle lg:h-[100dvh] lg:max-h-[100dvh] lg:flex-row lg:overflow-hidden">
       <aside
-        className="hidden w-40 shrink-0 flex-col border-r border-neutral-200/80 bg-white lg:flex"
+        className="hidden w-[200px] shrink-0 flex-col border-r border-border/80 bg-surface-subtle lg:flex lg:h-full lg:max-h-full lg:overflow-y-auto"
         aria-label="Main"
       >
-        <div className="h-1 w-full shrink-0 bg-primary-500" aria-hidden />
-        <div className="flex min-h-touch flex-col justify-center border-b border-neutral-200/80 px-3 py-2">
-          <span className="text-sm font-semibold tracking-tight text-neutral-900">{t('app_name')}</span>
-          {warehouseName ? (
-            <span className="mt-0.5 truncate text-caption text-neutral-500" title={warehouseName}>
-              {warehouseName}
-            </span>
-          ) : (
-            <span className="mt-0.5 truncate text-caption text-neutral-400">{t('warehouse_placeholder')}</span>
-          )}
+        <div className="h-1 w-full shrink-0 bg-brand-ui" aria-hidden />
+        <div className="flex min-h-touch flex-col justify-center border-b border-border/80 px-4 py-3">
+          <AppShellWordmark />
         </div>
         <nav className="flex flex-1 flex-col gap-0.5 p-1.5">
-          {tabs.map((tab) => (
-            <SidebarNavLink
-              key={tab.href}
-              href={tab.href}
-              end={tab.end}
-              pathname={pathname}
-              i18nKey={tab.i18nKey}
-              Icon={tab.Icon}
-            />
-          ))}
+          <AppShellNav pathname={pathname} />
         </nav>
-        <div className="flex flex-col gap-1.5 border-t border-neutral-200/80 p-2">
-          <UserMenu />
-        </div>
       </aside>
 
-      {/* Main column: header (mobile/tablet) + content */}
-      <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col">
-        <header
-          className={cn(
-            'z-10 flex w-full flex-col border-b border-neutral-200/80 bg-white shadow-sm lg:hidden',
-            (isInventoryLotDetailPath(pathname) || isTransactionDetailPath(pathname)) && 'hidden',
-          )}
-        >
-          <div className="h-0.5 w-full bg-primary-500" aria-hidden />
-          <div className="flex min-h-touch items-center justify-between gap-2 px-3 py-0 pt-[max(0.5rem,env(safe-area-inset-top,0px))]">
-            <div className="min-w-0 flex-1">
-              <h1 className="text-sm font-semibold tracking-tight text-neutral-900">{t('app_name')}</h1>
-              {warehouseName ? (
-                <p className="truncate text-caption text-neutral-500" title={warehouseName}>
-                  {warehouseName}
-                </p>
-              ) : (
-                <p className="truncate text-caption text-neutral-400">{t('warehouse_placeholder')}</p>
-              )}
-            </div>
-            <UserMenu />
-          </div>
-        </header>
+      <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden lg:min-h-0">
+        <DesktopTopBar />
 
-        <main className="page-container min-h-0 w-full max-w-none flex-1 self-stretch overflow-auto pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] pt-2 lg:pb-4 lg:pt-4">
+        <main className="page-container min-h-0 w-full max-w-none flex-1 self-stretch overflow-y-auto pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] pt-2 lg:pb-4 lg:pt-4">
           {children}
         </main>
 
-        {/* Mobile & tablet: bottom tab bar (super-app: green active, safe area) */}
         <nav
-          className="fixed bottom-0 left-0 right-0 z-40 border-t border-neutral-200/80 bg-white/95 pb-[max(0.25rem,env(safe-area-inset-bottom,0px))] shadow-[0_-4px_16px_rgba(0,0,0,0.05)] backdrop-blur-md lg:hidden"
+          className={cn(
+            'fixed bottom-0 left-0 right-0 z-40 border-t border-border/80 bg-white/95 pb-[max(0.25rem,env(safe-area-inset-bottom,0px))] shadow-[0_-4px_16px_rgba(0,0,0,0.05)] backdrop-blur-md lg:hidden',
+            hideMobileTabBar && 'hidden',
+          )}
           aria-label="Main"
         >
           <ul className="flex w-full justify-between px-1.5 py-1.5">
@@ -146,6 +108,30 @@ export function AppShell({ children }: { children: ReactNode }) {
   );
 }
 
+function AppShellWordmark() {
+  const { t } = useTranslation('common');
+  return (
+    <span className="font-display text-xl font-semibold tracking-tight text-text-primary">{t('app_name')}</span>
+  );
+}
+
+function AppShellNav(props: { pathname: string }) {
+  return (
+    <>
+      {tabs.map((tab) => (
+        <SidebarNavLink
+          key={tab.href}
+          href={tab.href}
+          end={tab.end}
+          pathname={props.pathname}
+          i18nKey={tab.i18nKey}
+          Icon={tab.Icon}
+        />
+      ))}
+    </>
+  );
+}
+
 function BottomTabLink(props: {
   href: string;
   end?: boolean;
@@ -161,21 +147,19 @@ function BottomTabLink(props: {
       <Link
         href={props.href}
         className={cn(
-          'flex min-h-touch flex-col items-center justify-center gap-1 rounded-full px-1.5 py-1 text-center transition-colors',
-          active
-            ? 'bg-primary-100 text-primary-700'
-            : 'text-neutral-500 hover:bg-neutral-100/80 hover:text-neutral-800',
+          'flex min-h-touch flex-col items-center justify-center gap-1 px-1.5 py-1 text-center transition-colors',
+          active ? 'text-brand-text' : 'text-text-tertiary hover:text-text-primary',
         )}
       >
         <Icon
-          className={cn('h-5 w-5 shrink-0', active ? 'text-primary-600' : 'text-neutral-400')}
+          className={cn('h-5 w-5 shrink-0', active ? 'text-brand-text' : 'text-text-tertiary')}
           strokeWidth={active ? 2.25 : 1.75}
           aria-hidden
         />
         <span
           className={cn(
             'text-caption font-semibold leading-tight',
-            active ? 'text-primary-800' : 'text-neutral-500',
+            active ? 'text-brand-text' : 'text-text-tertiary',
           )}
         >
           {t(props.i18nKey)}
@@ -201,12 +185,12 @@ function SidebarNavLink(props: {
       className={cn(
         'flex h-9 items-center gap-2.5 rounded-lg px-3 text-sm transition-colors',
         active
-          ? 'bg-[#E8F8EF] text-[#00B14F] font-semibold'
-          : 'font-medium text-neutral-600 hover:bg-neutral-50',
+          ? 'bg-brand-subtle font-semibold text-brand-text'
+          : 'font-medium text-text-secondary hover:bg-surface-subtle',
       )}
     >
       <Icon
-        className={cn('h-4 w-4 shrink-0', active ? 'text-[#00B14F]' : 'text-neutral-400')}
+        className={cn('h-4 w-4 shrink-0', active ? 'text-brand-text' : 'text-text-tertiary')}
         strokeWidth={active ? 2.25 : 1.75}
         aria-hidden
       />

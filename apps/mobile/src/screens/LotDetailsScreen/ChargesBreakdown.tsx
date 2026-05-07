@@ -9,10 +9,10 @@ export function ChargesBreakdown({ charges }: { charges: LotDetailChargeRow[] })
   if (charges.length === 0) {
     return (
       <VStack space="sm" px="$4" py="$10" alignItems="center">
-        <Text fontSize="$md" fontWeight="$medium" color="$textLight900" textAlign="center">
+        <Text fontSize="$md" fontWeight="$medium" color="$textPrimary" textAlign="center">
           {t('lot_detail.charges_empty_title')}
         </Text>
-        <Text fontSize="$sm" color="$dashboardMuted" textAlign="center">
+        <Text fontSize="$sm" color="$textTertiary" textAlign="center">
           {t('lot_detail.charges_empty_body')}
         </Text>
       </VStack>
@@ -27,7 +27,7 @@ export function ChargesBreakdown({ charges }: { charges: LotDetailChargeRow[] })
 
   return (
     <VStack space="md" px="$4" pb="$6" pt="$2">
-      <Text fontSize="$sm" fontWeight="$medium" color="$dashboardMuted" textTransform="uppercase">
+      <Text fontSize="$sm" fontWeight="$medium" color="$textTertiary" textTransform="uppercase">
         {t('lot_detail.charges_title')}
       </Text>
       <VStack space="md">
@@ -37,20 +37,20 @@ export function ChargesBreakdown({ charges }: { charges: LotDetailChargeRow[] })
             <Box
               key={c.id}
               borderBottomWidth={1}
-              borderBottomColor="#F3F4F6"
+              borderBottomColor="#F5F0E8"
               pb="$3"
             >
-              <Text fontSize="$sm" color="$textLight800">
+              <Text fontSize="$sm" color="$textPrimary">
                 {c.charge_type_label}
               </Text>
               <Box flexDirection="row" flexWrap="wrap" alignItems="center" gap="$2" mt="$1">
-                <Text fontSize="$sm" fontWeight="$semibold" color="$textLight900">
+                <Text fontSize="$sm" fontWeight="$semibold" color="$textPrimary">
                   {formatINR(amt)}
                 </Text>
                 <Text
                   fontSize="$xs"
                   fontWeight="$medium"
-                  color={c.is_paid ? '$dashboardMoney' : '$dashboardDanger'}
+                  color={c.is_paid ? '$inward' : '$outward'}
                 >
                   {c.is_paid ? t('lot_detail.charge_paid') : t('lot_detail.charge_pending')}
                 </Text>
@@ -59,28 +59,28 @@ export function ChargesBreakdown({ charges }: { charges: LotDetailChargeRow[] })
           );
         })}
       </VStack>
-      <Box borderTopWidth={1} borderTopColor="#E5E7EB" pt="$4" mt="$2">
+      <Box borderTopWidth={1} borderTopColor="#E5DED2" pt="$4" mt="$2">
         <Box flexDirection="row" justifyContent="space-between">
-          <Text fontSize="$md" fontWeight="$semibold" color="$textLight900">
+          <Text fontSize="$md" fontWeight="$semibold" color="$textPrimary">
             {t('lot_detail.total_charges')}
           </Text>
-          <Text fontSize="$md" fontWeight="$semibold" color="$textLight900">
+          <Text fontSize="$md" fontWeight="$semibold" color="$textPrimary">
             {formatINR(total)}
           </Text>
         </Box>
         <Box flexDirection="row" justifyContent="space-between" mt="$2">
-          <Text fontSize="$md" fontWeight="$semibold" color="$textLight900">
+          <Text fontSize="$md" fontWeight="$semibold" color="$textPrimary">
             {t('lot_detail.collected')}
           </Text>
-          <Text fontSize="$md" fontWeight="$semibold" color="#16A34A">
+          <Text fontSize="$md" fontWeight="$semibold" color="#0B7B6E">
             {formatINR(collected)}
           </Text>
         </Box>
         <Box flexDirection="row" justifyContent="space-between" mt="$2">
-          <Text fontSize="$md" fontWeight="$semibold" color="$textLight900">
+          <Text fontSize="$md" fontWeight="$semibold" color="$textPrimary">
             {t('lot_detail.pending')}
           </Text>
-          <Text fontSize="$md" fontWeight="$semibold" color="#DC2626">
+          <Text fontSize="$md" fontWeight="$semibold" color="#A83422">
             {formatINR(pending)}
           </Text>
         </Box>
