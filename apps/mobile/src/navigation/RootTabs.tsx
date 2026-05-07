@@ -1,9 +1,10 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { ArrowLeftRight, Home, Package, Users } from 'lucide-react-native';
+import { Home, IndianRupee, Package, Users } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { colors as t } from '@growcold/tokens';
 import { HomeScreen } from '../screens/HomeScreen';
 import { PartiesScreen } from '../screens/PartiesScreen';
 import { StockScreen } from '../screens/StockScreen';
@@ -11,8 +12,8 @@ import { MoneyScreen } from '../screens/MoneyScreen';
 
 export type RootTabParamList = {
   Home: undefined;
-  Inventory: undefined;
-  Transactions: undefined;
+  Stock: undefined;
+  Money: undefined;
   Parties: undefined;
 };
 
@@ -22,8 +23,8 @@ type IconComponent = typeof Home;
 
 const TAB_ICONS: Record<string, IconComponent> = {
   Home,
-  Inventory: Package,
-  Transactions: ArrowLeftRight,
+  Stock: Package,
+  Money: IndianRupee,
   Parties: Users,
 };
 
@@ -50,7 +51,7 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
               {Icon ? (
                 <Icon
                   size={20}
-                  color={focused ? '#00B14F' : '#9CA3AF'}
+                  color={focused ? t.brandUi : t.textTertiary}
                   strokeWidth={focused ? 2.25 : 1.75}
                 />
               ) : null}
@@ -66,11 +67,11 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
+    backgroundColor: t.bgSurface,
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    borderTopColor: t.borderDefault,
     paddingTop: 6,
-    shadowColor: '#000',
+    shadowColor: t.textPrimary,
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.04,
     shadowRadius: 8,
@@ -82,32 +83,26 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   iconPill: {
-    width: 48,
+    width: 28,
     height: 28,
-    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
   iconPillActive: {
-    backgroundColor: '#E8F8EF',
+    // No background — active state is conveyed by icon + label color only
   },
   label: {
     fontSize: 11,
     fontWeight: '500',
-    color: '#9CA3AF',
+    fontFamily: 'NotoSans_400Regular',
+    color: t.textTertiary,
   },
   labelActive: {
-    color: '#00B14F',
+    color: t.brandText,
     fontWeight: '600',
+    fontFamily: 'NotoSans_600SemiBold',
   },
 });
-
-function InventoryScreen() {
-  return <StockScreen />;
-}
-function TransactionsScreen() {
-  return <MoneyScreen />;
-}
 
 export function RootTabs() {
   const { t } = useTranslation('nav');
@@ -118,12 +113,8 @@ export function RootTabs() {
       screenOptions={{ headerShown: false }}
     >
       <Tab.Screen name="Home" component={HomeScreen} options={{ title: t('home') }} />
-      <Tab.Screen name="Inventory" component={InventoryScreen} options={{ title: t('stock') }} />
-      <Tab.Screen
-        name="Transactions"
-        component={TransactionsScreen}
-        options={{ title: t('payments') }}
-      />
+      <Tab.Screen name="Stock" component={StockScreen} options={{ title: t('stock') }} />
+      <Tab.Screen name="Money" component={MoneyScreen} options={{ title: t('money') }} />
       <Tab.Screen name="Parties" component={PartiesScreen} options={{ title: t('parties') }} />
     </Tab.Navigator>
   );

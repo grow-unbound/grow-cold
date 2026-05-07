@@ -16,7 +16,7 @@ export default function EditOperationalPaymentPage() {
 
   return (
     <div className="flex w-full flex-col gap-3">
-      <Link href="/transactions" className="text-caption font-medium text-primary-600 hover:underline">
+      <Link href="/transactions" className="text-caption font-medium text-brand-text hover:underline">
         ← {t('operational_payment.back_transactions')}
       </Link>
       <h1 className="h2">{t('operational_payment.edit_title')}</h1>

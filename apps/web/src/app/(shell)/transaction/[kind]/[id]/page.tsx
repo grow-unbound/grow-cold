@@ -19,7 +19,7 @@ export default function TransactionDetailPage() {
   if (kind !== 'receipt' && kind !== 'payment') {
     return (
       <div className="card mx-auto w-full max-w-2xl p-4">
-        <p className="text-body-sm text-danger-600">Invalid link.</p>
+        <p className="text-body-sm text-outward">Invalid link.</p>
         <Link href="/transactions" className="btn-secondary mt-2 inline-flex">
           {t('money.back_to_money')}
         </Link>
@@ -30,7 +30,7 @@ export default function TransactionDetailPage() {
   if (q.isPending) {
     return (
       <div className="card mx-auto w-full max-w-2xl p-4">
-        <p className="text-body-sm text-neutral-600">{t('loading')}</p>
+        <p className="text-body-sm text-text-secondary">{t('loading')}</p>
       </div>
     );
   }
@@ -38,8 +38,8 @@ export default function TransactionDetailPage() {
   if (q.isError || !q.data) {
     return (
       <div className="card mx-auto w-full max-w-2xl p-4">
-        <p className="text-body-sm text-danger-600">{t('error_load')}</p>
-        <Link href="/transactions" className="mt-2 inline-block text-sm text-primary-600 underline">
+        <p className="text-body-sm text-outward">{t('error_load')}</p>
+        <Link href="/transactions" className="mt-2 inline-block text-sm text-brand-text underline">
           {t('money.back_to_money')}
         </Link>
       </div>

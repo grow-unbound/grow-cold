@@ -62,7 +62,7 @@ export function PerformanceGraph({
   if (series.length === 0) {
     return (
       <Box h={height} justifyContent="center" alignItems="center">
-        <Text color="$textLight500" size="sm">
+        <Text color="$textTertiary" size="sm">
           —
         </Text>
       </Box>
@@ -74,26 +74,26 @@ export function PerformanceGraph({
       <HStack px="$1" pb="$2" space="md" alignItems="center">
         <HStack space="xs" alignItems="center">
           <Box w={12} h={12} borderRadius={2} style={{ backgroundColor: lodgedColor }} />
-          <Text size="xs" color="$textLight500">
+          <Text size="xs" color="$textTertiary">
             {lodgedLegend}
           </Text>
         </HStack>
         <HStack space="xs" alignItems="center">
           <Box w={12} h={12} borderRadius={2} style={{ backgroundColor: deliveredColor }} />
-          <Text size="xs" color="$textLight500">
+          <Text size="xs" color="$textTertiary">
             {deliveredLegend}
           </Text>
         </HStack>
       </HStack>
       <Svg width={w} height={height}>
-        <SvgText x={4} y={14} fontSize={10} fill="#6B7280">
+        <SvgText x={4} y={14} fontSize={10} fill="#7A6F61">
           {valueFormatter(maxY)}
         </SvgText>
         {bars.map((b, i) => (
           <React.Fragment key={`${b.label}-${i}`}>
             <Rect x={b.xL} y={b.yL} width={b.barW} height={b.hL} fill={lodgedColor} rx={2} />
             <Rect x={b.xD} y={b.yD} width={b.barW} height={b.hD} fill={deliveredColor} rx={2} />
-            <SvgText x={b.xL + b.barW / 2 - 8} y={height - 6} fontSize={9} fill="#6B7280">
+            <SvgText x={b.xL + b.barW / 2 - 8} y={height - 6} fontSize={9} fill="#7A6F61">
               {b.label}
             </SvgText>
           </React.Fragment>

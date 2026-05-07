@@ -8,11 +8,11 @@ interface PlaceholderScreenProps {
 export function PlaceholderScreen({ titleKey }: PlaceholderScreenProps) {
   const { t } = useTranslation('nav');
   return (
-    <Box flex={1} p="$4" bg="$backgroundLight0">
-      <Text fontSize="$xl" fontWeight="$semibold" color="$textLight900">
+    <Box flex={1} p="$4" bg="$bgSurface">
+      <Text fontSize="$xl" fontWeight="$semibold" color="$textPrimary">
         {t(titleKey)}
       </Text>
-      <Text mt="$2" fontSize="$sm" color="$textLight600">
+      <Text mt="$2" fontSize="$sm" color="$textSecondary">
         Placeholder — wire Supabase + flows next.
       </Text>
     </Box>

@@ -43,10 +43,10 @@ export function TimeFilterChips({ value, onChange }: TimeFilterChipsProps) {
             minHeight={48}
             justifyContent="center"
             borderWidth={1}
-            borderColor="$dashboardLodged"
-            bg={active ? '$dashboardLodged' : 'transparent'}
+            borderColor="$inward"
+            bg={active ? '$inward' : 'transparent'}
           >
-            <Text fontSize="$sm" fontWeight="$medium" color={active ? '#FFFFFF' : '$dashboardLodged'}>
+            <Text fontSize="$sm" fontWeight="$medium" color={active ? '#FFFFFF' : '$inward'}>
               {label(f)}
             </Text>
           </Pressable>

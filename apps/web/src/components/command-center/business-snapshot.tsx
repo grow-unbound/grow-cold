@@ -12,8 +12,8 @@ export function BusinessSnapshot({ data, isLoading }: Props) {
   if (isLoading || !data) {
     return (
       <div className="mt-2 flex gap-2">
-        <div className="h-[120px] flex-1 animate-pulse rounded-xl bg-neutral-200" />
-        <div className="h-[120px] flex-1 animate-pulse rounded-xl bg-neutral-200" />
+        <div className="h-[120px] flex-1 animate-pulse rounded-xl bg-surface-inset" />
+        <div className="h-[120px] flex-1 animate-pulse rounded-xl bg-surface-inset" />
       </div>
     );
   }
@@ -28,7 +28,7 @@ export function BusinessSnapshot({ data, isLoading }: Props) {
         <span className="text-2xl" aria-hidden>
           💰
         </span>
-        <p className="text-2xl font-bold text-neutral-900">{formatINR(data.cashBalance)}</p>
+        <p className="text-2xl font-bold text-text-primary">{formatINR(data.cashBalance)}</p>
         <p className="text-sm text-dashboard-muted">{t('cash_balance')}</p>
         <p className="text-sm text-dashboard-muted">
           {t('received_today')}: {formatINR(data.receivedToday)}
@@ -45,7 +45,7 @@ export function BusinessSnapshot({ data, isLoading }: Props) {
         <span className="text-2xl" aria-hidden>
           📦
         </span>
-        <p className="text-2xl font-bold text-neutral-900">{formatIndianNumber(data.totalBags)}</p>
+        <p className="text-2xl font-bold text-text-primary">{formatIndianNumber(data.totalBags)}</p>
         <p className="text-sm text-dashboard-muted">{t('total_bags')}</p>
         <p className="text-sm text-dashboard-muted">
           {t('total_lots')}: {data.totalLots}

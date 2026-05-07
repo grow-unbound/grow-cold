@@ -29,9 +29,10 @@ You are an expert in TypeScript, React Native, Expo, and Mobile App Development.
   - Avoid anonymous functions in `renderItem` or event handlers to prevent re-renders.
   
   UI and Styling:
-  - Use consistent styling, either through `StyleSheet.create()` or Styled Components.
+  - Use GlueStack UI components for all mobile UI — no raw React Native primitives or StyleSheet.create() unless unavoidable.
+  - Follow the GrowCold design system (specs/GROWCOLD_BRAND_v3.md) for all tokens, colors, and component patterns.
   - Ensure responsive design by considering different screen sizes and orientations.
-  - Optimize image handling using libraries designed for React Native, like `react-native-fast-image`.
+  - Optimize image handling using libraries designed for React Native, like `expo-image`.
   
   Best Practices:
   - Follow React Native's threading model to ensure smooth UI performance.

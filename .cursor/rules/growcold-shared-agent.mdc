@@ -1,72 +1,48 @@
 ---
-description: Shared/Core agent ownership and workflow for grow-cold shared package work
+description: Shared package development guide — what belongs in packages/shared and how to work with it
 globs:
   - packages/shared/**
 alwaysApply: false
 ---
 
-# GrowCold Shared/Core Agent
+# GrowCold Shared Package Guide
 
-You are the Shared/Core Agent for GrowCold. Your role is to build shared code (types, hooks, utilities, components) used by both web and mobile apps.
+`packages/shared` contains code used by both `apps/web` and `apps/mobile`. When a piece of logic, schema, or utility is needed in more than one app, put it here.
 
-## Ownership
+## What belongs in packages/shared
 
-You own ALL files in:
-- `packages/shared/src/**`
-- `packages/shared/package.json`
-- `packages/shared/tsconfig.json`
+- `packages/shared/src/api/**` — API client, endpoint definitions, typed response parsing
+- `packages/shared/src/components/**` — UI components safe for both React Native and web
+- `packages/shared/src/hooks/**` — shared hooks (e.g., `useOnlineStatus`, `useOfflineQueue`)
+- `packages/shared/src/store/**` — Zustand stores (offline queue, warehouse context)
+- `packages/shared/src/schemas/**` — Zod schemas and API contracts
+- `packages/shared/src/utils/**` — pure utilities (formatINR, formatDate, etc.)
+- `packages/shared/src/i18n/**` / `packages/shared/src/locales/**` — translation files
+- `packages/shared/src/offline/**` — offline queue and sync abstractions
 
-Primary areas:
-- `packages/shared/src/api/**` (API client, endpoints, contracts)
-- `packages/shared/src/components/**` (shared UI components, mobile-safe only)
-- `packages/shared/src/hooks/**` (shared hooks)
-- `packages/shared/src/store/**` (Zustand stores)
-- `packages/shared/src/schemas/**` (Zod schemas and contracts)
-- `packages/shared/src/utils/**` (pure utilities)
-- `packages/shared/src/i18n/**` / `packages/shared/src/locales/**` (translations)
-- `packages/shared/src/offline/**` (offline queue and sync abstractions)
+## Technical rules for shared code
 
-You CANNOT edit:
-- `apps/web/**` (Frontend Agent owns this)
-- `apps/mobile/**` (Mobile Agent owns this)
-- `packages/supabase/**` (Supabase Agent owns this)
-- `tests/**` (QA Agent owns this)
+- TypeScript strict mode and Zod at all external boundaries
+- **Platform-agnostic only** — no DOM-only APIs (`window`, `document`, browser globals) — this code runs on React Native too
+- Use `@supabase/supabase-js` for Supabase access. Accept runtime config (`supabaseUrl`, `supabaseAnonKey`) from the app layer — do not read env vars directly in shared
+- Keep utilities pure and side-effect free
+- Keep hooks compliant with React hook rules
+- Export public APIs through barrel exports (`packages/shared/src/index.ts` and sub-index files)
 
-## Workflow
+## API contracts
 
-1. Read Linear issue first (for example `GROW-M0-1`, `GROW-M0-2`, `GROW-M0-3`).
-2. Coordinate with Supabase Agent for schema details.
-3. Create API contracts first under `packages/shared/src/api/endpoints/` before implementation.
-4. Post in Linear when contract is ready.
-5. Implement contract consumers (schemas, auth helpers, client wrappers, utilities).
-6. Frontend/Mobile agents build against shared contracts.
-7. Open PR and request review; never self-merge.
+Define typed contracts under `packages/shared/src/api/endpoints/[resource].ts` before implementing consumers. Example:
 
-## Technical rules
+```typescript
+// packages/shared/src/api/endpoints/lots.ts
+export const GetLotsRequest = z.object({
+  warehouseId: z.string(),
+  status: z.enum(['ACTIVE', 'STALE']).optional(),
+});
+export type GetLotsRequest = z.infer<typeof GetLotsRequest>;
+```
 
-- Use TypeScript strict mode and Zod at boundaries.
-- Shared code must be platform-agnostic (works for Next.js web and future Expo mobile).
-- No DOM-only APIs (`window`, `document`, browser-only globals) in shared package code.
-- Supabase auth/data access uses `@supabase/supabase-js` in shared code. Do not use `@supabase/ssr` here.
-- Accept runtime config from app layers (`supabaseUrl`, `supabaseAnonKey`) rather than reading env directly in shared.
-- Keep utilities pure and side-effect free.
-- Keep hooks compliant with React hook rules.
-- Export public APIs through barrel exports (`packages/shared/src/index.ts` and sub-index files).
+## Commit format
 
-## Branch and commit format
-
-- Branch examples: `shared/M0-api-client`, `shared/M0-auth`, `shared/M1-offline-sync`
-- Commit format: `[shared]: [M#] Description`
-  - Example: `[shared]: [M0] Add Supabase shared client factory`
-
-## M0 priorities
-
-1. `GROW-M0-1`: Supabase client setup + shared schema alignment
-2. `GROW-M0-2`: Phone OTP auth contracts + helper implementation
-3. `GROW-M0-3`: API client scaffolding with auth header injection and typed response parsing
-
-## Notes
-
-- Keep API contracts in `packages/shared/src/api/endpoints/[resource].ts`.
-- Do not import from `apps/web/**` or `apps/mobile/**`.
-- If `packages/supabase/types.ts` is needed, coordinate with the Supabase/Orchestrator owner before changing backend-owned files.
+- `feat: add offline queue abstraction`
+- `fix: handle sync conflict in lot schema`

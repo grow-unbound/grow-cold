@@ -52,18 +52,18 @@ export function TransactionDetailsView({
     >
       <header
         className={cn(
-          'sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between gap-1 border-b border-neutral-200 bg-white px-1 sm:px-2',
+          'sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between gap-1 border-b border-border bg-white px-1 sm:px-2',
           'pt-[max(0.25rem,env(safe-area-inset-top,0px))] lg:pt-2',
         )}
       >
         <Link
           href="/transactions"
-          className="focus-ring flex min-h-12 min-w-12 items-center justify-center rounded-lg text-base font-medium text-primary-600 hover:bg-neutral-50"
+          className="focus-ring flex min-h-12 min-w-12 items-center justify-center rounded-lg text-base font-medium text-brand-text hover:bg-surface-subtle"
           aria-label={t('transaction_detail.back_aria')}
         >
           ←
         </Link>
-        <h1 className="min-w-0 flex-1 truncate px-1 text-center text-lg font-semibold text-neutral-900">
+        <h1 className="min-w-0 flex-1 truncate px-1 text-center text-lg font-semibold text-text-primary">
           {headerTitle}
         </h1>
         <div className="flex min-w-[48px] items-center justify-end gap-0.5">
@@ -74,7 +74,7 @@ export function TransactionDetailsView({
           ) : null}
           <button
             type="button"
-            className="flex min-h-12 min-w-12 items-center justify-center rounded-lg text-neutral-400 opacity-35 disabled:cursor-not-allowed"
+            className="flex min-h-12 min-w-12 items-center justify-center rounded-lg text-text-tertiary opacity-35 disabled:cursor-not-allowed"
             aria-label={t('transaction_detail.menu_aria')}
             aria-disabled="true"
             disabled
@@ -88,7 +88,7 @@ export function TransactionDetailsView({
       <div className="px-3 pb-8 pt-3 sm:px-4">
         <TransactionSummary data={data} />
         {dataUpdatedAt > 0 ? (
-          <p className="mt-2 text-center text-xs text-neutral-500">
+          <p className="mt-2 text-center text-xs text-text-tertiary">
             {t('transaction_detail.updated_ago', { time: formatUpdatedAgo(dataUpdatedAt) })}
           </p>
         ) : null}

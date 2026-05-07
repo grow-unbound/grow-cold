@@ -21,7 +21,7 @@ export function AlertsSection({ alerts, isLoading }: Props) {
   const { t } = useTranslation('home');
 
   if (isLoading) {
-    return <div className="mt-6 h-[100px] animate-pulse rounded-xl bg-neutral-200" />;
+    return <div className="mt-6 h-[100px] animate-pulse rounded-xl bg-surface-inset" />;
   }
 
   const items = alerts ?? [];
@@ -39,7 +39,7 @@ export function AlertsSection({ alerts, isLoading }: Props) {
             <li key={a.id}>
               <Link
                 href={alertHref(a)}
-                className="block py-2 text-base text-neutral-900 underline-offset-2 hover:underline"
+                className="block py-2 text-base text-text-primary underline-offset-2 hover:underline"
               >
                 • {a.message}
               </Link>

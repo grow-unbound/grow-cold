@@ -4,6 +4,7 @@ import {
   CheckLotNumberResponseSchema,
   CommandCenterActivityResponseSchema,
   CommandCenterAlertsResponseSchema,
+  CommandCenterHomeResponseSchema,
   CommandCenterMoneyResponseSchema,
   CommandCenterPartiesResponseSchema,
   CommandCenterSnapshotResponseSchema,
@@ -54,6 +55,7 @@ import {
   checkLotNumberHttpPath,
   commandCenterActivityPath,
   commandCenterAlertsPath,
+  commandCenterHomePath,
   commandCenterMoneyPath,
   commandCenterPartiesPath,
   commandCenterSnapshotPath,
@@ -89,6 +91,7 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tansta
 import { z } from 'zod';
 import {
   ChargesBootstrapResponseSchema,
+  ChargesBootstrapRowSchema,
   LotDeliveriesResponseSchema,
   SaveChargesRequestSchema,
   SaveChargesResponseSchema,
@@ -188,6 +191,19 @@ export function useCommandCenterAlerts(warehouseId: string | null) {
       parseRes(
         await fetch(commandCenterUrl(commandCenterAlertsPath, { warehouseId: warehouseId! })),
         CommandCenterAlertsResponseSchema,
+      ),
+  });
+}
+
+export function useCommandCenterHome(warehouseId: string | null) {
+  return useQuery({
+    queryKey: ['command-center', 'home', warehouseId],
+    enabled: Boolean(warehouseId),
+    staleTime: 60_000,
+    queryFn: async () =>
+      parseRes(
+        await fetch(commandCenterUrl(commandCenterHomePath, { warehouseId: warehouseId! })),
+        CommandCenterHomeResponseSchema,
       ),
   });
 }
@@ -515,6 +531,31 @@ export function useLocationsList(warehouseId: string | null) {
       const u = new URL(listLocationsHttpPath, window.location.origin);
       u.searchParams.set('warehouseId', warehouseId!);
       return parseRes(await fetch(u.toString()), ListLocationsResponseSchema);
+    },
+  });
+}
+
+export function useLodgementChargePreview(
+  warehouseId: string | null,
+  productId: string | null,
+  originalBags: number,
+  queryEnabled: boolean,
+) {
+  const previewSchema = z.object({
+    data: z.object({
+      charge_rows: z.array(ChargesBootstrapRowSchema),
+    }),
+  });
+  return useQuery({
+    queryKey: ['lodgement-charge-preview', warehouseId, productId, originalBags],
+    enabled: Boolean(warehouseId && productId) && queryEnabled && originalBags > 0,
+    queryFn: async () => {
+      const u = new URL(
+        `${window.location.origin}/api/products/${productId}/lodgement-charge-preview`,
+      );
+      u.searchParams.set('warehouseId', warehouseId!);
+      u.searchParams.set('originalBags', String(originalBags));
+      return parseRes(await fetch(u.toString()), previewSchema);
     },
   });
 }

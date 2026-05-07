@@ -7,6 +7,7 @@ import { create } from 'zustand';
 export type AppRole = 'OWNER' | 'MANAGER' | 'STAFF';
 
 const WAREHOUSE_LS_KEY = 'growcold-selected-warehouse-id';
+const WAREHOUSE_COOKIE_NAME = 'gc_last_warehouse_id';
 
 export type WarehouseOption = {
   id: string;
@@ -27,19 +28,42 @@ type SessionState = {
   clearSession: () => void;
 };
 
+function readCookieWarehouseId(): string | null {
+  if (typeof document === 'undefined') return null;
+  const m = document.cookie.match(
+    new RegExp(`(?:^|; )${WAREHOUSE_COOKIE_NAME.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}=([^;]*)`),
+  );
+  return m ? decodeURIComponent(m[1]) : null;
+}
+
+function writeWarehouseCookie(id: string) {
+  if (typeof window === 'undefined') return;
+  const maxAge = 60 * 60 * 24 * 400;
+  document.cookie = `${WAREHOUSE_COOKIE_NAME}=${encodeURIComponent(id)}; path=/; max-age=${maxAge}; samesite=lax`;
+}
+
+function clearWarehouseCookie() {
+  if (typeof window === 'undefined') return;
+  document.cookie = `${WAREHOUSE_COOKIE_NAME}=; path=/; max-age=0`;
+}
+
 function readStoredWarehouseId(): string | null {
   if (typeof window === 'undefined') return null;
+  const fromCookie = readCookieWarehouseId();
+  if (fromCookie) return fromCookie;
   return localStorage.getItem(WAREHOUSE_LS_KEY);
 }
 
 function persistWarehouseId(id: string) {
   if (typeof window === 'undefined') return;
   localStorage.setItem(WAREHOUSE_LS_KEY, id);
+  writeWarehouseCookie(id);
 }
 
 function clearStoredWarehouseId() {
   if (typeof window === 'undefined') return;
   localStorage.removeItem(WAREHOUSE_LS_KEY);
+  clearWarehouseCookie();
 }
 
 export const useSessionStore = create<SessionState>((set, get) => ({
@@ -81,40 +105,38 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       return;
     }
 
-    const { data: profile } = await client
-      .from('user_profiles')
-      .select('display_name, phone')
-      .eq('id', user.id)
-      .maybeSingle();
+    type AssignRow = {
+      warehouse_id: string;
+      warehouses: { id: string; warehouse_name: string } | null;
+    };
 
-    const { data: roleRow } = await client
-      .from('user_roles')
-      .select('role, tenant_id')
-      .eq('user_id', user.id)
-      .maybeSingle();
+    const [profileRes, roleRes, assignRes] = await Promise.all([
+      client.from('user_profiles').select('display_name, phone').eq('id', user.id).maybeSingle(),
+      client
+        .from('user_roles')
+        .select('role, tenant_id, tenants(name)')
+        .eq('user_id', user.id)
+        .maybeSingle(),
+      client
+        .from('user_warehouse_assignments')
+        .select('warehouse_id, warehouses(id, warehouse_name)')
+        .eq('user_id', user.id),
+    ]);
 
-    let tenantName: string | null = null;
-    if (roleRow?.tenant_id) {
-      const { data: tenant } = await client.from('tenants').select('name').eq('id', roleRow.tenant_id).maybeSingle();
-      tenantName = tenant?.name ?? null;
-    }
+    const roleRow = roleRes.data as
+      | { role: string; tenant_id: string; tenants: { name: string } | null }
+      | null;
+    const tenantName = roleRow?.tenants?.name ?? null;
 
-    const { data: assignmentRows } = await client
-      .from('user_warehouse_assignments')
-      .select('warehouse_id')
-      .eq('user_id', user.id);
-
-    const warehouseIds = assignmentRows?.map((r) => r.warehouse_id) ?? [];
-    let warehouses: WarehouseOption[] = [];
-    if (warehouseIds.length > 0) {
-      const { data: whRows } = await client
-        .from('warehouses')
-        .select('id, warehouse_name')
-        .in('id', warehouseIds)
-        .order('warehouse_name');
-      warehouses =
-        whRows?.map((w) => ({ id: w.id, warehouse_name: w.warehouse_name })) ?? [];
-    }
+    const assignmentRows = (assignRes.data ?? []) as AssignRow[];
+    const warehouses: WarehouseOption[] = assignmentRows
+      .map((r) => {
+        const w = r.warehouses;
+        if (!w) return null;
+        return { id: w.id, warehouse_name: w.warehouse_name };
+      })
+      .filter((x): x is WarehouseOption => x !== null)
+      .sort((a, b) => a.warehouse_name.localeCompare(b.warehouse_name));
 
     if (warehouses.length === 0) {
       clearStoredWarehouseId();
@@ -122,8 +144,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
 
     const stored = readStoredWarehouseId();
     const storedValid = Boolean(stored && warehouses.some((w) => w.id === stored));
-    const selectedWarehouseId =
-      storedValid ? stored! : warehouses[0]?.id ?? null;
+    const selectedWarehouseId = storedValid ? stored! : warehouses[0]?.id ?? null;
 
     if (warehouses.length > 0 && selectedWarehouseId && !storedValid) {
       persistWarehouseId(selectedWarehouseId);
@@ -131,8 +152,8 @@ export const useSessionStore = create<SessionState>((set, get) => ({
 
     set({
       role: (roleRow?.role as AppRole) ?? 'STAFF',
-      displayName: profile?.display_name ?? null,
-      phone: profile?.phone ?? null,
+      displayName: profileRes.data?.display_name ?? null,
+      phone: profileRes.data?.phone ?? null,
       tenantName,
       warehouses,
       selectedWarehouseId,

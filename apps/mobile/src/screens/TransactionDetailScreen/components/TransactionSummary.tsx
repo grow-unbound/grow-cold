@@ -4,8 +4,8 @@ import { Box, HStack, Text, VStack } from '@gluestack-ui/themed';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 
-const GREEN = '#16A34A';
-const PURPLE = '#7C3AED';
+const GREEN = '#0B7B6E';
+const PURPLE = '#7B5200';
 const EM = '\u2014';
 
 function methodDisplayKey(method: string | null, t: (k: string) => string): string {
@@ -56,7 +56,7 @@ export function TransactionSummary({ data }: { data: TransactionDetailData }) {
 
   return (
     <View style={{ position: 'relative' }}>
-      <Box bg="#F9FAFB" borderRadius={12} p="$4" style={{ position: 'relative' }}>
+      <Box bg="#FFFFFF" borderRadius={12} p="$4" style={{ position: 'relative' }}>
         <HStack position="absolute" right={0} top={0} zIndex={1}>
           <Box bg={badgeColor} px="$2" py="$1" borderRadius={4}>
             <Text color="$white" fontSize={12} fontWeight="$bold" textTransform="uppercase">
@@ -68,7 +68,7 @@ export function TransactionSummary({ data }: { data: TransactionDetailData }) {
           <Text
             fontSize={14}
             fontWeight="$semibold"
-            color="#6B7280"
+            color="#7A6F61"
             letterSpacing={0.5}
             textTransform="uppercase"
           >
@@ -77,13 +77,13 @@ export function TransactionSummary({ data }: { data: TransactionDetailData }) {
           <VStack space="sm">
             {rows.map((row) => (
               <VStack key={row.label} space="xs">
-                <Text fontSize={14} color="#6B7280">
+                <Text fontSize={14} color="#7A6F61">
                   {row.label}:
                 </Text>
                 <Text
                   fontSize={16}
                   fontWeight="$semibold"
-                  color={row.valueColor ?? '$textLight900'}
+                  color={row.valueColor ?? '$textPrimary'}
                   lineHeight={row.multiline ? 24 : undefined}
                 >
                   {row.value || EM}

@@ -7,8 +7,8 @@ import { cn } from '@/lib/utils';
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <span className="text-sm text-neutral-500">{label}</span>
-      <span className="text-base font-semibold text-neutral-900">{value}</span>
+      <span className="text-sm text-text-tertiary">{label}</span>
+      <span className="text-base font-semibold text-text-primary">{value}</span>
     </div>
   );
 }
@@ -28,10 +28,10 @@ export function LotSummary({ data }: { data: LotDetailData }) {
 
   const badgeClass =
     status === 'completed' || status === 'fresh'
-      ? 'border-[#16A34A] text-[#16A34A]'
+      ? 'border-[#0B7B6E] text-[#0B7B6E]'
       : status === 'aging'
         ? 'border-[#F59E0B] text-[#F59E0B]'
-        : 'border-[#DC2626] text-[#DC2626]';
+        : 'border-[#A83422] text-[#A83422]';
 
   const lodgedDate = formatYmdLong(data.lodgement_date);
   const lodgedLine = t('lot_detail.lodged_line', {
@@ -53,7 +53,7 @@ export function LotSummary({ data }: { data: LotDetailData }) {
       className="rounded-xl bg-[#F9FAFB] p-4"
       aria-labelledby="lot-summary-heading"
     >
-      <h2 id="lot-summary-heading" className="text-sm font-medium uppercase tracking-wide text-neutral-500">
+      <h2 id="lot-summary-heading" className="text-sm font-medium uppercase tracking-wide text-text-tertiary">
         {t('lot_detail.summary_title')}
       </h2>
       <div className="mt-3 flex flex-col gap-2">
@@ -67,7 +67,7 @@ export function LotSummary({ data }: { data: LotDetailData }) {
           value={t('lot_detail.bags_count', { count: data.balance_bags })}
         />
         <div className="flex flex-col gap-0.5">
-          <span className="text-sm text-neutral-500">{t('lot_detail.status')}</span>
+          <span className="text-sm text-text-tertiary">{t('lot_detail.status')}</span>
           <span
             className={cn(
               'inline-flex w-fit max-w-full rounded-md border px-2 py-1 text-base font-semibold',

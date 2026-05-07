@@ -15,7 +15,7 @@ import { useCreateMoneyPayment, useCreateReceipt, useCustomersList } from '@/lib
 import { cn } from '@/lib/utils';
 
 const GREEN = '#16A34A';
-const PURPLE = '#7C3AED';
+const PURPLE = '#C8712A';
 
 type Mode = 'receipt' | 'payment';
 
@@ -130,7 +130,7 @@ export function RecordMoneyTransactionDialog({ open, onClose, warehouseId }: Pro
             })}
           >
             <div className="form-field">
-              <label className="text-label-lg font-semibold text-neutral-700" htmlFor="m-customer">
+              <label className="text-label-lg font-semibold text-text-secondary" htmlFor="m-customer">
                 {t('transactions.customer')} *
               </label>
               <select
@@ -147,19 +147,19 @@ export function RecordMoneyTransactionDialog({ open, onClose, warehouseId }: Pro
               </select>
             </div>
             <div className="form-field">
-              <label className="text-label-lg font-semibold text-neutral-700" htmlFor="m-rdate">
+              <label className="text-label-lg font-semibold text-text-secondary" htmlFor="m-rdate">
                 {t('transactions.date')} *
               </label>
               <input id="m-rdate" type="date" className="input-base" {...rForm.register('receipt_date')} />
             </div>
             <div className="form-field">
-              <label className="text-label-lg font-semibold text-neutral-700" htmlFor="m-ramount">
+              <label className="text-label-lg font-semibold text-text-secondary" htmlFor="m-ramount">
                 {t('transactions.amount')} *
               </label>
               <input id="m-ramount" inputMode="decimal" className="input-base" {...rForm.register('total_amount')} />
             </div>
             <div className="form-field">
-              <p className="text-label-lg font-semibold text-neutral-700 mb-1">{t('transactions.method')}</p>
+              <p className="text-label-lg font-semibold text-text-secondary mb-1">{t('transactions.method')}</p>
               <div className="flex flex-wrap gap-2">
                 {PAYMENT_METHOD.map((m) => (
                   <button
@@ -167,7 +167,7 @@ export function RecordMoneyTransactionDialog({ open, onClose, warehouseId }: Pro
                     type="button"
                     className={cn(
                       'rounded-full border-2 px-3 py-1.5 text-sm font-semibold',
-                      rForm.watch('payment_method') === m ? 'bg-neutral-800 text-white border-neutral-800' : 'border-neutral-200',
+                      rForm.watch('payment_method') === m ? 'bg-brand-ui text-white border-brand-ui' : 'border-border',
                     )}
                     onClick={() => rForm.setValue('payment_method', m, { shouldValidate: true })}
                   >
@@ -177,7 +177,7 @@ export function RecordMoneyTransactionDialog({ open, onClose, warehouseId }: Pro
               </div>
             </div>
             <div className="form-field">
-              <label className="text-label-lg font-semibold text-neutral-700" htmlFor="m-rnotes">
+              <label className="text-label-lg font-semibold text-text-secondary" htmlFor="m-rnotes">
                 {t('stock.notes')}
               </label>
               <textarea id="m-rnotes" className="input-base min-h-[3rem]" {...rForm.register('notes')} />
@@ -207,25 +207,25 @@ export function RecordMoneyTransactionDialog({ open, onClose, warehouseId }: Pro
             })}
           >
             <div className="form-field">
-              <label className="text-label-lg font-semibold text-neutral-700" htmlFor="m-recip">
+              <label className="text-label-lg font-semibold text-text-secondary" htmlFor="m-recip">
                 {t('money.recipient')} *
               </label>
               <input id="m-recip" className="input-base" {...pForm.register('recipient_name', { required: true })} />
             </div>
             <div className="form-field">
-              <label className="text-label-lg font-semibold text-neutral-700" htmlFor="m-pdate">
+              <label className="text-label-lg font-semibold text-text-secondary" htmlFor="m-pdate">
                 {t('transactions.date')} *
               </label>
               <input id="m-pdate" type="date" className="input-base" {...pForm.register('payment_date')} />
             </div>
             <div className="form-field">
-              <label className="text-label-lg font-semibold text-neutral-700" htmlFor="m-pamount">
+              <label className="text-label-lg font-semibold text-text-secondary" htmlFor="m-pamount">
                 {t('transactions.amount')} *
               </label>
               <input id="m-pamount" inputMode="decimal" className="input-base" {...pForm.register('total_amount')} />
             </div>
             <div className="form-field">
-              <p className="text-label-lg font-semibold text-neutral-700 mb-1">{t('transactions.method')}</p>
+              <p className="text-label-lg font-semibold text-text-secondary mb-1">{t('transactions.method')}</p>
               <div className="flex flex-wrap gap-2">
                 {PAYMENT_METHOD.map((m) => (
                   <button
@@ -233,7 +233,7 @@ export function RecordMoneyTransactionDialog({ open, onClose, warehouseId }: Pro
                     type="button"
                     className={cn(
                       'rounded-full border-2 px-3 py-1.5 text-sm font-semibold',
-                      pForm.watch('payment_method') === m ? 'bg-neutral-800 text-white border-neutral-800' : 'border-neutral-200',
+                      pForm.watch('payment_method') === m ? 'bg-brand-ui text-white border-brand-ui' : 'border-border',
                     )}
                     onClick={() => pForm.setValue('payment_method', m, { shouldValidate: true })}
                   >
@@ -243,7 +243,7 @@ export function RecordMoneyTransactionDialog({ open, onClose, warehouseId }: Pro
               </div>
             </div>
             <div className="form-field">
-              <label className="text-label-lg font-semibold text-neutral-700" htmlFor="m-pnotes">
+              <label className="text-label-lg font-semibold text-text-secondary" htmlFor="m-pnotes">
                 {t('stock.notes')}
               </label>
               <textarea id="m-pnotes" className="input-base min-h-[3rem]" {...pForm.register('notes')} />

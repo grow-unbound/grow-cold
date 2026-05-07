@@ -15,7 +15,7 @@ export function KpiCard({ title, primary, secondary, trend, trendPositive }: Kpi
       minHeight={100}
       p="$4"
       borderRadius={12}
-      bg="$backgroundLight0"
+      bg="$bgSurface"
       style={{
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
@@ -25,14 +25,14 @@ export function KpiCard({ title, primary, secondary, trend, trendPositive }: Kpi
       }}
     >
       <VStack space="xs">
-        <Text size="xs" color="$textLight500" fontWeight="$medium">
+        <Text size="xs" color="$textTertiary" fontWeight="$medium">
           {title}
         </Text>
-        <Text fontSize={20} fontWeight="$bold" color="$textLight900">
+        <Text fontSize={20} fontWeight="$bold" color="$textPrimary">
           {primary}
         </Text>
         {secondary ? (
-          <Text size="sm" color="$textLight500">
+          <Text size="sm" color="$textTertiary">
             {secondary}
           </Text>
         ) : null}
@@ -41,10 +41,10 @@ export function KpiCard({ title, primary, secondary, trend, trendPositive }: Kpi
             size="sm"
             color={
               trendPositive === true
-                ? '$dashboardMoney'
+                ? '$inward'
                 : trendPositive === false
-                  ? '$dashboardDanger'
-                  : '$textLight500'
+                  ? '$outward'
+                  : '$textTertiary'
             }
           >
             {trend}

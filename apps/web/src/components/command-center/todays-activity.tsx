@@ -10,7 +10,7 @@ export function TodaysActivity({ data, isLoading }: Props) {
   const { t } = useTranslation('home');
 
   if (isLoading || !data) {
-    return <div className="mt-6 h-[140px] animate-pulse rounded-xl bg-neutral-200" />;
+    return <div className="mt-6 h-[140px] animate-pulse rounded-xl bg-surface-inset" />;
   }
 
   return (
@@ -19,15 +19,15 @@ export function TodaysActivity({ data, isLoading }: Props) {
         {t('todays_activity')}
       </h2>
       <div className="flex flex-col gap-2">
-        <p className="text-base text-neutral-900">
+        <p className="text-base text-text-primary">
           <span className="text-dashboard-lodged">↓ </span>
           {t('lodgements_fmt', { count: data.lodgementsCount, bags: data.lodgementsBags })}
         </p>
-        <p className="text-base text-neutral-900">
+        <p className="text-base text-text-primary">
           <span className="text-dashboard-delivered">↑ </span>
           {t('deliveries_fmt', { count: data.deliveriesCount, bags: data.deliveriesBags })}
         </p>
-        <p className="text-base text-neutral-900">
+        <p className="text-base text-text-primary">
           <span className="text-dashboard-money">₹ </span>
           {t('collected_fmt', {
             amount: formatINR(data.collectedAmount),

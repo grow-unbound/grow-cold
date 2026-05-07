@@ -56,8 +56,8 @@ export function PerformanceChartInner({
     <ResponsiveContainer width="100%" height={height}>
       <BarChart data={series} margin={{ top: 8, right: 8, left: 4, bottom: 4 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-        <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#6B7280' }} />
-        <YAxis tick={{ fontSize: 11, fill: '#6B7280' }} tickFormatter={(v) => valueFormatter(Number(v))} />
+        <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#7A6F61' }} />
+        <YAxis tick={{ fontSize: 11, fill: '#7A6F61' }} tickFormatter={(v) => valueFormatter(Number(v))} />
         <Tooltip
           formatter={(value: unknown, name) => [valueFormatter(coerceTooltipNumber(value)), name]}
           labelStyle={{ color: '#374151' }}

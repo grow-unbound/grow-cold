@@ -5,7 +5,7 @@ import { formatINR } from '@growcold/shared';
 import { useTranslation } from 'react-i18next';
 
 const GREEN = '#16A34A';
-const PURPLE = '#7C3AED';
+const PURPLE = '#C8712A';
 const EM = '\u2014';
 
 function methodDisplayKey(method: string | null, t: (k: string) => string): string {
@@ -39,7 +39,7 @@ export function TransactionSummary({ data }: { data: TransactionDetailData }) {
     {
       label: t('transaction_detail.amount'),
       value: formatINR(data.amount),
-      valueClassName: isReceipt ? 'text-[#16A34A]' : 'text-neutral-900',
+      valueClassName: isReceipt ? 'text-[#0B7B6E]' : 'text-text-primary',
     },
     { label: t('transaction_detail.method'), value: method },
     { label: t('transaction_detail.date'), value: data.displayDateTime, multiline: true },
@@ -63,15 +63,15 @@ export function TransactionSummary({ data }: { data: TransactionDetailData }) {
         {badgeText}
       </div>
       <div className="pr-20">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-text-tertiary">
           {t('transaction_detail.summary_title')}
         </h2>
         <dl className="mt-3 space-y-2">
           {rows.map((row) => (
             <div key={row.label} className="space-y-0.5">
-              <dt className="text-sm text-neutral-500">{row.label}:</dt>
+              <dt className="text-sm text-text-tertiary">{row.label}:</dt>
               <dd
-                className={`text-base font-semibold ${row.valueClassName ?? 'text-neutral-900'} ${
+                className={`text-base font-semibold ${row.valueClassName ?? 'text-text-primary'} ${
                   row.multiline ? 'whitespace-pre-wrap leading-relaxed' : ''
                 }`}
               >

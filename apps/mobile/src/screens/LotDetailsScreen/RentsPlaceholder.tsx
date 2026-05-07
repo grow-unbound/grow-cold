@@ -5,10 +5,10 @@ export function RentsPlaceholder() {
   const { t } = useTranslation('pages');
   return (
     <VStack space="md" px="$4" py="$10" alignItems="center">
-      <Text fontSize="$sm" fontWeight="$medium" color="$dashboardMuted" textTransform="uppercase">
+      <Text fontSize="$sm" fontWeight="$medium" color="$textTertiary" textTransform="uppercase">
         {t('lot_detail.rents_title')}
       </Text>
-      <Text fontSize="$sm" color="$dashboardMuted" textAlign="center" maxWidth={400} lineHeight="$md">
+      <Text fontSize="$sm" color="$textTertiary" textAlign="center" maxWidth={400} lineHeight="$md">
         {t('lot_detail.rents_placeholder_body')}
       </Text>
     </VStack>

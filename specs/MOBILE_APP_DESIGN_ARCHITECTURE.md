@@ -230,8 +230,8 @@ Parties Tab:
 - Others: 📦
 
 **Card Colors:**
-- **Lodgements:** 4px solid orange (#EA580C) left border
-- **Deliveries:** 4px solid teal (#0891B2) left border
+- **Lodgements:** 4px solid inward (#0B7B6E) left border
+- **Deliveries:** 4px solid outward (#A83422) left border
 - Background: White
 - No card background tints (keep clean)
 
@@ -312,8 +312,8 @@ Parties Tab:
 - [Payments] → Purple-bordered cards only
 
 **Card Colors:**
-- **Receipts:** 4px solid green (#10B981) left border
-- **Payments:** 4px solid purple (#7C3AED) left border
+- **Receipts:** 4px solid inward (#0B7B6E) left border
+- **Payments:** 4px solid pending (#7B5200) left border
 
 **Card Design:**
 ```
@@ -661,34 +661,36 @@ Triggered from 👤 menu icon in header.
 
 ## Design System Integration
 
+> Canonical source: `specs/GROWCOLD_BRAND_v3.md`. The values below are derived from it.
+
 ### Colors
 
-**Brand Colors:**
-- Primary Orange: #EA580C
-- Secondary Teal: #0891B2
-- Accent Purple: #7C3AED
-- Success Green: #10B981
-- Warning Yellow: #F59E0B
-- Error Red: #DC2626
+**Brand tokens:**
+- Brand CTA (buttons, icons, active indicator): `brand-ui #C8712A`
+- Brand text / labels using brand color: `brand-text #8C4A12`
+- Page canvas: `bg-page #FEFCF8`
+- Cards / inputs: `bg-surface #FFFFFF`
 
-**Transaction Type Colors:**
-- Lodgement border: Orange (#EA580C)
-- Delivery border: Teal (#0891B2)
-- Receipt border: Green (#10B981)
-- Payment border: Purple (#7C3AED)
+**Transaction type colors (semantic — never swap meanings):**
+- Lodgement / inward border: `inward #0B7B6E` (teal)
+- Delivery / outward border: `outward #A83422` (rust)
+- Receipt border: `inward #0B7B6E` (teal — money in = positive)
+- Payment border: `pending #7B5200` (amber — money out = pending/neutral)
 
-**Status Indicators:**
-- 🔴 Red: High priority / Stale / High outstanding
-- 🟡 Yellow: Medium priority / Aging / Medium outstanding
-- 🟢 Green: Good / Fresh / Low/No outstanding
+**Status indicators:**
+- 🔴 High priority / Stale / High outstanding: `outward #A83422`
+- 🟡 Medium priority / Aging / Due: `pending #7B5200`
+- 🟢 Good / Fresh / No outstanding: `inward #0B7B6E`
 
 ### Typography
 
-- Hero numbers: 32px bold
-- Card titles: 20px semibold
-- Body text: 16px regular
-- Secondary text: 14px regular
-- Captions: 12px regular
+- Display / hero numbers: 48px bold — Noto Serif
+- H1 / screen titles: 38px 600 — Noto Serif
+- H2 / section headings: 30px 600 — Noto Serif
+- H3 / card titles: 24px 500 — Noto Serif
+- Body text: 15px 400 — Noto Sans
+- Secondary text / captions: 13px 400 — Noto Sans
+- Labels / column headers: 11px 500 UPPERCASE — Noto Sans Mono
 
 ### Spacing
 
@@ -707,10 +709,10 @@ Triggered from 👤 menu icon in header.
 - Placeholder: 16px, gray (#9CA3AF)
 
 **Filter Chips:**
-- Height: 36px
+- Height: 36px visual, 48px tap zone
 - Border radius: 18px
-- Active: Solid brand color background, white text
-- Inactive: Border only, brand color text
+- Active: `brand-ui (#C8712A)` background, white text
+- Inactive: `brand-border` border only, `brand-text` text
 - Tap target: 48px (padding compensation)
 
 **Cards:**
@@ -722,7 +724,7 @@ Triggered from 👤 menu icon in header.
 **FAB:**
 - Size: 56px diameter
 - Position: Bottom-right, 16px margin
-- Background: Primary orange
+- Background: `brand-ui (#C8712A)`
 - Icon: White, 24px
 - Shadow: Elevation 6
 

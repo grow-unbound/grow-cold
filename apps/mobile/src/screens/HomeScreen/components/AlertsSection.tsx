@@ -17,18 +17,18 @@ export function AlertsSection({ alerts, isLoading }: Props) {
   const navigation = useNavigation<BottomTabNavigationProp<RootTabParamList>>();
 
   if (isLoading) {
-    return <Box h={100} mt="$6" borderRadius={12} bg="$backgroundLight200" />;
+    return <Box h={100} mt="$6" borderRadius={12} bg="$bgInset" />;
   }
 
   const items = alerts ?? [];
 
   return (
     <Box mt="$6">
-      <Text size="sm" fontWeight="$bold" color="$dashboardDanger" textTransform="uppercase" mb="$2">
+      <Text size="sm" fontWeight="$bold" color="$outward" textTransform="uppercase" mb="$2">
         {t('needs_attention')}
       </Text>
       {items.length === 0 ? (
-        <Text fontSize={16} color="$textLight500">
+        <Text fontSize={16} color="$textTertiary">
           {t('alerts_empty')}
         </Text>
       ) : (
@@ -41,15 +41,15 @@ export function AlertsSection({ alerts, isLoading }: Props) {
                   const root = navigation.getParent<NativeStackNavigationProp<RootStackParamList>>();
                   root?.navigate('PartyDetail', { customerId: a.nav.customerId });
                 } else if (a.nav.kind === 'stock_stale') {
-                  navigation.navigate('Inventory');
+                  navigation.navigate('Stock');
                 } else {
-                  navigation.navigate('Transactions');
+                  navigation.navigate('Money');
                 }
               }}
               accessibilityRole="button"
               py="$2"
             >
-              <Text fontSize={16} color="$textLight900">
+              <Text fontSize={16} color="$textPrimary">
                 • {a.message}
               </Text>
             </Pressable>

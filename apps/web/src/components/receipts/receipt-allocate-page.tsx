@@ -20,19 +20,19 @@ export function ReceiptAllocatePageClient({ receiptId }: { receiptId: string }) 
   if (!warehouseId) {
     return (
       <div className="card w-full">
-        <p className="text-body-sm text-neutral-600">{t('select_warehouse')}</p>
+        <p className="text-body-sm text-text-secondary">{t('select_warehouse')}</p>
       </div>
     );
   }
 
   if (receiptQ.isPending) {
-    return <p className="text-body-sm text-neutral-600">{t('receipts.loading_receipt')}</p>;
+    return <p className="text-body-sm text-text-secondary">{t('receipts.loading_receipt')}</p>;
   }
 
   if (receiptQ.isError || !row) {
     return (
-      <div className="card border-danger-200 p-4">
-        <p className="text-body-sm text-danger-700">{t('error_load')}</p>
+      <div className="card border-outward-border p-4">
+        <p className="text-body-sm text-outward">{t('error_load')}</p>
         <Button type="button" variant="secondary" className="mt-3 min-h-touch" asChild>
           <Link href="/transactions">{t('back')}</Link>
         </Button>
@@ -43,7 +43,7 @@ export function ReceiptAllocatePageClient({ receiptId }: { receiptId: string }) 
   if (row.allocation_confirmed_at) {
     return (
       <div className="card p-4">
-        <p className="text-body-sm text-neutral-800">{t('receipts.cannot_edit_confirmed')}</p>
+        <p className="text-body-sm text-text-primary">{t('receipts.cannot_edit_confirmed')}</p>
         <Button type="button" className="btn-primary mt-3 min-h-touch" asChild>
           <Link href="/transactions">{t('transactions.title')}</Link>
         </Button>
@@ -59,7 +59,7 @@ export function ReceiptAllocatePageClient({ receiptId }: { receiptId: string }) 
         </Button>
         <div className="min-w-0 flex-1">
           <h1 className="h2">{t('receipts.allocate_title')}</h1>
-          <p className="text-caption text-neutral-600">{row.customer_name}</p>
+          <p className="text-caption text-text-secondary">{row.customer_name}</p>
         </div>
       </header>
 

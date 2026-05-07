@@ -11,7 +11,7 @@ export function TodaysActivity({ data, isLoading }: Props) {
   const { t } = useTranslation('home');
 
   if (isLoading || !data) {
-    return <Box h={140} mt="$6" borderRadius={12} bg="$backgroundLight200" />;
+    return <Box h={140} mt="$6" borderRadius={12} bg="$bgInset" />;
   }
 
   return (
@@ -19,7 +19,7 @@ export function TodaysActivity({ data, isLoading }: Props) {
       mt="$6"
       p="$4"
       borderRadius={12}
-      bg="$backgroundLight0"
+      bg="$bgSurface"
       style={{
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
@@ -28,20 +28,20 @@ export function TodaysActivity({ data, isLoading }: Props) {
         elevation: 2,
       }}
     >
-      <Text size="sm" fontWeight="$bold" color="$textLight500" textTransform="uppercase" mb="$3">
+      <Text size="sm" fontWeight="$bold" color="$textTertiary" textTransform="uppercase" mb="$3">
         {t('todays_activity')}
       </Text>
       <VStack space="sm">
-        <Text fontSize={16} color="$textLight900">
-          <Text color="$dashboardLodged">↓ </Text>
+        <Text fontSize={16} color="$textPrimary">
+          <Text color="$inward">↓ </Text>
           {t('lodgements_fmt', { count: data.lodgementsCount, bags: data.lodgementsBags })}
         </Text>
-        <Text fontSize={16} color="$textLight900">
-          <Text color="$dashboardDelivered">↑ </Text>
+        <Text fontSize={16} color="$textPrimary">
+          <Text color="$inward">↑ </Text>
           {t('deliveries_fmt', { count: data.deliveriesCount, bags: data.deliveriesBags })}
         </Text>
-        <Text fontSize={16} color="$textLight900">
-          <Text color="$dashboardMoney">₹ </Text>
+        <Text fontSize={16} color="$textPrimary">
+          <Text color="$inward">₹ </Text>
           {t('collected_fmt', {
             amount: formatINR(data.collectedAmount),
             count: data.collectedCustomerCount,

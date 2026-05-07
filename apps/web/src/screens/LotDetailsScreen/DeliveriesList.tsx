@@ -10,8 +10,8 @@ export function DeliveriesList({ deliveries }: { deliveries: LotDetailDeliveryRo
   if (deliveries.length === 0) {
     return (
       <div className="flex flex-col items-center gap-1 px-4 py-10 text-center">
-        <p className="text-base font-medium text-neutral-900">{t('lot_detail.deliveries_empty_title')}</p>
-        <p className="text-sm text-neutral-500">{t('lot_detail.deliveries_empty_body')}</p>
+        <p className="text-base font-medium text-text-primary">{t('lot_detail.deliveries_empty_title')}</p>
+        <p className="text-sm text-text-tertiary">{t('lot_detail.deliveries_empty_body')}</p>
       </div>
     );
   }
@@ -27,15 +27,15 @@ export function DeliveriesList({ deliveries }: { deliveries: LotDetailDeliveryRo
         return (
           <li
             key={d.id}
-            className="rounded-xl border border-neutral-200/80 bg-white px-3 py-3 shadow-sm"
+            className="rounded-xl border border-border/80 bg-white px-3 py-3 shadow-sm"
           >
-            <p className="text-base font-semibold text-neutral-900">{formatYmdLong(d.delivery_date)}</p>
-            <p className="mt-1 text-sm text-neutral-600">
+            <p className="text-base font-semibold text-text-primary">{formatYmdLong(d.delivery_date)}</p>
+            <p className="mt-1 text-sm text-text-secondary">
               {meta}
               {driverPart}
             </p>
             {vehicle && vehicle.length > 0 ? (
-              <p className="mt-0.5 text-sm text-neutral-600">
+              <p className="mt-0.5 text-sm text-text-secondary">
                 {t('lot_detail.vehicle')}: {vehicle}
               </p>
             ) : null}

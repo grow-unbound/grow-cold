@@ -9,12 +9,12 @@ export function AuthBrandLogo() {
   return (
     <div className="flex flex-col items-center gap-1.5">
       <div
-        className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary-500 text-lg font-bold tracking-tight text-white shadow-md ring-1 ring-black/[0.06]"
+        className="flex h-14 w-14 items-center justify-center rounded-xl bg-brand-ui text-lg font-bold tracking-tight text-white shadow-md ring-1 ring-black/[0.06]"
         aria-hidden
       >
         GC
       </div>
-      <span className="text-sm font-semibold text-neutral-800">{t('app_name')}</span>
+      <span className="text-sm font-semibold text-text-primary">{t('app_name')}</span>
     </div>
   );
 }

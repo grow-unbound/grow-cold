@@ -13,7 +13,6 @@ import { StockFilterChips, type StockMovementFilter } from './stock-filter-chips
 import { StockStatusCard } from './stock-status-card';
 import { StockTransactionCard } from './stock-transaction-card';
 
-const GREEN = '#00B14F';
 
 function sectionKeyForRow(row: StockTabMovementRowDto): string {
   const d = startOfDay(parseISO(row.transactionDate));
@@ -123,7 +122,7 @@ export function StockScreen() {
   if (!warehouseId) {
     return (
       <div className="card w-full">
-        <p className="text-body-sm text-neutral-600">{t('select_warehouse')}</p>
+        <p className="text-body-sm text-text-secondary">{t('select_warehouse')}</p>
       </div>
     );
   }
@@ -132,15 +131,15 @@ export function StockScreen() {
 
   return (
     <div className="relative flex w-full max-w-none flex-col">
-      <div className="w-full space-y-2 bg-neutral-50 pb-2 pt-2">
+      <div className="w-full space-y-2 bg-surface-subtle pb-2 pt-2">
         <div className="relative">
           <Search
-            className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400"
+            className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-text-tertiary"
             aria-hidden
           />
           <input
             type="search"
-            className="input-base h-12 w-full rounded-xl border-0 bg-[#F3F4F6] py-3 pl-10 pr-10 text-base"
+            className="input-base h-12 w-full rounded-xl border-0 bg-surface-subtle py-3 pl-10 pr-10 text-base"
             placeholder={t('stock.search_placeholder')}
             aria-label={t('stock.search_placeholder')}
             value={search}
@@ -149,7 +148,7 @@ export function StockScreen() {
           {search ? (
             <button
               type="button"
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-2 text-neutral-500 hover:bg-neutral-200/80"
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-2 text-text-tertiary hover:bg-surface-inset/80"
               aria-label="Clear"
               onClick={() => setSearch('')}
             >
@@ -160,7 +159,7 @@ export function StockScreen() {
 
         <StockFilterChips value={filter} onChange={setFilter} />
 
-        <h2 className="text-label font-semibold tracking-wide text-neutral-500">
+        <h2 className="font-mono text-[11px] font-medium uppercase tracking-[0.1em] text-text-tertiary">
           {t('stock.transactions')}
         </h2>
       </div>
@@ -174,22 +173,22 @@ export function StockScreen() {
         />
 
         {searching && (
-          <p className="text-sm text-neutral-600">
+          <p className="text-sm text-text-secondary">
             {filtered.length > 0
               ? t('stock.showing_results', { count: filtered.length, query: debouncedSearch })
               : t('stock.no_results', { query: debouncedSearch })}
           </p>
         )}
         {searching && filtered.length === 0 && (
-          <p className="text-caption text-neutral-500">{t('stock.no_results_hint')}</p>
+          <p className="text-caption text-text-tertiary">{t('stock.no_results_hint')}</p>
         )}
 
-        {movementsQ.isError && <p className="text-danger-600 text-body-sm">{t('error_load')}</p>}
+        {movementsQ.isError && <p className="text-outward text-body-sm">{t('error_load')}</p>}
 
         {!movementsQ.isPending && !searching && flatItems.length === 0 && (
           <div className="card w-full py-8 text-center">
-            <p className="text-body-sm text-neutral-700">{t('stock.empty_movements')}</p>
-            <p className="mt-1 text-caption text-neutral-500">{t('stock.empty_movements_hint')}</p>
+            <p className="text-body-sm text-text-secondary">{t('stock.empty_movements')}</p>
+            <p className="mt-1 text-caption text-text-tertiary">{t('stock.empty_movements_hint')}</p>
           </div>
         )}
 
@@ -202,15 +201,15 @@ export function StockScreen() {
                 className="flex w-full min-h-touch items-center gap-2 text-left"
                 onClick={() => toggleSection(key)}
               >
-                <span className="text-label font-semibold tracking-wide text-neutral-500">
+                <span className="font-mono text-[11px] font-medium uppercase tracking-[0.1em] text-text-tertiary">
                   {sectionLabel(key)}
                 </span>
                 {open ? (
-                  <ChevronDown className="h-4 w-4 text-neutral-400" aria-hidden />
+                  <ChevronDown className="h-4 w-4 text-text-tertiary" aria-hidden />
                 ) : (
-                  <ChevronRight className="h-4 w-4 text-neutral-400" aria-hidden />
+                  <ChevronRight className="h-4 w-4 text-text-tertiary" aria-hidden />
                 )}
-                <span className="text-sm text-neutral-500">({items.length})</span>
+                <span className="text-sm text-text-tertiary">({items.length})</span>
               </button>
               {open && (
                 <ul className="flex flex-col gap-2">
@@ -226,13 +225,13 @@ export function StockScreen() {
         })}
 
         <div ref={loadMoreRef} className="h-4 w-full" aria-hidden />
-        {isFetchingNext && <p className="text-center text-caption text-neutral-500">{t('loading')}</p>}
+        {isFetchingNext && <p className="text-center text-caption text-text-tertiary">{t('loading')}</p>}
       </div>
 
       <button
         type="button"
-        className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px)+16px)] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full text-white shadow-lg lg:bottom-8 lg:right-[max(1.5rem,calc(50%-min(40rem,50vw)+1rem))]"
-        style={{ backgroundColor: GREEN, boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }}
+        className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px)+16px)] right-4 z-30 flex h-12 w-12 items-center justify-center rounded-full bg-brand-ui text-white shadow-lg lg:bottom-8 lg:right-[max(1.5rem,calc(50%-min(40rem,50vw)+1rem))]"
+        style={{ boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }}
         aria-label={t('stock.record_title')}
         onClick={() => setRecordOpen(true)}
       >

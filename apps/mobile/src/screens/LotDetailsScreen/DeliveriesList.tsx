@@ -9,10 +9,10 @@ export function DeliveriesList({ deliveries }: { deliveries: LotDetailDeliveryRo
   if (deliveries.length === 0) {
     return (
       <VStack space="sm" px="$4" py="$10" alignItems="center">
-        <Text fontSize="$md" fontWeight="$medium" color="$textLight900" textAlign="center">
+        <Text fontSize="$md" fontWeight="$medium" color="$textPrimary" textAlign="center">
           {t('lot_detail.deliveries_empty_title')}
         </Text>
-        <Text fontSize="$sm" color="$dashboardMuted" textAlign="center">
+        <Text fontSize="$sm" color="$textTertiary" textAlign="center">
           {t('lot_detail.deliveries_empty_body')}
         </Text>
       </VStack>
@@ -30,20 +30,20 @@ export function DeliveriesList({ deliveries }: { deliveries: LotDetailDeliveryRo
           <Box
             key={d.id}
             borderWidth={1}
-            borderColor="#E2E4E8"
+            borderColor="#E5DED2"
             borderRadius="$lg"
             bg="$white"
             p="$3"
           >
-            <Text fontSize="$md" fontWeight="$semibold" color="$textLight900">
+            <Text fontSize="$md" fontWeight="$semibold" color="$textPrimary">
               {formatYmdLong(d.delivery_date)}
             </Text>
-            <Text mt="$1" fontSize="$sm" color="$dashboardMuted">
+            <Text mt="$1" fontSize="$sm" color="$textTertiary">
               {meta}
               {driverPart}
             </Text>
             {vehicle && vehicle.length > 0 ? (
-              <Text mt="$0.5" fontSize="$sm" color="$dashboardMuted">
+              <Text mt="$0.5" fontSize="$sm" color="$textTertiary">
                 {t('lot_detail.vehicle')}: {vehicle}
               </Text>
             ) : null}

@@ -23,8 +23,8 @@ export function TransactionDetailScreen({ navigation, route }: Props) {
   if (q.isPending) {
     return (
       <Box flex={1} justifyContent="center" alignItems="center" bg="$white">
-        <ActivityIndicator size="large" color="#00B14F" />
-        <Text mt="$3" color="$dashboardMuted">
+        <ActivityIndicator size="large" color="#C8712A" />
+        <Text mt="$3" color="$textTertiary">
           {t('loading')}
         </Text>
       </Box>
@@ -36,7 +36,7 @@ export function TransactionDetailScreen({ navigation, route }: Props) {
       <Box flex={1} p="$4" pt={insets.top + 12} bg="$white" justifyContent="center">
         <Text color="$red600">{t('error_load')}</Text>
         <Pressable mt="$4" onPress={() => navigation.goBack()}>
-          <Text color="$primary600" fontWeight="$semibold">
+          <Text color="$brandUiHover" fontWeight="$semibold">
             {t('money.back_to_money')}
           </Text>
         </Pressable>
@@ -52,7 +52,7 @@ export function TransactionDetailScreen({ navigation, route }: Props) {
 
   const meta =
     q.dataUpdatedAt > 0 ? (
-      <Text fontSize="$xs" color="#6B7280" textAlign="center" mt="$2" px="$3">
+      <Text fontSize="$xs" color="#7A6F61" textAlign="center" mt="$2" px="$3">
         {t('transaction_detail.updated_ago', { time: formatUpdatedAgo(q.dataUpdatedAt) })}
       </Text>
     ) : null;
@@ -63,7 +63,7 @@ export function TransactionDetailScreen({ navigation, route }: Props) {
       alignItems="center"
       justifyContent="space-between"
       borderBottomWidth={1}
-      borderBottomColor="#E2E4E8"
+      borderBottomColor="#E5DED2"
       bg="$white"
       px="$2"
       style={{ paddingTop: Math.max(insets.top, 8) }}
@@ -79,7 +79,7 @@ export function TransactionDetailScreen({ navigation, route }: Props) {
         justifyContent="center"
         alignItems="center"
       >
-        <Text fontSize="$lg" color="$dashboardLodged" fontWeight="$medium">
+        <Text fontSize="$lg" color="$inward" fontWeight="$medium">
           ←
         </Text>
       </Pressable>
@@ -88,7 +88,7 @@ export function TransactionDetailScreen({ navigation, route }: Props) {
         textAlign="center"
         fontSize={18}
         fontWeight="$semibold"
-        color="$textLight900"
+        color="$textPrimary"
         numberOfLines={1}
         px="$1"
       >
@@ -96,7 +96,7 @@ export function TransactionDetailScreen({ navigation, route }: Props) {
       </Text>
       <HStack alignItems="center" minWidth={48} justifyContent="flex-end">
         {isOffline ? (
-          <Text fontSize={11} color="#DC2626" fontWeight="$semibold" numberOfLines={1} mr="$1">
+          <Text fontSize={11} color="#A83422" fontWeight="$semibold" numberOfLines={1} mr="$1">
             {t('transaction_detail.offline')}
           </Text>
         ) : null}
@@ -113,7 +113,7 @@ export function TransactionDetailScreen({ navigation, route }: Props) {
           alignItems="center"
           opacity={0.35}
         >
-          <Text fontSize="$xl" color="$dashboardMuted">
+          <Text fontSize="$xl" color="$textTertiary">
             ⋮
           </Text>
         </Pressable>

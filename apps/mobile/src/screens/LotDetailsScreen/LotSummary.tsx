@@ -6,10 +6,10 @@ import { useTranslation } from 'react-i18next';
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <VStack space="xs">
-      <Text fontSize="$sm" color="$dashboardMuted">
+      <Text fontSize="$sm" color="$textTertiary">
         {label}
       </Text>
-      <Text fontSize="$md" fontWeight="$semibold" color="$textLight900">
+      <Text fontSize="$md" fontWeight="$semibold" color="$textPrimary">
         {value}
       </Text>
     </VStack>
@@ -31,10 +31,10 @@ export function LotSummary({ data }: { data: LotDetailData }) {
 
   const borderColor =
     status === 'completed' || status === 'fresh'
-      ? '#16A34A'
+      ? '#0B7B6E'
       : status === 'aging'
-        ? '#F59E0B'
-        : '#DC2626';
+        ? '#7B5200'
+        : '#A83422';
 
   const lodgedDate = formatYmdLong(data.lodgement_date);
   const lodgedLine = t('lot_detail.lodged_line', { bags: data.original_bags, date: lodgedDate });
@@ -49,8 +49,8 @@ export function LotSummary({ data }: { data: LotDetailData }) {
       : t('lot_detail.status_days', { label: statusLabel, days: daysSinceLodgement });
 
   return (
-    <Box bg="$dashboardSurface" borderRadius="$lg" p="$4">
-      <Text fontSize="$sm" fontWeight="$medium" color="$dashboardMuted" textTransform="uppercase">
+    <Box bg="$bgSurface" borderRadius="$lg" p="$4">
+      <Text fontSize="$sm" fontWeight="$medium" color="$textTertiary" textTransform="uppercase">
         {t('lot_detail.summary_title')}
       </Text>
       <VStack space="sm" mt="$3">
@@ -64,7 +64,7 @@ export function LotSummary({ data }: { data: LotDetailData }) {
         <Row label={t('lot_detail.delivered')} value={deliveredLine} />
         <Row label={t('lot_detail.balance')} value={t('lot_detail.bags_count', { count: data.balance_bags })} />
         <VStack space="xs">
-          <Text fontSize="$sm" color="$dashboardMuted">
+          <Text fontSize="$sm" color="$textTertiary">
             {t('lot_detail.status')}
           </Text>
           <Box

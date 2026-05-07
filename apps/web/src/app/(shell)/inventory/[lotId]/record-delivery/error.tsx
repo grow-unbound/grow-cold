@@ -11,8 +11,8 @@ export default function RecordDeliveryError({ error, reset }: { error: Error; re
 
   return (
     <div className="card w-full max-w-[560px]">
-      <h2 className="text-lg font-semibold text-neutral-900">{t('error_load')}</h2>
-      <p className="mt-2 text-body-sm text-danger-600">{error.message}</p>
+      <h2 className="text-lg font-semibold text-text-primary">{t('error_load')}</h2>
+      <p className="mt-2 text-body-sm text-outward">{error.message}</p>
       <div className="mt-4 flex flex-wrap gap-2">
         <button type="button" className="btn-primary min-h-touch" onClick={reset}>
           {t('try_again')}

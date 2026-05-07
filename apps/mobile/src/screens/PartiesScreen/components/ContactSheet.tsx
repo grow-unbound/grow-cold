@@ -30,10 +30,10 @@ export function ContactSheet({ isOpen, onClose, code, phone }: Props) {
     <Actionsheet isOpen={isOpen} onClose={onClose}>
       <ActionsheetBackdrop onPress={onClose} />
       <ActionsheetContent px="$4" pb="$8">
-        <Text fontSize={18} fontWeight="$semibold" color="$textLight900" mb="$1">
+        <Text fontSize={18} fontWeight="$semibold" color="$textPrimary" mb="$1">
           {t('parties.contact_title', { code })}
         </Text>
-        <Text size="sm" color="$textLight600" mb="$3">
+        <Text size="sm" color="$textSecondary" mb="$3">
           {phone}
         </Text>
         <ActionsheetItem
@@ -42,7 +42,7 @@ export function ContactSheet({ isOpen, onClose, code, phone }: Props) {
             onClose();
           }}
         >
-          <ActionsheetItemText fontSize={16} color="#0891B2">
+          <ActionsheetItemText fontSize={16} color="#A83422">
             {t('parties.call')}
           </ActionsheetItemText>
         </ActionsheetItem>
@@ -53,13 +53,13 @@ export function ContactSheet({ isOpen, onClose, code, phone }: Props) {
               onClose();
             }}
           >
-            <ActionsheetItemText fontSize={16} color="#0891B2">
+            <ActionsheetItemText fontSize={16} color="#A83422">
               {t('parties.whatsapp')}
             </ActionsheetItemText>
           </ActionsheetItem>
         ) : null}
         <ActionsheetItem onPress={onClose}>
-          <ActionsheetItemText fontSize={16} color="#374151">
+          <ActionsheetItemText fontSize={16} color="#4A4237">
             {t('parties.cancel')}
           </ActionsheetItemText>
         </ActionsheetItem>

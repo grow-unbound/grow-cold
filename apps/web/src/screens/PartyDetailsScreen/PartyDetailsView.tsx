@@ -40,7 +40,7 @@ export function PartyDetailsView({ warehouseId, customerId }: Props) {
   if (!warehouseId) {
     return (
       <div className="card w-full max-w-3xl lg:max-w-5xl">
-        <p className="text-body-sm text-neutral-600">{t('select_warehouse')}</p>
+        <p className="text-body-sm text-text-secondary">{t('select_warehouse')}</p>
       </div>
     );
   }
@@ -48,7 +48,7 @@ export function PartyDetailsView({ warehouseId, customerId }: Props) {
   if (isLoading) {
     return (
       <div className="mx-auto w-full max-w-3xl px-3 py-6 lg:max-w-5xl lg:px-6">
-        <p className="text-body-sm text-neutral-600">{t('loading')}</p>
+        <p className="text-body-sm text-text-secondary">{t('loading')}</p>
       </div>
     );
   }
@@ -59,7 +59,7 @@ export function PartyDetailsView({ warehouseId, customerId }: Props) {
         <Link href="/parties" className="text-sm font-medium text-cyan-700">
           ← {t('back')}
         </Link>
-        <p className="mt-4 text-body-sm text-danger-600">{t('error_load')}</p>
+        <p className="mt-4 text-body-sm text-outward">{t('error_load')}</p>
       </div>
     );
   }
@@ -71,7 +71,7 @@ export function PartyDetailsView({ warehouseId, customerId }: Props) {
 
   return (
     <div className="mx-auto w-full max-w-3xl lg:max-w-5xl">
-      <div className="sticky top-0 z-30 border-b border-neutral-200 bg-white">
+      <div className="sticky top-0 z-30 border-b border-border bg-white">
         <div className="flex h-14 items-center gap-2 px-2 sm:px-3">
           <Link
             href="/parties"
@@ -80,12 +80,12 @@ export function PartyDetailsView({ warehouseId, customerId }: Props) {
           >
             ←
           </Link>
-          <h1 className="min-w-0 flex-1 truncate text-center text-lg font-semibold text-neutral-900">
+          <h1 className="min-w-0 flex-1 truncate text-center text-lg font-semibold text-text-primary">
             {data.customerCode}
           </h1>
           <button
             type="button"
-            className="flex min-h-touch min-w-touch shrink-0 items-center justify-center rounded-lg px-2 text-neutral-400"
+            className="flex min-h-touch min-w-touch shrink-0 items-center justify-center rounded-lg px-2 text-text-tertiary"
             disabled
             aria-disabled="true"
             aria-label={t('parties.party_detail.menu_aria')}
@@ -95,7 +95,7 @@ export function PartyDetailsView({ warehouseId, customerId }: Props) {
           </button>
         </div>
         <div
-          className="flex border-t border-neutral-100 px-2 sm:px-3"
+          className="flex border-t border-border px-2 sm:px-3"
           role="tablist"
           aria-label={t('parties.party_detail.tabs_aria')}
         >
@@ -109,7 +109,7 @@ export function PartyDetailsView({ warehouseId, customerId }: Props) {
                 aria-selected={active}
                 className={cn(
                   'min-h-touch flex-1 border-b-[3px] py-3 text-sm font-medium transition-colors',
-                  active ? 'border-dashboard-lodged text-dashboard-lodged' : 'border-transparent text-neutral-500',
+                  active ? 'border-dashboard-lodged text-dashboard-lodged' : 'border-transparent text-text-tertiary',
                 )}
                 onClick={() => setTab(x.id)}
               >
